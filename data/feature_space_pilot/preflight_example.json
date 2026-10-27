@@ -1,40 +1,9 @@
 {
   "human": {
-    "accounted_usd": 0,
-    "actual_plannable_generation_jobs": 324,
-    "blockers": [
-      "Human source gate (harpaintner_2018): Publisher/PMC supplement endpoints returned HTML challenge pages or 404. No materialized reference or exact columns verified.",
-      "Human source gate (vinson_2008): Human reference must be verified from the source and codebook",
-      "Human source sample is not frozen at the declared size",
-      "Missing verified human source for vinson_2008",
-      "No verified human source data",
-      "P0 requires verified participant instructions for vinson_2008",
-      "generator model/price gate: Pinned hosted frontier model ID and revision required",
-      "judge model/price gate: Pinned hosted frontier model ID and revision required"
-    ],
-    "budget_cap_usd": 100,
-    "capability_deviations": [
-      "generator: seed omitted by frozen provider capability policy",
-      "generator: temperature omitted by frozen provider capability policy",
-      "judge: seed omitted by frozen provider capability policy",
-      "judge: temperature omitted by frozen provider capability policy"
-    ],
+    "stage": "human",
     "demo": false,
-    "design_hash": "55139f9cb2e15e5d9a036499a199bc971c36392c3794fdd8eea3ed04cb5325d0",
-    "estimates": {},
-    "generation_jobs": 540,
-    "judgment_cells_upper_bound": 12000,
-    "live_ready": false,
-    "preflight_hash": "44b8a60c686a72dd9659da69e935aff8362cfa091811f62df4e58834d12bb188",
-    "prompt_hashes": {
-      "P0.txt": "84c77574b765785975efb6c32fae9fbb1f3a1e33e1db7b5ff1abdfc80fc9d944",
-      "P0_harpaintner.txt": "fe3208ea79605111f2bbca49dda57fd2182732fd9d3b18a42a0272b4365cbb8e",
-      "P1.txt": "136898fa16b4a328158db5ad637d570c57513ed5c2201cbb04bef5cddb343d06",
-      "P2.txt": "3f3e6bb745106f5f98a5472dbf02587b713d3b8906796609728309940e98f45f",
-      "binary_v1.txt": "18825161634d12ce02743c6885309e4e7ebcfcb673fa25186ec7591a0953114f"
-    },
-    "remaining_usd": 100,
-    "remaining_worst_case_usd": null,
+    "design_hash": "a810c81c13d7519cb1e514dc3fe1315a26a96bd8a368ff004d98343b570ebb36",
+    "preflight_hash": "13ef1da69cee1c6039f899b29795483a1f3bf71f2cd785998aa9cd7ae51603eb",
     "selected_item_count": 36,
     "selected_item_ids": [
       "vv_actionN_ascent",
@@ -74,6 +43,77 @@
       "vv_object_potato",
       "vv_object_thumb"
     ],
+    "generation_jobs": 540,
+    "actual_plannable_generation_jobs": 324,
+    "judgment_cells_upper_bound": 12000,
+    "estimates": {
+      "generation": {
+        "calls": 540,
+        "attempts_with_retries": 1080,
+        "input_tokens_per_attempt": 30000,
+        "output_tokens_per_attempt": 1000,
+        "worst_case_usd": 75.60000000000001,
+        "prices": {
+          "input_per_million": 2,
+          "model_id": "gpt-6.1-sol",
+          "output_per_million": 10,
+          "revision": "gpt-6.1-sol",
+          "source_url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+          "verified_at": "2026-10-26"
+        },
+        "remaining_attempts_upper_bound": 1080,
+        "remaining_worst_case_usd": 75.60000000000001
+      },
+      "judgment": {
+        "calls": 12000,
+        "attempts_with_retries": 24000,
+        "input_tokens_per_attempt": 30000,
+        "output_tokens_per_attempt": 1000,
+        "worst_case_usd": 1680.0000000000002,
+        "prices": {
+          "input_per_million": 2,
+          "model_id": "gpt-6.1-sol",
+          "output_per_million": 10,
+          "revision": "gpt-6.1-sol",
+          "source_url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+          "verified_at": "2026-10-26"
+        },
+        "remaining_attempts_upper_bound": 24000,
+        "remaining_worst_case_usd": 1680.0000000000002
+      }
+    },
+    "worst_case_usd": 1755.6000000000001,
+    "remaining_worst_case_usd": 1755.6000000000001,
+    "budget_cap_usd": 100,
+    "blockers": [
+      "Human source gate (harpaintner_2018): Publisher/PMC supplement endpoints returned HTML challenge pages or 404. No materialized reference or exact columns verified.",
+      "Human source gate (vinson_2008): Human reference must be verified from the source and codebook",
+      "Human source sample is not frozen at the declared size",
+      "Missing verified human source for vinson_2008",
+      "No verified human source data",
+      "P0 requires verified participant instructions for vinson_2008",
+      "Remaining plan plus prior cumulative liabilities exceeds budget",
+      "Worst-case plan exceeds cumulative budget",
+      "judgment remaining plan plus prior cumulative liabilities exceeds stage budget",
+      "judgment worst-case estimate exceeds stage budget; freeze a smaller bank/design"
+    ],
+    "warnings": [],
+    "accounted_usd": 0,
+    "remaining_usd": 100,
+    "capability_deviations": [
+      "generator: seed omitted by frozen provider capability policy",
+      "generator: temperature omitted by frozen provider capability policy",
+      "judge: seed omitted by frozen provider capability policy",
+      "judge: temperature omitted by frozen provider capability policy"
+    ],
+    "prompt_hashes": {
+      "P0.txt": "84c77574b765785975efb6c32fae9fbb1f3a1e33e1db7b5ff1abdfc80fc9d944",
+      "P0_harpaintner.txt": "fe3208ea79605111f2bbca49dda57fd2182732fd9d3b18a42a0272b4365cbb8e",
+      "P1.txt": "136898fa16b4a328158db5ad637d570c57513ed5c2201cbb04bef5cddb343d06",
+      "P2.txt": "3f3e6bb745106f5f98a5472dbf02587b713d3b8906796609728309940e98f45f",
+      "binary_v1.txt": "18825161634d12ce02743c6885309e4e7ebcfcb673fa25186ec7591a0953114f"
+    },
+    "source_hashes": {},
     "source_code_hashes": {
       "__init__.py": "1b21260acfae39d5a4241fdcdd5431f949a1ab39b951ddc413721b756f593bf9",
       "bank.py": "4493c0b9e6bc1ed76123d32c239d9710f88431f7532423bfd34f1b9b557cddb1",
@@ -95,41 +135,13 @@
       "run.py": "60f3c4f9346944ea2c48139f4ec1bc0f2773d789bb5ece714c90d241175fedbf",
       "source_adapters.py": "5eb8e3ff00aa150f18ba669788591fd9f22421cfba141faab4170ddfd94e5030"
     },
-    "source_hashes": {},
-    "stage": "human",
-    "warnings": [],
-    "worst_case_usd": null
+    "live_ready": false
   },
   "tasks": {
-    "accounted_usd": 0,
-    "actual_plannable_generation_jobs": 135,
-    "blockers": [
-      "generator model/price gate: Pinned hosted frontier model ID and revision required",
-      "judge model/price gate: Pinned hosted frontier model ID and revision required"
-    ],
-    "budget_cap_usd": 100,
-    "capability_deviations": [
-      "generator: seed omitted by frozen provider capability policy",
-      "generator: temperature omitted by frozen provider capability policy",
-      "judge: seed omitted by frozen provider capability policy",
-      "judge: temperature omitted by frozen provider capability policy"
-    ],
+    "stage": "tasks",
     "demo": false,
-    "design_hash": "6da20579da8fb6292a825738f214257a281cf9f5826597dfe9933f16d343e99f",
-    "estimates": {},
-    "generation_jobs": 135,
-    "judgment_cells_upper_bound": 3000,
-    "live_ready": false,
-    "preflight_hash": "9ae5e701451d2219a229bfe2de8f5a9273a0bb61a222aec03303edafd5cd2abf",
-    "prompt_hashes": {
-      "P0.txt": "84c77574b765785975efb6c32fae9fbb1f3a1e33e1db7b5ff1abdfc80fc9d944",
-      "P0_harpaintner.txt": "fe3208ea79605111f2bbca49dda57fd2182732fd9d3b18a42a0272b4365cbb8e",
-      "P1.txt": "136898fa16b4a328158db5ad637d570c57513ed5c2201cbb04bef5cddb343d06",
-      "P2.txt": "3f3e6bb745106f5f98a5472dbf02587b713d3b8906796609728309940e98f45f",
-      "binary_v1.txt": "18825161634d12ce02743c6885309e4e7ebcfcb673fa25186ec7591a0953114f"
-    },
-    "remaining_usd": 100,
-    "remaining_worst_case_usd": null,
+    "design_hash": "99c7af328e705735e1073230703695844efacb6c83ab7203288361d61c4175a5",
+    "preflight_hash": "de36f51095561e746d0b48f7e5e354edf86c1d9a19c94d3268e75fb4ae504cd2",
     "selected_item_count": 15,
     "selected_item_ids": [
       "S_deadline",
@@ -148,6 +160,71 @@
       "finance_S_review",
       "finance_S_both"
     ],
+    "generation_jobs": 135,
+    "actual_plannable_generation_jobs": 135,
+    "judgment_cells_upper_bound": 3000,
+    "estimates": {
+      "generation": {
+        "calls": 135,
+        "attempts_with_retries": 270,
+        "input_tokens_per_attempt": 30000,
+        "output_tokens_per_attempt": 1000,
+        "worst_case_usd": 18.900000000000002,
+        "prices": {
+          "input_per_million": 2,
+          "model_id": "gpt-6.1-sol",
+          "output_per_million": 10,
+          "revision": "gpt-6.1-sol",
+          "source_url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+          "verified_at": "2026-10-26"
+        },
+        "remaining_attempts_upper_bound": 270,
+        "remaining_worst_case_usd": 18.900000000000002
+      },
+      "judgment": {
+        "calls": 3000,
+        "attempts_with_retries": 6000,
+        "input_tokens_per_attempt": 30000,
+        "output_tokens_per_attempt": 1000,
+        "worst_case_usd": 420.00000000000006,
+        "prices": {
+          "input_per_million": 2,
+          "model_id": "gpt-6.1-sol",
+          "output_per_million": 10,
+          "revision": "gpt-6.1-sol",
+          "source_url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
+          "verified_at": "2026-10-26"
+        },
+        "remaining_attempts_upper_bound": 6000,
+        "remaining_worst_case_usd": 420.00000000000006
+      }
+    },
+    "worst_case_usd": 438.90000000000003,
+    "remaining_worst_case_usd": 438.90000000000003,
+    "budget_cap_usd": 100,
+    "blockers": [
+      "Remaining plan plus prior cumulative liabilities exceeds budget",
+      "Worst-case plan exceeds cumulative budget",
+      "judgment remaining plan plus prior cumulative liabilities exceeds stage budget",
+      "judgment worst-case estimate exceeds stage budget; freeze a smaller bank/design"
+    ],
+    "warnings": [],
+    "accounted_usd": 0,
+    "remaining_usd": 100,
+    "capability_deviations": [
+      "generator: seed omitted by frozen provider capability policy",
+      "generator: temperature omitted by frozen provider capability policy",
+      "judge: seed omitted by frozen provider capability policy",
+      "judge: temperature omitted by frozen provider capability policy"
+    ],
+    "prompt_hashes": {
+      "P0.txt": "84c77574b765785975efb6c32fae9fbb1f3a1e33e1db7b5ff1abdfc80fc9d944",
+      "P0_harpaintner.txt": "fe3208ea79605111f2bbca49dda57fd2182732fd9d3b18a42a0272b4365cbb8e",
+      "P1.txt": "136898fa16b4a328158db5ad637d570c57513ed5c2201cbb04bef5cddb343d06",
+      "P2.txt": "3f3e6bb745106f5f98a5472dbf02587b713d3b8906796609728309940e98f45f",
+      "binary_v1.txt": "18825161634d12ce02743c6885309e4e7ebcfcb673fa25186ec7591a0953114f"
+    },
+    "source_hashes": {},
     "source_code_hashes": {
       "__init__.py": "1b21260acfae39d5a4241fdcdd5431f949a1ab39b951ddc413721b756f593bf9",
       "bank.py": "4493c0b9e6bc1ed76123d32c239d9710f88431f7532423bfd34f1b9b557cddb1",
@@ -169,9 +246,6 @@
       "run.py": "60f3c4f9346944ea2c48139f4ec1bc0f2773d789bb5ece714c90d241175fedbf",
       "source_adapters.py": "5eb8e3ff00aa150f18ba669788591fd9f22421cfba141faab4170ddfd94e5030"
     },
-    "source_hashes": {},
-    "stage": "tasks",
-    "warnings": [],
-    "worst_case_usd": null
+    "live_ready": false
   }
 }

@@ -2,7 +2,7 @@
 
 The standalone pilot is implemented in `feature_space_pilot/` and uses hosted, OpenAI-compatible frontier-model APIs. The offline workflow needs only Python, NumPy, SciPy, and pytest.
 
-Generator and judge model IDs are deliberately **unselected**, as requested. No paid model calls were made during implementation. A synthetic offline run demonstrates the engineering workflow; it is not a scientific benchmark result.
+Generator and judge now default to **GPT-6.1 Sol (`gpt-6.1-sol`), low reasoning**, per the latest user request. Three repetitions and the $100 live cap remain unchanged. No paid model calls were made during implementation. A synthetic offline run demonstrates the engineering workflow; it is not a scientific benchmark result.
 
 ## Quick start
 
@@ -55,7 +55,7 @@ Edit `generator` and `judge` independently in `configs/feature_space_pilot.json`
 | `reasoning_effort` | Optional provider-supported setting |
 | `prices` | Model-specific table described below |
 
-`prices` must include `model_id`, `revision`, numeric `input_per_million`, numeric `output_per_million`, `verified_at`, and `source_url`. Model/revision must match the associated role. Verify current provider pricing and account availability before setting these values; no default dollar rates are asserted. Counts and conservative upper bounds are reported instead of unsupported price estimates.
+`prices` must include `model_id`, `revision`, numeric `input_per_million`, numeric `output_per_million`, `verified_at`, and `source_url`. Model/revision must match the associated role. The checked default is standard GPT-6.1 Sol pricing of $2 input / $10 output per million tokens, verified 2026-10-26 against the official model page. Reverify pricing and account availability before paid work. The provider currently lists an undated identifier; `snapshot_note` explicitly records that limitation, and actual response model/fingerprint are logged. No immutable-weight revision is invented. Counts and conservative upper bounds are reported instead of unsupported price estimates.
 
 The adapter uses HTTPS Chat Completions, strict `response_format.json_schema`, and `max_completion_tokens`. The selected provider must support that contract. Native Anthropic/Gemini request formats require a separately verified adapter; merely changing the base URL does not make them compatible. The live runner loads the configured API-key variables from the project-root `.env` after source/model/budget preflight passes and before any artifact or reservation is created. Nonempty exported variables take precedence. Values are literal; `.env` content is never executed as shell code. Only the generator/judge variables named by `api_key_env` are loaded. Dry runs, reports and offline demos do not read credentials. Actual values are never stored in configs, prompts, manifests or logs; inline keys are rejected. The official [structured-output documentation](https://developers.openai.com/api/docs/guides/structured-outputs) was inspected for this adapter.
 
@@ -81,7 +81,7 @@ python -m feature_space_pilot.run --config configs/feature_space_pilot.json --st
 
 The human command uses `--stage human` and additionally requires all source/sample/protocol gates. The explicit preflight hash is an addition to the PRD CLI; it ensures that the reviewed dry run matches the current frozen design and remaining-spend bound. A changed prior balance requires a fresh dry run. The implementation never starts a paid run implicitly. The default task stage now plans 135 generation calls (15 targets × 3 families × 3 repetitions), 70% fewer than the original 450-call design. The binary-judgment upper bound is still 3,000 cells; fewer generation repetitions do not guarantee the same percentage reduction in total cost. See `data/feature_space_pilot/sampling_amendment.json` for the frozen amendment.
 
-The cumulative pilot cap is at most **$500**, with stage ceilings of $120 generation, $220 judgments, $80 adjudication, $30 embeddings, $50 reserve. All live stages share `budget_live.jsonl` under the configured artifact root. Keep that root/ledger for the entire pilot; a new directory is not a new spending allowance. No automated paid merge/adjudication/embedding calls are currently scheduled; those stage allocations are retained for a separately preflighted extension. Reviews are manual; embeddings are imported as pinned artifacts.
+The current cumulative pilot cap is **$100**, with an enforced maximum of **$500**, with stage ceilings of $120 generation, $220 judgments, $80 adjudication, $30 embeddings, $50 reserve. All live stages share `budget_live.jsonl` under the configured artifact root. Keep that root/ledger for the entire pilot; a new directory is not a new spending allowance. No automated paid merge/adjudication/embedding calls are currently scheduled; those stage allocations are retained for a separately preflighted extension. Reviews are manual; embeddings are imported as pinned artifacts.
 
 Each attempt is reserved and fsynced **before** transmission. Failed parses are charged from returned usage and retained before a separately reserved retry. Unknown usage/timeouts retain the full reservation. Missing/invalid usage or an over-reservation provider response halts execution; an overage records the actual cost. Provider invoices remain the authority for billing; the ledger is a conservative token-based estimate. Provider errors are logged by class rather than potentially sensitive error bodies. There are no hidden SDK retries or response caches.
 
@@ -146,3 +146,7 @@ Rerun the same stage with reviewed evaluation inputs to refresh reports without 
 `DATA_DICTIONARY.md` describes every artifact. `scratchpad_feature_space_pilot.md` contains incremental RED → GREEN → REFACTOR evidence, source decisions, failures, spending and resume instructions. No scientific run is considered complete merely because tests pass. The automatic decision memo keeps the synthetic demo at **revise before scale-up**.
 
 `registry.py`/`fixtures.py`: validated stimuli and synthetic inputs. `references.py`/`source_adapters.py`: evaluation-only sources. `prompts.py`/`planner.py`: isolation and independent jobs. `clients.py`/`budget.py`/`engine.py`: hosted requests, reservations and checkpoints. `bank.py`/`judge.py`: canonical candidates and binary matrices. `metrics.py`/`composition.py`/`report.py`: analyses, audits and reports.
+
+## Visualization
+
+The separate read-only explorer and static exporter are documented in `VISUALIZATION_EXPLORER.md`. They operate on existing artifacts without reading `.env`, changing judgments or running the API pipeline. Install `requirements-feature-space-viz.txt` for the full test suite and explorer.

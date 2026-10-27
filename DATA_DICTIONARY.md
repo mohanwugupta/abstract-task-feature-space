@@ -41,3 +41,12 @@ All run artifacts live under `artifacts/feature_space_pilot/<run_id>/`. Text use
 `budget_live.jsonl` and `budget_demo.jsonl` sit above individual run folders. `reserve` entries bind a ticket/job/stage to a worst-case USD liability; `settle` entries replace the reservation with provider-token cost; `overage` records actual cost and stops execution. Unknown usage remains reserved. The adjacent lock file coordinates processes. Keep a single live ledger across the entire pilot.
 
 Source inventory and selection files live in `data/feature_space_pilot/`; retain raw norm files read-only and separately from model prompts.
+
+
+## Read-only visualization artifacts
+
+`feature_space_pilot.viz` reads one verified run and writes separately under `artifacts/feature_space_visualizations/<run_id>/v1/`. `figure_manifest.json` records the exact source-manifest digest, evaluation fingerprint, visualization module hashes, renderer versions, analysis config/seed, selected counts, captions and underlying-data digests. Source runs and references are never resealed or altered.
+
+The offline `index.html` gallery links PNG/SVG/PDF, tidy JSON/CSV, and `feature_inspector.html` (canonical propositions, source phrases/items/prompts/replicates, full target text, independent evidence and merge/manual-review provenance). Synthetic exports have `synthetic_` filenames and an explicit nonempirical banner. Gated or integrity-blocked figures get status pages rather than fabricated values.
+
+Interactive/export state semantics: `1` applicable, `0` independently judged inapplicable, `?` unresolved/missing, `N/A` outside declared scope. Excluded candidates remain unjudged proposals; origin filters do not relabel applicability. See `VISUALIZATION_EXPLORER.md` for exact commands and interpretation rules.

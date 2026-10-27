@@ -1,0 +1,7 @@
+-r requirements-feature-space-pilot.txt
+# Optional offline explorer/export stack, verified together on Python 3.11.
+streamlit==1.57.0
+plotly==7.1.0
+matplotlib==3.10.5
+pandas==2.3.2
+Pillow==11.3.0

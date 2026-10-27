@@ -9,13 +9,35 @@ The pipeline provides isolated feature discovery, conservative candidate consoli
 Requires Python 3.11. No API credentials or GPU are needed.
 
 ```bash
-python -m pip install -r requirements-feature-space-pilot.txt
+python -m pip install -r requirements-feature-space-viz.txt
 python -m feature_space_pilot.run --config configs/feature_space_pilot.json --stage all --demo
 python -m feature_space_pilot.report --config configs/feature_space_pilot.json
 python -m pytest -q tests/feature_space_pilot
 ```
 
 The full synthetic demonstration runs 675 generation requests (three repetitions per target and prompt family) and produces a complete binary matrix, composition audits, cost accounting, and a hashed manifest under `artifacts/feature_space_pilot/`. Synthetic results validate the engineering workflow; they are not human benchmark findings. The three-repetition default follows the [user sampling amendment](data/feature_space_pilot/sampling_amendment.json), replacing the original PRD’s ten-repetition plan.
+
+## Offline visualization explorer
+
+Install the pinned explorer dependencies, then point it at **one existing frozen run**:
+
+```bash
+python -m pip install -r requirements-feature-space-viz.txt
+streamlit run feature_space_pilot/viz/app.py -- --run-dir artifacts/feature_space_pilot/YOUR_RUN_ID
+```
+
+The default Task Atlas compares creative writing and reconciliation with full proposition text. Other pages cover all six compositions, a four-state matrix, pooled feature discovery, gated human/embedding comparisons, and exact provenance/evidence inspection. Filters on discovery origin never redefine applicability. No API key, network access, model calls, or study execution is needed after dependencies are installed.
+
+Use **Export publication figures** in the app to create the gallery and download its ZIP bundle. For a gallery and paper/slide figures without starting a server:
+
+```bash
+python -m feature_space_pilot.viz.cli --run-dir artifacts/feature_space_pilot/YOUR_RUN_ID --inventory
+python -m feature_space_pilot.viz.cli --run-dir artifacts/feature_space_pilot/YOUR_RUN_ID
+```
+
+Open [the example offline gallery](artifacts/feature_space_visualizations/demo_all_cebc8c4d0142b011/v1/index.html) after rendering that example run, or `artifacts/feature_space_visualizations/YOUR_RUN_ID/v1/index.html` for your selected run. Generated PNG (220 DPI), SVG and PDF files, tidy data, a feature evidence inspector and `figure_manifest.json` stay outside the read-only source run. Synthetic filenames/banner distinguish engineering fixtures from empirical results. Human/embedding panels require verified aligned inputs; unavailable evidence is displayed explicitly.
+
+See [visualization usage and interpretation](VISUALIZATION_EXPLORER.md) and the [visualization TDD/QA record](scratchpad_feature_space_visualizations.md).
 
 ## Documentation
 
@@ -33,7 +55,7 @@ OPENAI_API_KEY=your-openai-api-key-here
 
 The live runner loads it automatically. An existing exported `OPENAI_API_KEY` takes precedence. `.env` is ignored by Git; `.env.example` provides the blank template. Offline demos and dry runs do not read credentials.
 
-Generator and judge model IDs remain configurable. Paid execution requires verified model pricing/capabilities, a successful dry run, its matching preflight hash, and explicit `--execute-live`. The configured cumulative API cap is at most $500.
+Generator and judge default to **GPT-6.1 Sol (`gpt-6.1-sol`) with low reasoning**; unsupported seed/temperature parameters are omitted. Model IDs remain configurable. Paid execution requires verified model pricing/capabilities, a successful dry run, its matching preflight hash, and explicit `--execute-live`. The current configured cumulative API cap is **$100** (hard maximum $500). Conservative full-bank estimates can still block a paid run; visualization never makes API calls.
 
 The human benchmark remains blocked pending acquisition/verification of the abstract-concept supplement and the exact Vinson participant protocol. Thirty-six Vinson labels and all fifteen task targets are frozen; missing human stimuli are not fabricated. No paid model calls were made during implementation.
 
@@ -41,6 +63,6 @@ The human benchmark remains blocked pending acquisition/verification of the abst
 
 This is a standalone pilot project. Execution uses hosted APIs, and the offline workflow needs only Python, NumPy, SciPy, and pytest.
 
-The pilot's **50 offline tests** cover schemas, source gates, prompts, independent jobs, budget controls, binary judgments, metrics, compositionality, checkpoint recovery, and full CLI runs. CI runs without credentials.
+The pilot's offline tests cover schemas, source gates, prompts, independent jobs, budget controls, binary judgments, metrics, compositionality, checkpoint recovery, and full CLI runs. CI runs without credentials.
 
 Generated run directories are excluded from Git. Reproduce the sample report with the offline command above. Pilot fixtures and references are committed directly with their byte hashes preserved. Downloaded human norm files retain their source-specific terms recorded in the source registry; this project does not grant additional rights to those data.
