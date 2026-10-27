@@ -1,8 +1,4 @@
-"""Offline model-specific payload tokenization with explicit framing reserve.
-
-Counts the full serialized transport payload (including schemas), then adds a
-disclosed margin. This is a conservative local budget, not an exact server count.
-"""
+"""Labeled offline planning bounds and provider input counts, with framing reserve."""
 
 from __future__ import annotations
 from functools import lru_cache
@@ -52,11 +48,25 @@ def _encoding(model):
 
 def count_payload(payload, settings):
     options = settings.get("token_counting") or {}
-    if options.get("method") != "tiktoken_payload_plus_margin_v1":
-        raise ValueError("Configure a verified input-token counting method")
     margin = options.get("framing_margin_tokens")
     if type(margin) is not int or margin < 128:
         raise ValueError("Explicit conservative framing/schema margin required")
+    if options.get("method") == "provider_count_required_v1":
+        encoded = canonical(payload)
+        return dict(
+            payload_tokens=None,
+            framing_margin_tokens=margin,
+            input_token_bound=len(encoded.encode()) + margin,
+            payload_bytes=len(encoded.encode()),
+            encoding=None,
+            request_sha256=digest(payload),
+            method=options["method"],
+            exact_provider_count=False,
+            provider_count_required=True,
+            planning_basis="UTF-8 payload byte upper bound, not a measured model token count",
+        )
+    if options.get("method") != "tiktoken_payload_plus_margin_v1":
+        raise ValueError("Configure a verified input-token counting method")
     encoded = canonical(payload)
     encoding = _encoding(settings["model_id"])
     count = len(encoding.encode(encoded, disallowed_special=()))
@@ -72,6 +82,47 @@ def count_payload(payload, settings):
         method=options["method"],
         exact_provider_count=False,
     )
+
+
+def provider_count_payload(payload, settings, transport):
+    if settings.get("api_format") != "responses":
+        raise ValueError(
+            "Exact provider counting requires the same Responses payload used for execution"
+        )
+    result = count_payload(payload, settings)
+    counted = transport(
+        {
+            k: v
+            for k, v in payload.items()
+            if k
+            in {
+                "model",
+                "input",
+                "instructions",
+                "text",
+                "reasoning",
+                "tools",
+                "tool_choice",
+                "parallel_tool_calls",
+            }
+        }
+    )
+    n = counted.get("input_tokens")
+    if type(n) is not int or n < 0:
+        raise ValueError("Invalid provider input-token count")
+    result.update(
+        payload_tokens=n,
+        input_token_bound=n + settings["token_counting"]["framing_margin_tokens"],
+        exact_provider_count=True,
+        provider_count_required=False,
+        count_endpoint="/v1/responses/input_tokens",
+        planning_basis="Provider model-specific input count plus framing reserve",
+    )
+    if result["input_token_bound"] > settings["max_input_tokens"]:
+        raise ValueError(
+            "Provider input-token count exceeds frozen ceiling before reservation"
+        )
+    return result
 
 
 def validate_payload(payload, settings):

@@ -63,7 +63,7 @@ The offline input-audit CLI writes `stimuli.jsonl` (60 hashed items), `abstract_
 
 ## Scientific and budget preflight amendment
 
-`Data Sheet 1.xlsx` is the pinned, read-only user-supplied Harpaintner workbook. `references/harpaintner_crosswalk.json` records the exact 24-row match against its 296-concept sheet; `publisher_download_verified=false` preserves chain-of-custody limits. Vinson raw/derived rows are independently cross-checked. `budget_amendment.json` records English, GPT-5-mini-low, three repetitions, label-blind bank150, role token envelopes, <=$100 summed stage allocations and combined 75×150 scope.
+`Data Sheet 1.xlsx` is the pinned, read-only user-supplied Harpaintner workbook. `references/harpaintner_crosswalk.json` records the exact 24-row match against its 296-concept sheet; `publisher_download_verified=false` preserves chain-of-custody limits. Vinson raw/derived rows are independently cross-checked. The historical `budget_amendment.json` records English, GPT-5-mini-low, three repetitions, label-blind bank150, role token envelopes, <=$100 summed stage allocations and combined 75×150 scope.
 
 `pilot_abstract_translation_review.csv` holds original German, published loose English, reviewed English, named reviewer and pending/approved/rejected decisions. It is hash-pinned; no pending entry is treated as reviewed. Registry `stimulus_condition`, `english_text`, `original_german` and `translation_review` preserve the declared cross-language condition. Vinson `text` adds the published noun/verb marker while `source_text` retains the norm lookup key.
 
@@ -72,3 +72,14 @@ The offline input-audit CLI writes `stimuli.jsonl` (60 hashed items), `abstract_
 `human_norm_comparison.json.category_geometry` contains conditional supplementary Euclidean RDMs of reviewed category proportions, common item/category order and item-bootstrap comparison. It requires >=4 aligned items and complete independent coding for compared generated profiles; it is separate from `geometry` binary-feature Jaccard. Unsupported feature recall/participant reliability remain unavailable.
 
 `calibration_<id>/attempt.jsonl` and `result.json` are isolated explicit one-call diagnostics with real schema/usage/ledger settlement, not scientific pilot rows. The original supplied `pilot_prompt_size_audit.json` remains historical byte-only data, not the current tokenizer audit. Full preparation/execution instructions: [PREFLIGHT_WORKFLOW.md](PREFLIGHT_WORKFLOW.md).
+
+
+## Progress and Batch execution
+
+`configs/feature_space_pilot.json` now selects future Luna-low Batch runs; `feature_space_pilot_mini_online.json` preserves the earlier model settings. A frozen run's config remains its provenance. The new execution amendment is in `batch_execution_amendment.json`; the scientific v2 amendment is historical and unchanged.
+
+`batch_state.json` is atomically written, content-hashed state with frozen-config hash, per-request task metadata/custom IDs, ledger tickets, exact payloads/token counts/prices, provider batch/file IDs, lifecycle status and ingestion markers. `batch_input_<key>.jsonl` is the hash-pinned API submission. `batch_output_file_id_<key>.jsonl` and `batch_error_file_id_<key>.jsonl` preserve raw provider responses. These are included in the ordinary sealed run inventory. Do not edit or delete state to retry an uncertain submission.
+
+Primary `generations.jsonl`/`judgments.jsonl` retain the original schemas and hashes, adding `execution_mode`, `batch_id` and `batch_custom_id` for Batch attempts. IDs join unordered provider output to frozen jobs. Usage settles the existing shared ledger once. Provider-counted `token_budget` records distinguish exact provider counts plus reserve from offline byte-based planning bounds.
+
+The `status` command produces read-only approximate live snapshots rather than sealed artifacts. Completed calls include ambiguous results; resolved 0/1 cells are counted separately. Ledger spending is cumulative across runs and includes outstanding reservations. New process progress messages use stderr; final JSON uses stdout. See [BATCH_AND_PROGRESS.md](BATCH_AND_PROGRESS.md).

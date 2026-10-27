@@ -9,6 +9,34 @@ from feature_space_pilot.budget import Ledger
 ROOT = Path(__file__).resolve().parents[2]
 
 
+@pytest.mark.parametrize("margin", [-1, 0, True, None])
+def test_provider_count_policy_requires_conservative_framing_reserve(margin):
+    from feature_space_pilot.token_accounting import count_payload
+
+    settings = load_config(ROOT / "configs/feature_space_pilot.json")["generator"]
+    settings["token_counting"]["framing_margin_tokens"] = margin
+    with pytest.raises(ValueError, match="margin"):
+        count_payload(dict(model="gpt-6-luna", input="fixture"), settings)
+
+
+def test_provider_count_evidence_labels_actual_count_separately_from_byte_plan():
+    from feature_space_pilot.token_accounting import provider_count_payload
+    from feature_space_pilot.clients import build_payload
+
+    settings = load_config(ROOT / "configs/feature_space_pilot.json")["generator"]
+    payload = build_payload(
+        settings, system="Fixture", user="{}", schema=generation_schema("x", 4)
+    )
+    seen = []
+    result = provider_count_payload(
+        payload, settings, lambda body: seen.append(body) or dict(input_tokens=123)
+    )
+    assert seen == [{k: payload[k] for k in ["model", "input", "text", "reasoning"]}]
+    assert result["payload_tokens"] == 123 and result["input_token_bound"] == 635
+    assert result["exact_provider_count"] and not result["provider_count_required"]
+    assert "Provider" in result["planning_basis"]
+
+
 def test_counter_covers_exact_transport_payload_schema_and_utf8_offline(monkeypatch):
     from feature_space_pilot.token_accounting import count_payload
     from feature_space_pilot.clients import build_payload
@@ -19,7 +47,9 @@ def test_counter_covers_exact_transport_payload_schema_and_utf8_offline(monkeypa
         "urlopen",
         lambda *a, **k: pytest.fail("Offline count attempted network access"),
     )
-    settings = load_config(ROOT / "configs/feature_space_pilot.json")["generator"]
+    settings = load_config(ROOT / "configs/feature_space_pilot_mini_online.json")[
+        "generator"
+    ]
     assert settings["model_id"] == "gpt-5-mini-2025-08-07"
     payload = build_payload(
         settings,
@@ -56,7 +86,7 @@ def test_counter_covers_exact_transport_payload_schema_and_utf8_offline(monkeypa
 def test_oversize_rejected_before_reservation_or_transport(tmp_path):
     from feature_space_pilot.engine import _call
 
-    config = load_config(ROOT / "configs/feature_space_pilot.json")
+    config = load_config(ROOT / "configs/feature_space_pilot_mini_online.json")
     settings = dict(config["generator"], max_input_tokens=1)
     prompt = dict(system="A request", user="{}")
     client = FakeClient()
@@ -93,8 +123,8 @@ def test_actual_prompt_audit_includes_all_75_targets_and_long_finance_payload():
     assert result["n_items"] == 75 and result["generation"]["n_templates"] == 225
     assert result["judgment"]["n_templates"] == 75
     assert result["largest_generation"]["item_id"].startswith("finance_")
-    assert result["generation"]["max_input_token_bound"] <= 7500
-    assert result["judgment"]["max_input_token_bound_with_feature_reserve"] <= 7500
+    assert result["generation"]["max_input_token_bound"] <= 16000
+    assert result["judgment"]["max_input_token_bound_with_feature_reserve"] <= 16000
     assert result["declared_output_tokens"] == dict(generation=700, judgment=400)
     assert result["byte_lengths_are_token_counts"] is False
 
@@ -117,9 +147,9 @@ def test_combined_75_by_150_plan_preserves_prior_spend_and_fits_100(tmp_path):
         result["generation_jobs"] == 675
         and result["judgment_cells_upper_bound"] == 11250
     )
-    assert result["worst_case_usd"] == pytest.approx(64.60875)
+    assert result["worst_case_usd"] == pytest.approx(21.56625)
     assert result["accounted_usd"] == pytest.approx(0.002814)
-    assert result["total_liability_usd"] == pytest.approx(64.611564)
+    assert result["total_liability_usd"] == pytest.approx(21.569064)
     assert result["live_ready"] and not result["blockers"]
     assert sum(config["stage_caps"].values()) <= 100
     assert path.read_bytes() == before
@@ -142,10 +172,10 @@ def test_individual_stage_cannot_ignore_combined_campaign_budget():
     from feature_space_pilot.engine import preflight
 
     config = load_config(ROOT / "configs/feature_space_pilot.json")
-    config["api_cap_usd"] = 60
-    config["stage_caps"] = dict(generation=5, judgment=55)
+    config["api_cap_usd"] = 20
+    config["stage_caps"] = dict(generation=3, judgment=17)
     result = preflight(config, "human")
-    assert result["worst_case_usd"] < 60
+    assert result["worst_case_usd"] < 20
     assert not result["live_ready"]
     assert any("Combined human and task" in b for b in result["blockers"])
 
@@ -155,7 +185,7 @@ def test_provider_input_envelope_breach_halts_even_when_total_cost_fits(tmp_path
     from feature_space_pilot.token_accounting import count_payload
     from feature_space_pilot.engine import _call
 
-    config = load_config(ROOT / "configs/feature_space_pilot.json")
+    config = load_config(ROOT / "configs/feature_space_pilot_mini_online.json")
     settings = config["judge"]
     schema = generation_schema("x", 4)
     bound = count_payload(

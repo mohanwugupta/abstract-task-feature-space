@@ -67,15 +67,17 @@ OPENAI_API_KEY=your-openai-api-key-here
 
 The live runner loads it automatically. An existing exported `OPENAI_API_KEY` takes precedence. `.env` is ignored by Git; `.env.example` provides the blank template. Offline demos and dry runs do not read credentials.
 
-Generator and judge now default to user-selected **GPT-5 mini (`gpt-5-mini-2025-08-07`) with low reasoning**; unsupported seed/temperature parameters are omitted. Model IDs remain configurable. Paid execution requires verified model pricing/capabilities, a successful dry run, its matching preflight hash, and explicit `--execute-live`. The current configured cumulative API cap is **$100** (hard maximum $500). The label-blind 150-feature bank and 7,500-input/700-generation-output/400-judge-output envelopes give a combined human+task ceiling of **$64.60875**, plus existing liabilities. Stage allocations sum to $100. Visualization never makes API calls.
+Future generator and judge runs default to user-selected **GPT-6 Luna (`gpt-6-luna`), low reasoning, using OpenAI Batch**. The current Mini run continues unchanged. Model IDs remain configurable; unsupported seed/temperature parameters are omitted. Paid execution requires verified pricing/capabilities, a fresh dry-run hash and explicit `--execute-live`. Three repetitions, the 150-feature bank and the shared **$100** cumulative cap remain. The new Luna Batch human+task completion ceiling is **$21.56625**, plus existing liabilities, with 16,000-input/700-generation-output/400-judge-output envelopes and two attempts.
 
-All 60 supplied human stimuli and 15 task targets are integrated. Raw sources, workbook crosswalk and separate P0 protocols are verified as documented; English abstract generation is explicitly exploratory while pending reviews suppress translated human comparisons. A one-call GPT-5-mini diagnostic passed; total recorded diagnostic spending is $0.003158. No full live pilot has run.
+All 60 supplied human stimuli and 15 task targets are integrated. Source/workbook/P0 verification remains enforced; English abstract generation is exploratory and pending reviews suppress affected comparisons. Mini diagnostics passed previously; Luna and Batch have offline mocked validation, with no paid diagnostic performed during this change.
+
+Monitor the ongoing run without restarting it:
 
 ```bash
-python -m feature_space_pilot.preflight --config configs/feature_space_pilot.json --campaign
+.venv/bin/python -m feature_space_pilot.status --watch
 ```
 
-Follow [the preflight workflow](PREFLIGHT_WORKFLOW.md) for preparation, fresh stage hashes and explicit execution. The older mini snapshot is marked deprecated by the provider; its account access passed the isolated diagnostic, and the code never substitutes another model silently.
+See [Batch and progress instructions](BATCH_AND_PROGRESS.md) for asynchronous submission/collection, and [the preflight workflow](PREFLIGHT_WORKFLOW.md) for source preparation, fresh stage hashes and explicit execution. New runner processes print progress to stderr; `--quiet` hides it. Visualization never makes API calls.
 
 ## Validation and reference data
 

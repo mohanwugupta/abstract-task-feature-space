@@ -1,0 +1,144 @@
+{
+  "api_cap_usd": 100,
+  "batch_max_requests": 1000,
+  "bootstrap_resamples": 500,
+  "candidate_cap": 150,
+  "demo": false,
+  "execution_mode": "online",
+  "generator": {
+    "api_key_env": "OPENAI_API_KEY",
+    "base_url": "https://api.openai.com/v1",
+    "batch_prices": {
+      "input_per_million": 0.125,
+      "model_id": "gpt-5-mini-2025-08-07",
+      "output_per_million": 1,
+      "revision": "gpt-5-mini-2025-08-07",
+      "source_url": "https://developers.openai.com/api/docs/guides/batch",
+      "verified_at": "2026-10-27"
+    },
+    "capabilities_source": "https://developers.openai.com/api/docs/models/gpt-5-mini",
+    "capabilities_verified_at": "2026-10-27",
+    "max_input_tokens": 7500,
+    "max_output_tokens": 700,
+    "model_id": "gpt-5-mini-2025-08-07",
+    "prices": {
+      "input_per_million": 0.25,
+      "model_id": "gpt-5-mini-2025-08-07",
+      "output_per_million": 2,
+      "revision": "gpt-5-mini-2025-08-07",
+      "source_url": "https://developers.openai.com/api/docs/models/gpt-5-mini",
+      "verified_at": "2026-10-27"
+    },
+    "provider": "openai_compatible",
+    "reasoning_effort": "low",
+    "revision": "gpt-5-mini-2025-08-07",
+    "snapshot_note": "User-selected GPT-5 mini pinned to dated snapshot. Provider currently labels this older model deprecated; access is checked with the bounded diagnostic before any full run.",
+    "supports_seed": false,
+    "supports_structured_outputs": true,
+    "supports_temperature": false,
+    "temperature": 0.8,
+    "timeout_seconds": 90,
+    "token_counting": {
+      "framing_margin_tokens": 512,
+      "method": "tiktoken_payload_plus_margin_v1"
+    }
+  },
+  "human_abstract_summary": "human_norm_pilot_abstract_24.csv",
+  "human_abstract_summary_sha256": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
+  "human_language_condition": "published_english_exploratory",
+  "human_stimuli": "human_norm_pilot_60_stimuli.csv",
+  "human_stimuli_sha256": "8778e68187120b318ac3828c99787af0995e1f7496f5c6ad48d00e8359008374",
+  "human_target_count": 60,
+  "judge": {
+    "api_key_env": "OPENAI_API_KEY",
+    "base_url": "https://api.openai.com/v1",
+    "batch_prices": {
+      "input_per_million": 0.125,
+      "model_id": "gpt-5-mini-2025-08-07",
+      "output_per_million": 1,
+      "revision": "gpt-5-mini-2025-08-07",
+      "source_url": "https://developers.openai.com/api/docs/guides/batch",
+      "verified_at": "2026-10-27"
+    },
+    "capabilities_source": "https://developers.openai.com/api/docs/models/gpt-5-mini",
+    "capabilities_verified_at": "2026-10-27",
+    "max_input_tokens": 7500,
+    "max_output_tokens": 400,
+    "model_id": "gpt-5-mini-2025-08-07",
+    "prices": {
+      "input_per_million": 0.25,
+      "model_id": "gpt-5-mini-2025-08-07",
+      "output_per_million": 2,
+      "revision": "gpt-5-mini-2025-08-07",
+      "source_url": "https://developers.openai.com/api/docs/models/gpt-5-mini",
+      "verified_at": "2026-10-27"
+    },
+    "provider": "openai_compatible",
+    "reasoning_effort": "low",
+    "revision": "gpt-5-mini-2025-08-07",
+    "snapshot_note": "User-selected GPT-5 mini pinned to dated snapshot. Provider currently labels this older model deprecated; access is checked with the bounded diagnostic before any full run.",
+    "supports_seed": false,
+    "supports_structured_outputs": true,
+    "supports_temperature": false,
+    "temperature": 0.8,
+    "timeout_seconds": 90,
+    "token_counting": {
+      "framing_margin_tokens": 512,
+      "method": "tiktoken_payload_plus_margin_v1"
+    }
+  },
+  "judgment_audit_fraction": 0.05,
+  "max_attempts": 2,
+  "protocols": {
+    "harpaintner_2018": {
+      "cap": 4,
+      "deviations": [
+        "English prompts and published loose English stimulus labels; German human source",
+        "At-most-four machine output envelope adapts approximately four in the original method"
+      ],
+      "language": "en",
+      "source_feature_cap": 4,
+      "source_feature_cap_kind": "approximate_count_in_original_method",
+      "source_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.01748/full",
+      "text": "List about four properties, associations or situations that spontaneously come to mind for the target concept. Avoid synonyms of the target. There is no time limit. If none come to mind, return an empty list. Return at most {cap} entries in this documented English adaptation of the published method; it is not a verbatim German instruction replication.",
+      "verified": true,
+      "version": "harpaintner_2018_english_adaptation_v1"
+    },
+    "vinson_2008": {
+      "analysis_comparison_cap": 10,
+      "cap": null,
+      "deviations": [
+        "Single isolated target instead of 30–40-word sheet",
+        "Original noun/verb demonstrations omitted to preserve target isolation",
+        "JSON binary-proposition contract and finite output-token ceiling are engineering adaptations; no human feature-count cap imposed"
+      ],
+      "source_feature_cap": null,
+      "source_pages": [
+        186,
+        190
+      ],
+      "source_url": "https://link.springer.com/content/pdf/10.3758/BRM.40.1.183.pdf",
+      "text": "Describe the target meaning as fully as possible with separate, short semantic features. Focus on properties that distinguish the target from similar things. Include relevant attributes, purposes and characteristic actions. Avoid dictionary-style sentences that combine independent properties. Do not list pure word associations that fail to describe the target. There is no requested number of features. This single-target JSON adaptation follows the published Appendix; it is not a verbatim replication of the original multi-word questionnaire.",
+      "verified": true,
+      "version": "vinson_2008_appendix_adaptation_v1"
+    }
+  },
+  "rate_limit_seconds": 1,
+  "replicates": 3,
+  "root": "..",
+  "schema_version": "pilot_v1",
+  "scientific_preflight_enabled": true,
+  "seed": 42,
+  "source_registry": "data/feature_space_pilot/source_registry.json",
+  "stage_caps": {
+    "adjudication": 10,
+    "embeddings": 5,
+    "generation": 10,
+    "judgment": 65,
+    "reserve": 10
+  },
+  "task_stimuli": "data/feature_space_pilot/stimuli_tasks.jsonl",
+  "translation_review_file": "pilot_abstract_translation_review.csv",
+  "translation_review_sha256": "bff5e642436bb2838a348deff5c1a8c1445190be4418a1399e053ed95c120b74",
+  "vinson_syntax_markers": true
+}

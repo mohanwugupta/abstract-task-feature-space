@@ -13,6 +13,9 @@ from .io import write_json
 
 
 def calibrate(config, *, role="judge", execute_live=False, client=None):
+    from .execution import execution_config
+
+    config = execution_config(config, "online")
     if not execute_live:
         raise ValueError("Calibration requires explicit --execute-live")
     if role not in {"generator", "judge"}:

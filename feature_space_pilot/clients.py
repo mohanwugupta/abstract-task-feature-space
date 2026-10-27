@@ -58,7 +58,58 @@ def build_payload(settings, *, system, user, schema, seed=None, temperature=0.8)
         type="json_schema",
         json_schema=dict(name="pilot_response", strict=True, schema=schema),
     )
+    if s.get("api_format") == "responses":
+        payload = dict(
+            model=s["model_id"],
+            input=payload["messages"],
+            max_output_tokens=s["max_output_tokens"],
+            stream=False,
+            store=False,
+            text=dict(
+                format=dict(
+                    type="json_schema",
+                    name="pilot_response",
+                    strict=True,
+                    schema=schema,
+                )
+            ),
+        )
+        if s.get("reasoning_effort"):
+            payload["reasoning"] = dict(effort=s["reasoning_effort"])
     return payload
+
+
+def parse_api_response(response):
+    usage = response.get("usage") or {}
+    if "choices" in response:
+        choice = (response.get("choices") or [{}])[0]
+        raw = (choice.get("message") or {}).get("content") or ""
+        reason = choice.get("finish_reason")
+        inputs, outputs = usage.get("prompt_tokens"), usage.get("completion_tokens")
+    else:
+        parts = [
+            part
+            for message in response.get("output", [])
+            for part in message.get("content", [])
+        ]
+        raw = "".join(
+            p.get("text", "") for p in parts if p.get("type") == "output_text"
+        )
+        reason = (
+            "stop"
+            if response.get("status") == "completed"
+            and not any(p.get("type") == "refusal" for p in parts)
+            else response.get("status", "error")
+        )
+        inputs, outputs = usage.get("input_tokens"), usage.get("output_tokens")
+    return raw, dict(
+        input_tokens=inputs,
+        output_tokens=outputs,
+        response_model=response.get("model"),
+        response_id=response.get("id"),
+        system_fingerprint=response.get("system_fingerprint"),
+        finish_reason=reason,
+    )
 
 
 class HostedClient:
@@ -69,12 +120,17 @@ class HostedClient:
     """
 
     def __init__(self, settings):
+        if settings.get("pricing_mode") == "batch":
+            raise ValueError(
+                "Use online pricing for synchronous requests; Batch pricing requires Batch transport"
+            )
         self.settings = dict(settings)
         if settings["provider"] != "openai_compatible":
             raise ValueError("Unsupported hosted API provider adapter")
         if not settings["base_url"].startswith("https://"):
             raise ValueError("Hosted API requires HTTPS")
         self.transport = self._transport
+        self._count_cache = {}
 
     def _transport(self, payload):
         key = os.environ.get(self.settings["api_key_env"])
@@ -83,7 +139,12 @@ class HostedClient:
                 f'Missing API key environment variable {self.settings["api_key_env"]}'
             )
         request = urllib.request.Request(
-            self.settings["base_url"].rstrip("/") + "/chat/completions",
+            self.settings["base_url"].rstrip("/")
+            + (
+                "/responses"
+                if self.settings.get("api_format") == "responses"
+                else "/chat/completions"
+            ),
             data=canonical(payload).encode(),
             headers={
                 "Authorization": "Bearer " + key,
@@ -95,6 +156,34 @@ class HostedClient:
             request, timeout=self.settings.get("timeout_seconds", 90)
         ) as r:
             return json.load(r)
+
+    def count_payload(self, payload):
+        from .token_accounting import count_payload, provider_count_payload
+
+        preliminary = count_payload(payload, self.settings)
+        if not preliminary.get("provider_count_required"):
+            return preliminary
+        key = preliminary["request_sha256"]
+        if key not in self._count_cache:
+            self._count_cache[key] = provider_count_payload(
+                payload, self.settings, self.count_transport
+            )
+        return self._count_cache[key]
+
+    def count_transport(self, payload):
+        request = urllib.request.Request(
+            self.settings["base_url"].rstrip("/") + "/responses/input_tokens",
+            data=canonical(payload).encode(),
+            headers={
+                "Authorization": "Bearer " + os.environ[self.settings["api_key_env"]],
+                "Content-Type": "application/json",
+            },
+            method="POST",
+        )
+        with urllib.request.urlopen(
+            request, timeout=self.settings.get("timeout_seconds", 90)
+        ) as response:
+            return json.load(response)
 
     def complete(self, *, system, user, schema, seed=None, temperature=0.8):
         payload = build_payload(
@@ -108,19 +197,15 @@ class HostedClient:
         if self.settings.get("token_counting"):
             from .token_accounting import validate_payload
 
-            validate_payload(payload, self.settings)
+            preliminary = validate_payload(payload, self.settings)
+            if preliminary.get("provider_count_required"):
+                counted = self.count_payload(payload)
+                if counted["input_token_bound"] > self.settings["max_input_tokens"]:
+                    raise ValueError(
+                        "Provider count exceeds frozen input-token ceiling"
+                    )
         response = self.transport(payload)
-        usage = response.get("usage") or {}
-        choices = response.get("choices") or []
-        choice = choices[0] if choices else {}
-        return choice.get("message", {}).get("content") or "", dict(
-            input_tokens=usage.get("prompt_tokens"),
-            output_tokens=usage.get("completion_tokens"),
-            response_model=response.get("model"),
-            response_id=response.get("id"),
-            system_fingerprint=response.get("system_fingerprint"),
-            finish_reason=choice.get("finish_reason"),
-        )
+        return parse_api_response(response)
 
 
 class FakeClient:

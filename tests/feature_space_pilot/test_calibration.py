@@ -12,7 +12,7 @@ def test_calibration_is_explicit_single_attempt_and_uses_shared_ledger(
     from feature_space_pilot.calibrate import calibrate
     import feature_space_pilot.calibrate as module
 
-    c = load_config(ROOT / "configs/feature_space_pilot.json")
+    c = load_config(ROOT / "configs/feature_space_pilot_mini_online.json")
     c["artifact_root"] = str(tmp_path / "artifacts")
     with pytest.raises(ValueError, match="execute.live|explicit"):
         calibrate(c, role="judge")

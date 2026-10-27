@@ -1,6 +1,6 @@
 # Scientific and $100 budget preflight
 
-The current pilot uses **GPT-5 mini (`gpt-5-mini-2025-08-07`), low reasoning**, per the user's model choice. It retains **three repetitions**, uses a predeclared **150-feature bank**, and uses **English stimuli** as requested. German originals remain source metadata, not silently substituted model inputs.
+Future iterations use **GPT-6 Luna (`gpt-6-luna`), low reasoning, OpenAI Batch**. The running Mini pilot continues unchanged. Both retain **three repetitions**, a **150-feature bank**, and **English stimuli**. German originals remain source metadata. See [BATCH_AND_PROGRESS.md](BATCH_AND_PROGRESS.md) for monitoring the current process and collecting future Batch work.
 
 ## Validate this checkout
 
@@ -14,7 +14,7 @@ From the repository root with Python 3.11:
 
 `--prepare` checks the pinned reference/workbook/crosswalk hashes before making those files read-only. Git does not preserve read-only permission bits, so run it once after checkout. It never edits data values, reads credentials or calls a model. Modified source bytes fail instead of being resealed.
 
-The combined preflight should report `live_ready: true` and `blockers: []`. That means the configured scientific generation condition and conservative budgets pass; it does not approve every downstream human comparison or guarantee provider account access. The dated GPT-5-mini snapshot is currently marked deprecated by the provider; the isolated live diagnostic confirmed access for this account on 2026-10-27. No model is silently substituted if access changes.
+The combined preflight should report `live_ready: true` and `blockers: []`. That means the configured scientific generation condition and conservative budgets pass; it does not approve every downstream human comparison or guarantee provider account access. Luna account/Batch access has not been live-tested during implementation. No model is silently substituted if access changes.
 
 ## Run the human pilot
 
@@ -27,7 +27,7 @@ Get a fresh human-stage hash:
 Copy that result's `preflight_hash`, then explicitly execute:
 
 ```bash
-.venv/bin/python -m feature_space_pilot.run --config configs/feature_space_pilot.json --stage human --execute-live --preflight-hash HASH_FROM_HUMAN_DRY_RUN
+.venv/bin/python -m feature_space_pilot.run --config configs/feature_space_pilot.json --stage human --execute-live --preflight-hash HASH_FROM_HUMAN_DRY_RUN --watch
 ```
 
 Use `--stage tasks` with its own fresh dry-run hash for the 15 case-study targets. Human and task stages keep separate frozen outputs and share one cumulative live ledger. A paid `--stage all` is not supported. The runner loads the project `.env` only after preflight and hash checks pass.
@@ -54,11 +54,11 @@ The workbook contains category proportions, not individual human feature strings
 | Tasks | 135 | 2,250 |
 | Combined | 675 | 11,250 |
 
-The frozen role envelopes are 7,500 input tokens, 700 generation output tokens and 400 judgment output tokens, including reasoning/format tokens. Two attempts are budgeted for every job. Current verified standard GPT-5-mini rates are $0.25 input/$2 output per million tokens. The combined ceiling is **$64.60875**, plus prior cumulative liabilities. After the one-call diagnostic, total existing spend is **$0.003158**, so the current maximum combined liability is **$64.611908**, leaving about $35.39 of the $100 cap. These are conditional token-based bounds; invoices remain the billing authority.
+Future Luna role envelopes are 16,000 input tokens, 700 generation output tokens and 400 judgment output tokens, including reasoning/format tokens. Two attempts are budgeted for every job. Verified Batch rates are $0.05 input/$0.25 output per million tokens. The combined completion ceiling is **$21.56625**, plus actual cumulative liabilities, including the ongoing Mini run. A fresh preflight reads the current ledger; the earlier $0.003158 diagnostic balance is historical. The preserved Mini-online configuration retains its original 7,500-input ceiling and $64.60875 combined bound. These are conditional token-based bounds; invoices remain the billing authority.
 
 Stage allocations are generation $10, judgment $65, adjudication $10, embeddings $5 and reserve $10; they sum to $100. Combined preflight adds human and task remaining work and counts prior liability once. Both stage entrypoints also check the combined budget. Reservations precede requests; unknown usage stays reserved; actual provider usage settles the same durable ledger. Never delete or replace that ledger to obtain a new allowance.
 
-The single request builder is shared by transport, preflight and the controller. `tiktoken` tokenizes the complete canonical payload, including JSON schema, with the selected model's mapped `o200k_base` encoding. The table is pinned and vendored for offline use; unknown model mappings fail. An explicit **512-token framing reserve** is added. This is a conservative local bound, not an exact server count; byte lengths are reported separately. Both controller and client reject over-cap payloads before reservation/transport. Any provider usage beyond the envelope records actual cost and halts. [OpenAI token-counting guidance](https://developers.openai.com/api/docs/guides/token-counting) explains the distinction and that output ceilings include non-visible tokens.
+The request builder is shared by transport, preflight and the controller. Luna has no verified local tokenizer mapping: offline audits separately label payload bytes and a conservative byte-based upper bound. Live Luna execution requires the provider's Responses input-count endpoint on the exact schema/input, plus a **512-token reserve**, before any completion reservation or submission. Mini retains its mapped `o200k_base` canonical-payload count with a pinned vendored table and explicit reserve. Neither offline method claims an exact server count. Both controller and client reject over-cap payloads before submission. Actual provider usage settles cost and envelope breaches halt execution. [OpenAI token-counting guidance](https://developers.openai.com/api/docs/guides/token-counting) explains schema/framing counts and non-visible output tokens.
 
 Detailed reproducible audits:
 
@@ -80,4 +80,4 @@ The implemented calibration command defaults to one judgment call, no retries, <
 .venv/bin/python -m feature_space_pilot.calibrate --config configs/feature_space_pilot.json --role judge --execute-live
 ```
 
-One such call passed on 2026-10-27: 304 input / 134 output tokens, local input bound 890, normal completion and estimated $0.000344 cost. It is an isolated diagnostic and never enters pilot matrices. It does not start the full pilot. Token ceilings can cause truncation on longer responses; failed attempts remain audited and are never converted to successful empty lists.
+A historical Mini call passed on 2026-10-27 (not a Luna test): 304 input / 134 output tokens, local input bound 890, normal completion and estimated $0.000344 cost. It is an isolated diagnostic and never enters pilot matrices. It does not start the full pilot. Token ceilings can cause truncation on longer responses; failed attempts remain audited and are never converted to successful empty lists.

@@ -26,6 +26,7 @@ from .bank import consolidate
 from .judge import RUBRIC, judge_prompt, parse_judgment, build_matrix
 from .budget import Ledger, estimate_cost, validate_prices
 from .environment import load_api_credentials
+from .progress import emit
 
 STAGES = ("human", "tasks", "all")
 
@@ -76,7 +77,9 @@ def load_config(path):
     path = Path(path).resolve()
     c = json.loads(path.read_text())
     c["root"] = str((path.parent / Path(c.get("root", ".."))).resolve())
-    return c
+    from .execution import execution_config
+
+    return execution_config(c)
 
 
 def resolve(c, path):
@@ -604,7 +607,20 @@ def _call(
     parser,
     max_attempts,
     delay,
+    progress=None,
 ):
+    from .batch import BatchStageClient
+
+    if isinstance(client, BatchStageClient):
+        return client.session.enqueue(
+            prompt=prompt,
+            schema=schema,
+            settings=settings,
+            job_id=job_id,
+            stage=stage,
+            journal_name=Path(path).name,
+            record_base=record_base,
+        )
     # Every provider attempt is reserved first; no provider retry is hidden in the adapter.
     attempts = sum(
         e["event"] == "reserve" and e.get("job_id") == job_id for e in ledger.events
@@ -627,6 +643,22 @@ def _call(
                 settings,
             )
             input_bound = token_count["input_token_bound"]
+            if token_count.get("provider_count_required"):
+                if not hasattr(client, "count_payload"):
+                    raise ValueError(
+                        "Provider token count is required before reservation"
+                    )
+                token_count = client.count_payload(
+                    build_payload(
+                        settings,
+                        system=prompt["system"],
+                        user=prompt["user"],
+                        schema=schema,
+                        seed=record_base.get("seed"),
+                        temperature=settings.get("temperature", 0),
+                    )
+                )
+                input_bound = token_count["input_token_bound"]
         else:
             input_bound = (
                 len(canonical([prompt["system"], prompt["user"], schema]).encode())
@@ -638,6 +670,16 @@ def _call(
             settings["prices"], input_bound, settings["max_output_tokens"]
         )
         ticket = ledger.reserve(job_id, stage, amount)
+        emit(
+            progress,
+            "attempt_start",
+            stage=stage,
+            attempt=attempt + 1,
+            max_attempts=max_attempts,
+            **{
+                k: record_base.get(k) for k in ["item_id", "prompt_family", "replicate"]
+            },
+        )
         started = time.monotonic()
         raw = ""
         usage = {}
@@ -691,6 +733,14 @@ def _call(
         )
         record["record_hash"] = digest(record)
         append_jsonl(path, record)
+        emit(
+            progress,
+            "attempt_finished",
+            stage=stage,
+            parse_status=record["parse_status"],
+            latency_seconds=record["latency_seconds"],
+            accounted_usd=ledger.total,
+        )
         if fatal:
             raise ValueError(error)
         if parsed is not None:
@@ -701,8 +751,16 @@ def _call(
 
 
 def run_pipeline(
-    c, stage, *, client=None, execute_live=False, preflight_hash=None, max_jobs=None
+    c,
+    stage,
+    *,
+    client=None,
+    execute_live=False,
+    preflight_hash=None,
+    max_jobs=None,
+    progress=None,
 ):
+    emit(progress, "start", message=f"Checking {stage} run and cumulative budget")
     plan = preflight(c, stage)
     if execute_live:
         if c.get("demo"):
@@ -744,6 +802,11 @@ def run_pipeline(
     with Ledger(
         ledger_path, cap=c["api_cap_usd"], stage_caps=c["stage_caps"]
     ) as ledger:
+        emit(
+            progress,
+            "run_opened",
+            message=f"Run {run_id}; mode={c.get('execution_mode','online')}; already accounted ${ledger.total:.4f}",
+        )
         if (out / "manifest.json").exists():
             old = _resume_manifest(out)
             if old["design_hash"] != plan["design_hash"]:
@@ -751,6 +814,11 @@ def run_pipeline(
             if old["status"] == "complete" and old.get(
                 "evaluation_inputs_hash"
             ) == evaluation_inputs_hash(c):
+                emit(
+                    progress,
+                    "finished",
+                    message=f"{run_id}: already complete; no repeated calls",
+                )
                 return dict(old, output_dir=str(out))
             append_jsonl(out / "manifest_history.jsonl", old)
         # These are reproducible frozen inputs, not mutable historical results.
@@ -835,22 +903,50 @@ def run_pipeline(
             frozen_sources = [spec]
             source_hashes["synthetic_demo"] = spec["sha256"]
         write_json(out / "frozen_source_registry.json", dict(sources=frozen_sources))
+        batch_session = None
+        if execute_live and c.get("execution_mode") == "batch":
+            from .batch import BatchSession, BatchStageClient
+
+            batch_session = BatchSession(c, out, ledger, progress=progress)
+            batch_session.refresh()
         gen_client = client or (
-            FakeClient() if c.get("demo") else HostedClient(c["generator"])
+            FakeClient()
+            if c.get("demo")
+            else (
+                BatchStageClient(batch_session)
+                if batch_session
+                else HostedClient(c["generator"])
+            )
         )
         judge_client = client or (
-            FakeClient() if c.get("demo") else HostedClient(c["judge"])
+            FakeClient()
+            if c.get("demo")
+            else (
+                BatchStageClient(batch_session)
+                if batch_session
+                else HostedClient(c["judge"])
+            )
         )
         gen_path = out / "generations.jsonl"
         done = _read(gen_path)
         processed = 0
+        generation_completed = len(
+            {r["job_id"] for r in done if r.get("parse_status") == "ok"}
+        )
+        emit(
+            progress,
+            "stage_progress",
+            stage="generation",
+            completed=generation_completed,
+            planned=len(jobs),
+        )
         for job in pending_jobs(jobs, done):
             if max_jobs is not None and processed >= max_jobs:
                 break
             parser = lambda raw, j=job: parse_generation(
                 raw, j["item_id"], cap=j["cap"]
             )
-            _call(
+            result = _call(
                 gen_client,
                 job,
                 generation_schema(job["item_id"], job["cap"]),
@@ -875,10 +971,21 @@ def run_pipeline(
                 parser,
                 c["max_attempts"],
                 c.get("rate_limit_seconds", 0),
+                progress=progress,
             )
             processed += 1
-            if c.get("rate_limit_seconds"):
+            generation_completed += result is not None
+            emit(
+                progress,
+                "stage_progress",
+                stage="generation",
+                completed=generation_completed,
+                planned=len(jobs),
+            )
+            if c.get("rate_limit_seconds") and not batch_session:
                 time.sleep(min(c["rate_limit_seconds"], 30))
+        if batch_session:
+            batch_session.flush("generation")
         generations = [r for r in _read(gen_path) if r["parse_status"] == "ok"]
         if len({r["job_id"] for r in generations}) != len(generations):
             raise ValueError("Duplicate successful generation jobs")
@@ -982,11 +1089,23 @@ def run_pipeline(
                     parser,
                     c["max_attempts"],
                     c.get("rate_limit_seconds", 0),
+                    progress=progress,
                 )
                 if result and result.get("status") == "ambiguous":
                     append_jsonl(out / "judgment_audit.jsonl", result)
-                if c.get("rate_limit_seconds"):
+                if result:
+                    seen.add(job["job_id"])
+                if c.get("rate_limit_seconds") and not batch_session:
                     time.sleep(min(c["rate_limit_seconds"], 30))
+                emit(
+                    progress,
+                    "stage_progress",
+                    stage="judgment",
+                    completed=len(seen),
+                    planned=len(judge_jobs),
+                )
+            if batch_session:
+                batch_session.flush("judgment")
             judgments = [r for r in _read(judge_path) if r["parse_status"] == "ok"]
             # Human adjudications resolve ambiguous/missing cells, never overwrite a primary judgment silently.
             by_cell = {(r["item_id"], r["feature_id"]): r for r in judgments}
@@ -1063,6 +1182,8 @@ def run_pipeline(
                     ["item_id"] + scope["feature_ids"],
                 )
                 status = "complete"
+        if batch_session and batch_session.active:
+            status = "batch_pending"
         all_run_attempts = _read(gen_path) + _read(out / "judgments.jsonl")
         write_json(
             out / "cost_report.json",
@@ -1134,4 +1255,9 @@ def run_pipeline(
 
         write_reports(out, evaluation_config, generations, items, bank, judgments)
         manifest = seal_manifest(out)
+        emit(
+            progress,
+            "finished",
+            message=f"{run_id}: {status}; {len(generations)}/{len(jobs)} generation jobs; {manifest['resolved_judgments']}/{manifest['planned_judgments']} resolved judgments",
+        )
         return dict(manifest, output_dir=str(out))

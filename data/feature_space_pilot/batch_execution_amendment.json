@@ -1,0 +1,46 @@
+{
+  "applies_to": "Future iterations only; existing Mini run and scientific v2 amendment unchanged",
+  "batch_max_requests": 1000,
+  "batch_prices": {
+    "input_per_million": 0.05,
+    "model_id": "gpt-6-luna",
+    "output_per_million": 0.25,
+    "revision": "gpt-6-luna",
+    "source_url": "https://developers.openai.com/api/docs/pricing",
+    "verified_at": "2026-10-27"
+  },
+  "candidate_cap": 150,
+  "combined_completion_ceiling_usd": 21.56625,
+  "cumulative_cap_usd": 100,
+  "date": "2026-10-27",
+  "execution_mode": "batch",
+  "ledger_policy": "Same cumulative ledger, including all prior model/iteration liabilities; no balance reset",
+  "live_validation": "No Luna, token-counter or Batch request made during implementation",
+  "max_attempts": 2,
+  "model_id": "gpt-6-luna",
+  "reasoning_effort": "low",
+  "replicates": 3,
+  "stage_caps": {
+    "adjudication": 10,
+    "embeddings": 5,
+    "generation": 10,
+    "judgment": 65,
+    "reserve": 10
+  },
+  "standard_prices": {
+    "input_per_million": 0.1,
+    "model_id": "gpt-6-luna",
+    "output_per_million": 0.5,
+    "revision": "gpt-6-luna",
+    "source_url": "https://developers.openai.com/api/docs/pricing",
+    "verified_at": "2026-10-27"
+  },
+  "token_count_policy": "Provider input count plus 512 before reservation; offline bytes/upper bound separately labeled; no invented local Luna mapping",
+  "token_envelopes": {
+    "generation_output_including_reasoning": 700,
+    "input": 16000,
+    "judgment_output_including_reasoning": 400
+  },
+  "user_choice": "Luna low; leave current process running, Batch for future runs",
+  "version": "future_execution_v3_luna_batch"
+}
