@@ -5,7 +5,7 @@ from .prompts import generation_prompt
 
 
 def plan_generation(
-    items, settings, *, replicates=10, seed=42, live=False, protocols=None
+    items, settings, *, replicates=3, seed=42, live=False, protocols=None
 ):
     if type(replicates) is not int or replicates < 1:
         raise ValueError("replicates must be positive")

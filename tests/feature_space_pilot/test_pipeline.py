@@ -11,7 +11,7 @@ def test_dry_run_no_writes_or_calls_and_live_requires_sources_prices(tmp_path):
     c = demo_config(tmp_path)
     before = set(tmp_path.rglob("*"))
     p = preflight(c, "all")
-    assert p["generation_jobs"] == 2250 and p["demo"] is True
+    assert p["generation_jobs"] == 675 and p["demo"] is True
     assert set(tmp_path.rglob("*")) == before
     with pytest.raises(ValueError, match="source|synthetic|model|price"):
         run_pipeline(c, "human", execute_live=True)

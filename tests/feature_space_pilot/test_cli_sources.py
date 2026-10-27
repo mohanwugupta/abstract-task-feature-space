@@ -43,7 +43,7 @@ def test_cli_dry_runs_and_demo_entrypoints(tmp_path):
         "--config",
         "configs/feature_space_pilot.json",
     ]
-    for stage, count in [("human", 1800), ("tasks", 450)]:
+    for stage, count in [("human", 540), ("tasks", 135)]:
         p = subprocess.run(
             common + ["--stage", stage, "--dry-run"],
             cwd=ROOT,
@@ -62,7 +62,7 @@ def test_cli_dry_runs_and_demo_entrypoints(tmp_path):
     )
     assert p.returncode == 0, p.stderr
     m = json.loads(p.stdout)
-    assert m["status"] == "complete" and m["completed_generation_jobs"] == 2250
+    assert m["status"] == "complete" and m["completed_generation_jobs"] == 675
     p = subprocess.run(
         [
             sys.executable,

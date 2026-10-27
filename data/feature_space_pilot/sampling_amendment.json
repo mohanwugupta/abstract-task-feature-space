@@ -1,0 +1,23 @@
+{
+  "allocation": "For each family, task=floor(n/2)+1 when n is odd and (frozen composition index + family index) is even; otherwise task=floor(n/2). Situation=n-task; direct=n. Family order is P0,P1,P2. Composition order is the frozen situated-target order.",
+  "authorization": "User requested three repetitions per target/prompt family to reduce costs",
+  "comparison_policy": "equal_calls_alternating_component_extra_v1",
+  "date": "2026-10-26",
+  "generation_call_reduction_fraction": 0.7,
+  "judge_scope_unchanged": true,
+  "outcome_independent": true,
+  "planned_combined_generation_calls": 675,
+  "planned_human_generation_calls": 540,
+  "planned_task_generation_calls": 135,
+  "previous_replicates": 10,
+  "prompt_families": [
+    "P0",
+    "P1",
+    "P2"
+  ],
+  "replicates": 3,
+  "retain_all_generated_discoveries": true,
+  "scope_note": "Overrides the initial PRD repetition count. Targets, feature caps, reference-data gates, prompt families and hard USD cap are unchanged.",
+  "smoke_replicates": 2,
+  "version": "sampling_amendment_v1"
+}

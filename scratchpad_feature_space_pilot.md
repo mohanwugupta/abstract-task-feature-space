@@ -205,3 +205,29 @@
 - Validation: 42 standalone tests pass; fresh full synthetic demo completes 2,250 generations and 1,200 resolved binary cells; reference byte hashes are preserved. GitHub Actions offline workflow was triggered by publication.
 - Whitespace inspection flags the deliberately preserved CRLF reference CSV and the user's original Markdown line breaks; those source bytes were retained to preserve reference hashes and the requested PRD.
 - No paid API calls or credentials were uploaded. Model/price selection and human-source scientific gates remain pending as documented.
+
+## 2026-10-26 — User-requested reduction to three repetitions: RED
+
+- User amended the sampling design from ten to three independent repetitions per target/prompt family to reduce API costs. Preserve all targets, prompt families, binary judging and source gates.
+- New acceptance tests in `test_sampling.py`: defaults plan 675 combined / 135 task / 540 human generation requests; odd repetition counts execute successfully; matched comparisons use all three direct samples with equal per-family call budgets; even-count designs remain supported.
+- Frozen odd-count rule: split each family's component budget as 2 task + 1 situation or 1 task + 2 situation, alternating the extra sample by frozen composition index and prompt-family index. This uses all three direct samples, costs no extra calls, and balances the extra component allocation across the six compositions. Retain all discoveries separately. Do not select allocations using generated outcomes.
+- Expected RED: current defaults remain ten; preflight rejects odd counts; allocation helper does not exist. No paid calls; cumulative live spending remains $0.
+
+## 2026-10-26 — Three-repetition reduction GREEN and refactor
+
+- Observed RED: `python3 -m pytest -q tests/feature_space_pilot/test_sampling.py` → **3 failed** for the intended reasons: demo default 10 instead of 3; preflight rejected odd 3; missing matched-allocation helper.
+- GREEN: the same command → **3 passed**. Defaults in live config, demo config and job planner are now three; preflight accepts integer counts >=2; all three direct replicates enter matched comparisons. At n=3, family-specific component allocations alternate 2+1 / 1+2, independently of outcomes; six compositions balance task and situation component calls at 27 each. Even n=2/4/10 behavior remains supported.
+- Updated CLI/default-count assertions to the user-authorized new counts. Kept the explicit 10-repetition planner test as a supported nondefault regression. Small smoke remains two repetitions to avoid increasing its cost.
+- Added `data/feature_space_pilot/sampling_amendment.json`, updated current setup/data documentation and README; preserved the original PRD and historical scratchpad records. Generation calls decrease 70%; binary judgment scope/cost is not assumed to decrease by that amount.
+- REFACTOR: formatted changed source/tests with Black; full standalone regression is being checked. No paid model calls; $0 billed, $500 live cap remains.
+
+
+## 2026-10-26 — Three-repetition final verification and publication
+
+- REFACTOR/regression: `python3 -m pytest -q tests` → **45 passed**. New default/odd-count tests and existing even-count, retry, resume, source, binary, metric and CLI regressions all pass.
+- Fresh offline run `demo_all_cebc8c4d0142b011` completed **675/675 generation jobs** and **1200/1200 binary cells**. All artifact hashes verified. Each of the six composition comparisons uses 9 component calls versus 9 direct calls; all three direct repetitions per family are included.
+- Updated example preflights and sample run manifest. Human/task generation plans are now 540 and 135. Judgment upper bounds remain 12,000 and 3,000 respectively.
+- Detected a concurrent user configuration edit setting `api_cap_usd` from 500 to **100**. Preserved it; the sampling implementation did not change that field. This supersedes earlier default-cap statements in this record. Live spend remains $0, so the current configured live cap is $100.
+- Recorded the sampling amendment before any live evaluation. Original PRD and earlier completed artifacts are preserved as historical designs; the new default and sample report use three repetitions. No paid requests were made.
+- Report: `/Users/mg9965/Desktop/abstract-task-feature-space/artifacts/feature_space_pilot/demo_all_cebc8c4d0142b011/pilot_report.md`; manifest: `/Users/mg9965/Desktop/abstract-task-feature-space/artifacts/feature_space_pilot/demo_all_cebc8c4d0142b011/manifest.json`; config SHA-256: `8d2ab30c00ef0c87ce04802c13126dcfcc029d5e56da66aaadaa90014afc06ba`.
+- Next: commit and publish the reviewed sampling/config/documentation update to the existing private repository.

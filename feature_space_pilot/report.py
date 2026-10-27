@@ -15,7 +15,7 @@ from .metrics import (
     split_half,
     unavailable,
 )
-from .composition import compare_composition
+from .composition import compare_composition, matched_sampling_allocation
 from .prompts import normalize_phrase
 
 
@@ -482,7 +482,6 @@ def write_reports(out, c, generations, items, bank, judgments):
     write_csv(out / "task_level_feature_audit.csv", task_rows, fields)
     compositions = []
     interaction_rows = []
-    half = c["replicates"] // 2
     manual_audits = {}
     for target, audits in c.get("relational_audit", {}).items():
         manual_audits[target] = {}
@@ -498,16 +497,22 @@ def write_reports(out, c, generations, items, bank, judgments):
                 )
             manual_audits[target][feature] = decision["confirmed"]
     write_json(out / "manual_relational_audits.json", c.get("relational_audit", {}))
-    for item in items:
-        if item["target_type"] != "situated_task":
-            continue
+    for composition_index, item in enumerate(
+        i for i in items if i["target_type"] == "situated_task"
+    ):
         t = item["parent_id"]
         s = item["situation_ids"][0]
         ts = item["item_id"]
+        allocation = matched_sampling_allocation(
+            c["replicates"], composition_index=composition_index
+        )
 
-        def records(id, limit):
+        def records(id, role):
             return [
-                r for r in generations if r["item_id"] == id and r["replicate"] < limit
+                r
+                for r in generations
+                if r["item_id"] == id
+                and r["replicate"] < allocation[r["prompt_family"]][role]
             ]
 
         def feats(rs):
@@ -518,7 +523,7 @@ def write_reports(out, c, generations, items, bank, judgments):
                 if normalize_phrase(f) in text_to_id
             }
 
-        rt, rs, rd = records(t, half), records(s, half), records(ts, c["replicates"])
+        rt, rs, rd = records(t, "task"), records(s, "situation"), records(ts, "direct")
         js = {
             k: {f: cells[id, f] for f in feature_map if (id, f) in cells}
             for k, id in [("T", t), ("S", s), ("TS", ts)]
@@ -546,7 +551,8 @@ def write_reports(out, c, generations, items, bank, judgments):
                 situation_id=s,
                 full_component_discovered=sorted(discovered[t] | discovered[s]),
                 full_direct_discovered=sorted(discovered[ts]),
-                balance_rule="first_half_T_plus_first_half_S_versus_all_direct_v1",
+                balance_rule="equal_calls_alternating_component_extra_v1",
+                sampling_allocation=allocation,
                 incremental_examples=[
                     dict(feature_id=f, text=feature_map[f])
                     for f in result["incremental_applicable"]
@@ -697,7 +703,7 @@ def write_reports(out, c, generations, items, bank, judgments):
             lines.append("")
     lines += [
         "",
-        "The balanced comparison uses half the task and half the situation replicates against all direct replicates, separately within each family. The same independent judge cells for T+S evaluate both the component bank and its union with direct discoveries. Full discoveries are also retained. Token counts and gain per call/token appear in `compositionality_audit.json`.",
+        "The balanced comparison uses equal generation-call budgets separately within each family, retaining all direct replicates. For odd counts, the extra component sample alternates between task and situation by frozen composition and prompt-family order, independently of outcomes (three repetitions use 2+1 or 1+2 component samples versus 3 direct samples). Even counts split component samples equally. The same independent judge cells for T+S evaluate both the component bank and its union with direct discoveries. Full discoveries are also retained. The exact sampling_allocation, token counts and gain per call/token appear in `compositionality_audit.json`.",
         "Interaction candidates require applicability to T+S, nonapplicability to T and S individually, and a named manual relational audit before confirmation. No mathematical emergence or internal representation claim is made.",
         "",
         "## Costs, missing evidence and decision",

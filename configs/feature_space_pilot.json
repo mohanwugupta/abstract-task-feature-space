@@ -1,5 +1,5 @@
 {
-  "api_cap_usd": 500,
+  "api_cap_usd": 100,
   "bootstrap_resamples": 500,
   "candidate_cap": 200,
   "demo": false,
@@ -43,7 +43,7 @@
   "max_attempts": 2,
   "protocols": {},
   "rate_limit_seconds": 1,
-  "replicates": 10,
+  "replicates": 3,
   "root": "..",
   "schema_version": "pilot_v1",
   "seed": 42,

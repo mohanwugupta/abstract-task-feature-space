@@ -15,7 +15,7 @@ python -m feature_space_pilot.report --config configs/feature_space_pilot.json
 python -m pytest -q tests/feature_space_pilot
 ```
 
-The full synthetic demonstration runs 2,250 generation requests and produces a complete binary matrix, composition audits, cost accounting, and a hashed manifest under `artifacts/feature_space_pilot/`. Synthetic results validate the engineering workflow; they are not human benchmark findings.
+The full synthetic demonstration runs 675 generation requests (three repetitions per target and prompt family) and produces a complete binary matrix, composition audits, cost accounting, and a hashed manifest under `artifacts/feature_space_pilot/`. Synthetic results validate the engineering workflow; they are not human benchmark findings. The three-repetition default follows the [user sampling amendment](data/feature_space_pilot/sampling_amendment.json), replacing the original PRD’s ten-repetition plan.
 
 ## Documentation
 
@@ -33,6 +33,6 @@ The human benchmark remains blocked pending acquisition/verification of the abst
 
 This is a standalone pilot project. Execution uses hosted APIs, and the offline workflow needs only Python, NumPy, SciPy, and pytest.
 
-The pilot's **42 offline tests** cover schemas, source gates, prompts, independent jobs, budget controls, binary judgments, metrics, compositionality, checkpoint recovery, and full CLI runs. CI runs without credentials.
+The pilot's **45 offline tests** cover schemas, source gates, prompts, independent jobs, budget controls, binary judgments, metrics, compositionality, checkpoint recovery, and full CLI runs. CI runs without credentials.
 
 Generated run directories are excluded from Git. Reproduce the sample report with the offline command above. Pilot fixtures and references are committed directly with their byte hashes preserved. Downloaded human norm files retain their source-specific terms recorded in the source registry; this project does not grant additional rights to those data.

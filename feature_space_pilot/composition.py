@@ -3,6 +3,27 @@
 from __future__ import annotations
 
 
+def matched_sampling_allocation(replicates, *, composition_index):
+    """Equal per-family call budgets, including odd replicate counts.
+
+    An odd extra component sample alternates by frozen composition/family order,
+    independently of outcomes. Every direct replicate is used. Even counts retain
+    the original equal task/situation split.
+    """
+    if type(replicates) is not int or replicates < 2:
+        raise ValueError("Integer replicate count >=2 required")
+    if type(composition_index) is not int or composition_index < 0:
+        raise ValueError("Nonnegative integer composition index required")
+    half, odd = divmod(replicates, 2)
+    allocation = {}
+    for family_index, family in enumerate(("P0", "P1", "P2")):
+        task = half + int(bool(odd) and (composition_index + family_index) % 2 == 0)
+        allocation[family] = dict(
+            task=task, situation=replicates - task, direct=replicates
+        )
+    return allocation
+
+
 def compare_composition(
     task,
     situation,

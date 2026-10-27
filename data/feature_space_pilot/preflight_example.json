@@ -1,7 +1,7 @@
 {
   "human": {
     "accounted_usd": 0,
-    "actual_plannable_generation_jobs": 1080,
+    "actual_plannable_generation_jobs": 324,
     "blockers": [
       "Human source gate (harpaintner_2018): Publisher/PMC supplement endpoints returned HTML challenge pages or 404. No materialized reference or exact columns verified.",
       "Human source gate (vinson_2008): Human reference must be verified from the source and codebook",
@@ -12,7 +12,7 @@
       "generator model/price gate: Pinned hosted frontier model ID and revision required",
       "judge model/price gate: Pinned hosted frontier model ID and revision required"
     ],
-    "budget_cap_usd": 500,
+    "budget_cap_usd": 100,
     "capability_deviations": [
       "generator: seed omitted by frozen provider capability policy",
       "generator: temperature omitted by frozen provider capability policy",
@@ -20,12 +20,12 @@
       "judge: temperature omitted by frozen provider capability policy"
     ],
     "demo": false,
-    "design_hash": "3e530bd08c7d3744e4cc8ec7c049f01974f4b2baf6af7a294ab3ccbc89f6d1cf",
+    "design_hash": "cd035c79171fd5de5eefe4c128ec061d8d8eff517590e9e03a4647af76f2b41f",
     "estimates": {},
-    "generation_jobs": 1800,
+    "generation_jobs": 540,
     "judgment_cells_upper_bound": 12000,
     "live_ready": false,
-    "preflight_hash": "8cf0a63de353556e0eea808681dcf3b0464513300597467147e916e5749f13bb",
+    "preflight_hash": "8a2afe5be863517df31186866482668dc90ff945855934d44dc770158c00593e",
     "prompt_hashes": {
       "P0.txt": "84c77574b765785975efb6c32fae9fbb1f3a1e33e1db7b5ff1abdfc80fc9d944",
       "P0_harpaintner.txt": "fe3208ea79605111f2bbca49dda57fd2182732fd9d3b18a42a0272b4365cbb8e",
@@ -33,7 +33,7 @@
       "P2.txt": "3f3e6bb745106f5f98a5472dbf02587b713d3b8906796609728309940e98f45f",
       "binary_v1.txt": "18825161634d12ce02743c6885309e4e7ebcfcb673fa25186ec7591a0953114f"
     },
-    "remaining_usd": 500,
+    "remaining_usd": 100,
     "remaining_worst_case_usd": null,
     "selected_item_count": 36,
     "selected_item_ids": [
@@ -79,18 +79,18 @@
       "bank.py": "4493c0b9e6bc1ed76123d32c239d9710f88431f7532423bfd34f1b9b557cddb1",
       "budget.py": "d77ab9306dafcccde81d05d00e49b080e94369c3d56b7509715f93157bb13380",
       "clients.py": "9dad414fd86f35cad5b4d0b6287a1eb3683def30b71fca12f4c3defd957a02ec",
-      "composition.py": "9275abcac510ee23a49c63855ae827a30348579a361054c1ba9bc2924054e38a",
-      "engine.py": "f6f001be50bf27900332fa84286bc5856175aa2e0edfabeb91d2f4f9f53e256f",
+      "composition.py": "f13cf651ea6939f9052a17f2518bf9f88f39c28bb068f5aeb5b0bb14b9b39185",
+      "engine.py": "6dfc049a911290010046ddec8e90ead4ca39401cff4b30bec90c5f61866ca0de",
       "fixtures.py": "0679d33f32623593e1a12b9b2670f72f22afdbbdd8236a317555478fc02af782",
       "io.py": "76caf415b30e113fc440a81577bdf25fc13d95b24de26d8b7d25d2972edc369b",
       "judge.py": "fc88f413df652eef13c4c55fe2402693513f7c97ae937d708b13db3e4128fbb8",
       "metrics.py": "7c9da0fee2bc684cdb1e171742a6055752ab7b32e69a24a8c6bb0a3cb1b5248e",
-      "planner.py": "8b8bf582a4560e3ab5e65dea0d53f10261bd3e8b4b6d13ce1b6b072e768f0d35",
+      "planner.py": "d82dbfa02b536c34d01aea52e4ef2da54806d9a39d8d10daf73aef29817af1ee",
       "preflight.py": "f8c293529b3e168e2339a91a2bbd24485ecc97506659f5cd73097e58a5652626",
       "prompts.py": "52cfa556daea07d25215f1d9d1172e11e8c5b55248821d994487717a3f7a3070",
       "references.py": "7b6d2c9eb42107371b0202b01cff9b029b5b2d3212bc146db374e55eff3dabb5",
       "registry.py": "f11f0a9251f1f109ec6daab88f0db323518dcc901dd73c6789f27283b0896ae1",
-      "report.py": "9ff5c1560a2fbf9151c5ae6d909cdc9f1d245e9346fcf0ef67bff2c4fcd39752",
+      "report.py": "12b336ba95c63f43928991ae451e935c3bae9915974b0c957797d5fc6e2ec15d",
       "run.py": "60f3c4f9346944ea2c48139f4ec1bc0f2773d789bb5ece714c90d241175fedbf",
       "source_adapters.py": "5eb8e3ff00aa150f18ba669788591fd9f22421cfba141faab4170ddfd94e5030"
     },
@@ -101,12 +101,12 @@
   },
   "tasks": {
     "accounted_usd": 0,
-    "actual_plannable_generation_jobs": 450,
+    "actual_plannable_generation_jobs": 135,
     "blockers": [
       "generator model/price gate: Pinned hosted frontier model ID and revision required",
       "judge model/price gate: Pinned hosted frontier model ID and revision required"
     ],
-    "budget_cap_usd": 500,
+    "budget_cap_usd": 100,
     "capability_deviations": [
       "generator: seed omitted by frozen provider capability policy",
       "generator: temperature omitted by frozen provider capability policy",
@@ -114,12 +114,12 @@
       "judge: temperature omitted by frozen provider capability policy"
     ],
     "demo": false,
-    "design_hash": "65349da460a47c95c28465f498cf396a8a768e3eeb4b8da6e24cba85ad8aa61c",
+    "design_hash": "02f069248a51a08fa91d39b0be866b1aa1fd972660259843b073b14c548808bb",
     "estimates": {},
-    "generation_jobs": 450,
+    "generation_jobs": 135,
     "judgment_cells_upper_bound": 3000,
     "live_ready": false,
-    "preflight_hash": "6fea83fce8a98139794a978150bb80c623614ed993312a39a7c73e5dcb3a50df",
+    "preflight_hash": "8cb4ba7215b11fd1d42982cbf378be731a6cce251b40684faa4e9bc1650556db",
     "prompt_hashes": {
       "P0.txt": "84c77574b765785975efb6c32fae9fbb1f3a1e33e1db7b5ff1abdfc80fc9d944",
       "P0_harpaintner.txt": "fe3208ea79605111f2bbca49dda57fd2182732fd9d3b18a42a0272b4365cbb8e",
@@ -127,7 +127,7 @@
       "P2.txt": "3f3e6bb745106f5f98a5472dbf02587b713d3b8906796609728309940e98f45f",
       "binary_v1.txt": "18825161634d12ce02743c6885309e4e7ebcfcb673fa25186ec7591a0953114f"
     },
-    "remaining_usd": 500,
+    "remaining_usd": 100,
     "remaining_worst_case_usd": null,
     "selected_item_count": 15,
     "selected_item_ids": [
@@ -152,18 +152,18 @@
       "bank.py": "4493c0b9e6bc1ed76123d32c239d9710f88431f7532423bfd34f1b9b557cddb1",
       "budget.py": "d77ab9306dafcccde81d05d00e49b080e94369c3d56b7509715f93157bb13380",
       "clients.py": "9dad414fd86f35cad5b4d0b6287a1eb3683def30b71fca12f4c3defd957a02ec",
-      "composition.py": "9275abcac510ee23a49c63855ae827a30348579a361054c1ba9bc2924054e38a",
-      "engine.py": "f6f001be50bf27900332fa84286bc5856175aa2e0edfabeb91d2f4f9f53e256f",
+      "composition.py": "f13cf651ea6939f9052a17f2518bf9f88f39c28bb068f5aeb5b0bb14b9b39185",
+      "engine.py": "6dfc049a911290010046ddec8e90ead4ca39401cff4b30bec90c5f61866ca0de",
       "fixtures.py": "0679d33f32623593e1a12b9b2670f72f22afdbbdd8236a317555478fc02af782",
       "io.py": "76caf415b30e113fc440a81577bdf25fc13d95b24de26d8b7d25d2972edc369b",
       "judge.py": "fc88f413df652eef13c4c55fe2402693513f7c97ae937d708b13db3e4128fbb8",
       "metrics.py": "7c9da0fee2bc684cdb1e171742a6055752ab7b32e69a24a8c6bb0a3cb1b5248e",
-      "planner.py": "8b8bf582a4560e3ab5e65dea0d53f10261bd3e8b4b6d13ce1b6b072e768f0d35",
+      "planner.py": "d82dbfa02b536c34d01aea52e4ef2da54806d9a39d8d10daf73aef29817af1ee",
       "preflight.py": "f8c293529b3e168e2339a91a2bbd24485ecc97506659f5cd73097e58a5652626",
       "prompts.py": "52cfa556daea07d25215f1d9d1172e11e8c5b55248821d994487717a3f7a3070",
       "references.py": "7b6d2c9eb42107371b0202b01cff9b029b5b2d3212bc146db374e55eff3dabb5",
       "registry.py": "f11f0a9251f1f109ec6daab88f0db323518dcc901dd73c6789f27283b0896ae1",
-      "report.py": "9ff5c1560a2fbf9151c5ae6d909cdc9f1d245e9346fcf0ef67bff2c4fcd39752",
+      "report.py": "12b336ba95c63f43928991ae451e935c3bae9915974b0c957797d5fc6e2ec15d",
       "run.py": "60f3c4f9346944ea2c48139f4ec1bc0f2773d789bb5ece714c90d241175fedbf",
       "source_adapters.py": "5eb8e3ff00aa150f18ba669788591fd9f22421cfba141faab4170ddfd94e5030"
     },

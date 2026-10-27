@@ -53,7 +53,7 @@ def demo_config(root):
         schema_version="pilot_v1",
         root=str(root),
         demo=True,
-        replicates=10,
+        replicates=3,
         seed=42,
         candidate_cap=200,
         max_attempts=2,
@@ -147,9 +147,9 @@ def preflight(c, stage):
         raise ValueError("API cap must be >0 and <=500")
     if not 1 <= c["candidate_cap"] <= 200:
         raise ValueError("Candidate cap must be 1–200; amend design to increase it")
-    if type(c["replicates"]) is not int or c["replicates"] < 2 or c["replicates"] % 2:
+    if type(c["replicates"]) is not int or c["replicates"] < 2:
         raise ValueError(
-            "Even positive replicate count >=2 required for matched component budgets"
+            "Integer replicate count >=2 required for matched component budgets"
         )
     if type(c["max_attempts"]) is not int or not 1 <= c["max_attempts"] <= 5:
         raise ValueError("max_attempts must be 1–5")
