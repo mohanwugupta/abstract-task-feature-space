@@ -1,0 +1,78 @@
+{
+  "inputs": 75,
+  "human": 60,
+  "tasks": 15,
+  "generation": {
+    "n_templates": 225,
+    "bytes_min": 915,
+    "bytes_median": 955,
+    "bytes_p95": 1402,
+    "bytes_max": 6701,
+    "top_longest": [
+      [
+        6701,
+        "finance_S_both",
+        "P2"
+      ],
+      [
+        6642,
+        "finance_S_review",
+        "P2"
+      ],
+      [
+        6613,
+        "finance_S_deadline",
+        "P2"
+      ],
+      [
+        6581,
+        "finance_S_both",
+        "P1"
+      ],
+      [
+        6550,
+        "finance_S_both",
+        "P0"
+      ],
+      [
+        6522,
+        "finance_S_review",
+        "P1"
+      ]
+    ]
+  },
+  "judging": {
+    "n_templates": 75,
+    "bytes_min": 1342,
+    "bytes_median": 1351,
+    "bytes_p95": 1680,
+    "bytes_max": 6979,
+    "top_longest": [
+      [
+        6979,
+        "finance_S_both"
+      ],
+      [
+        6920,
+        "finance_S_review"
+      ],
+      [
+        6891,
+        "finance_S_deadline"
+      ],
+      [
+        6799,
+        "finance_T"
+      ],
+      [
+        1680,
+        "poem_S_both"
+      ],
+      [
+        1621,
+        "poem_S_review"
+      ]
+    ]
+  },
+  "reference_note": "Counts include system + JSON input payload + response schema; exclude protocol/framing wire overhead and cached history; byte counts are not tokens. Finance descriptions dominate extreme values."
+}

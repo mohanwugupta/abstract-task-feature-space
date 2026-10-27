@@ -53,7 +53,7 @@ def test_cli_dry_runs_and_demo_entrypoints(tmp_path):
         assert p.returncode == 0, p.stderr
         result = json.loads(p.stdout)
         assert result["generation_jobs"] == count
-        assert result["live_ready"] is False and result["blockers"]
+        assert result["live_ready"] is True and not result["blockers"]
     p = subprocess.run(
         common + ["--stage", "all", "--demo", "--output-root", str(tmp_path)],
         cwd=ROOT,
@@ -81,6 +81,8 @@ def test_cli_dry_runs_and_demo_entrypoints(tmp_path):
 def test_missing_human_data_does_not_underestimate_declared_matrix_scope():
     from feature_space_pilot.engine import load_config, preflight
 
-    plan = preflight(load_config(ROOT / "configs/feature_space_pilot.json"), "human")
-    assert plan["judgment_cells_upper_bound"] == 12000
-    assert any("harpaintner_2018" in b for b in plan["blockers"])
+    config = load_config(ROOT / "configs/feature_space_pilot.json")
+    plan = preflight(config, "human")
+    assert plan["judgment_cells_upper_bound"] == 60 * config["candidate_cap"] == 9000
+    assert plan["scientific_preflight"]["generation_ready"]
+    assert not plan["scientific_preflight"]["abstract_comparison_ready"]

@@ -1,0 +1,43 @@
+{
+  "candidate_cap": 150,
+  "candidate_selection": "Existing deterministic normalized-phrase SHA-256 order before any judgments; retain excluded provenance",
+  "combined_ceiling_usd": 64.60875,
+  "coverage_tradeoff": "25% smaller maximum selected vocabulary; do not select by human agreement, categories, judged outcomes or desired composition results",
+  "cumulative_cap_usd": 100,
+  "date": "2026-10-27",
+  "generation_jobs": {
+    "human": 540,
+    "tasks": 135,
+    "total": 675
+  },
+  "judgment_cell_bounds": {
+    "human": 9000,
+    "tasks": 2250,
+    "total": 11250
+  },
+  "ledger_policy": "Retain shared existing budget_live.jsonl and actual spent amount; no balance reset or separate allowance per stage",
+  "max_attempts": 2,
+  "previous_candidate_cap": 200,
+  "replicates": 3,
+  "source_workbook_sha256": "a0d94ee950f5dcdb5bd753cb9050ddeda4a96d8493bc63772113bc31a39af293",
+  "stage_caps": {
+    "adjudication": 10,
+    "embeddings": 5,
+    "generation": 10,
+    "judgment": 65,
+    "reserve": 10
+  },
+  "token_envelopes": {
+    "generation_output_including_reasoning": 700,
+    "input": 7500,
+    "judgment_output_including_reasoning": 400
+  },
+  "translation_claim_policy": "Pending published English stimuli permit exploratory generation, not unreviewed cross-language human quantitative comparisons",
+  "translation_review_sha256": "bff5e642436bb2838a348deff5c1a8c1445190be4418a1399e053ed95c120b74",
+  "user_choices": {
+    "language": "published_english_exploratory",
+    "model": "gpt-5-mini-2025-08-07",
+    "reasoning_effort": "low"
+  },
+  "version": "scientific_budget_v2_english_mini_150"
+}

@@ -10,6 +10,7 @@ Requires Python 3.11. No API credentials or GPU are needed.
 
 ```bash
 python -m pip install -r requirements-feature-space-viz.txt
+python -m feature_space_pilot.scientific --config configs/feature_space_pilot.json --prepare
 python -m feature_space_pilot.run --config configs/feature_space_pilot.json --stage all --demo
 python -m feature_space_pilot.report --config configs/feature_space_pilot.json
 python -m pytest -q tests/feature_space_pilot
@@ -41,14 +42,14 @@ See [visualization usage and interpretation](VISUALIZATION_EXPLORER.md) and the 
 
 ## Human CSV inputs
 
-The default configuration now reads both supplied human CSVs: **60 stimuli**, cross-checked against the **24-item abstract category summary**. Original labels, German source text, translation status and existing Vinson splits are preserved. The abstract summary supplies rounded category proportions rather than feature strings.
+The default configuration now reads both supplied human CSVs: **60 stimuli**, cross-checked against the **24-item abstract category summary**. Original reference labels, German source text, translation status and existing splits are preserved. Model-facing Vinson words use the published noun/verb syntax markers; abstract targets use English, as requested. The abstract summary supplies rounded category proportions rather than feature strings.
 
 ```bash
 python -m feature_space_pilot.human_inputs --config configs/feature_space_pilot.json --output-dir artifacts/human_input_audit/v1
 python -m feature_space_pilot.run --config configs/feature_space_pilot.json --stage human --dry-run
 ```
 
-The audit is offline; the normal human dry run now plans all **540 generation jobs**. Source/protocol/translation verification and budget sizing still gate paid execution. See [human input mapping, audit and remaining gates](HUMAN_INPUTS.md).
+The audit is offline; the human stage plans **540 generation jobs**. Scientific generation preflight and the combined $100 budget now pass. Pending abstract translation/coding reviews still gate quantitative cross-language comparisons. See [scientific checks, budget, and execution commands](PREFLIGHT_WORKFLOW.md) and [CSV mappings](HUMAN_INPUTS.md).
 
 ## Documentation
 
@@ -66,9 +67,15 @@ OPENAI_API_KEY=your-openai-api-key-here
 
 The live runner loads it automatically. An existing exported `OPENAI_API_KEY` takes precedence. `.env` is ignored by Git; `.env.example` provides the blank template. Offline demos and dry runs do not read credentials.
 
-Generator and judge default to **GPT-6.1 Sol (`gpt-6.1-sol`) with low reasoning**; unsupported seed/temperature parameters are omitted. Model IDs remain configurable. Paid execution requires verified model pricing/capabilities, a successful dry run, its matching preflight hash, and explicit `--execute-live`. The current configured cumulative API cap is **$100** (hard maximum $500). Conservative full-bank estimates can still block a paid run; visualization never makes API calls.
+Generator and judge now default to user-selected **GPT-5 mini (`gpt-5-mini-2025-08-07`) with low reasoning**; unsupported seed/temperature parameters are omitted. Model IDs remain configurable. Paid execution requires verified model pricing/capabilities, a successful dry run, its matching preflight hash, and explicit `--execute-live`. The current configured cumulative API cap is **$100** (hard maximum $500). The label-blind 150-feature bank and 7,500-input/700-generation-output/400-judge-output envelopes give a combined human+task ceiling of **$64.60875**, plus existing liabilities. Stage allocations sum to $100. Visualization never makes API calls.
 
-All 60 supplied human stimuli and 15 task targets are integrated. The human benchmark remains blocked pending source/codebook/terms, participant-protocol and translation verification, plus budget sizing. A two-request live connectivity diagnostic passed (estimated $0.002814); no full live pilot has run.
+All 60 supplied human stimuli and 15 task targets are integrated. Raw sources, workbook crosswalk and separate P0 protocols are verified as documented; English abstract generation is explicitly exploratory while pending reviews suppress translated human comparisons. A one-call GPT-5-mini diagnostic passed; total recorded diagnostic spending is $0.003158. No full live pilot has run.
+
+```bash
+python -m feature_space_pilot.preflight --config configs/feature_space_pilot.json --campaign
+```
+
+Follow [the preflight workflow](PREFLIGHT_WORKFLOW.md) for preparation, fresh stage hashes and explicit execution. The older mini snapshot is marked deprecated by the provider; its account access passed the isolated diagnostic, and the code never substitutes another model silently.
 
 ## Validation and reference data
 

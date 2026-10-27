@@ -1,0 +1,396 @@
+{
+  "adapter_version": "harpaintner_workbook_crosswalk_v1",
+  "discrepancies": [],
+  "matched_items": 24,
+  "matches": [
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0010",
+      "original_german": "Aktivität",
+      "published_loose_english": "activity",
+      "source_excel_row": 10
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0020",
+      "original_german": "Anstrengung",
+      "published_loose_english": "effort",
+      "source_excel_row": 20
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0071",
+      "original_german": "Ekel",
+      "published_loose_english": "disgust",
+      "source_excel_row": 71
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0095",
+      "original_german": "Erwartung",
+      "published_loose_english": "expectation",
+      "source_excel_row": 95
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0100",
+      "original_german": "Fitneß",
+      "published_loose_english": "fitness",
+      "source_excel_row": 100
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0112",
+      "original_german": "Gedanke",
+      "published_loose_english": "thought",
+      "source_excel_row": 112
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0114",
+      "original_german": "Gefühl",
+      "published_loose_english": "emotion",
+      "source_excel_row": 114
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0116",
+      "original_german": "Gehorsam",
+      "published_loose_english": "obedience",
+      "source_excel_row": 116
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0119",
+      "original_german": "Gerechtigkeit",
+      "published_loose_english": "justice",
+      "source_excel_row": 119
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0145",
+      "original_german": "Katastrophe",
+      "published_loose_english": "catastrophe",
+      "source_excel_row": 145
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0149",
+      "original_german": "Kompromiss",
+      "published_loose_english": "compromise",
+      "source_excel_row": 149
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0152",
+      "original_german": "Kooperation",
+      "published_loose_english": "cooperation",
+      "source_excel_row": 152
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0154",
+      "original_german": "Kreativität",
+      "published_loose_english": "creativity",
+      "source_excel_row": 154
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0182",
+      "original_german": "Perfektion",
+      "published_loose_english": "perfection",
+      "source_excel_row": 182
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0194",
+      "original_german": "Rat",
+      "published_loose_english": "advice",
+      "source_excel_row": 194
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0200",
+      "original_german": "Revolution",
+      "published_loose_english": "revolution",
+      "source_excel_row": 200
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0202",
+      "original_german": "Ritual",
+      "published_loose_english": "ritual",
+      "source_excel_row": 202
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0218",
+      "original_german": "Sehnsucht",
+      "published_loose_english": "desire",
+      "source_excel_row": 218
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0223",
+      "original_german": "Sitte",
+      "published_loose_english": "convention",
+      "source_excel_row": 223
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0249",
+      "original_german": "Überraschung",
+      "published_loose_english": "surprise",
+      "source_excel_row": 249
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0253",
+      "original_german": "Unterstützung",
+      "published_loose_english": "support",
+      "source_excel_row": 253
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0255",
+      "original_german": "Verachtung",
+      "published_loose_english": "contempt",
+      "source_excel_row": 255
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0269",
+      "original_german": "Vertrauen",
+      "published_loose_english": "trust",
+      "source_excel_row": 269
+    },
+    {
+      "fields_checked": [
+        "abstractness_rating",
+        "familiarity_rating",
+        "human_is_e",
+        "human_sc",
+        "human_sm",
+        "human_va",
+        "item_text",
+        "original_german"
+      ],
+      "item_id": "hp18_row0292",
+      "original_german": "Würde",
+      "published_loose_english": "dignity",
+      "source_excel_row": 292
+    }
+  ],
+  "provenance": "User-supplied workbook; exact internal derivation verified against primary publication schema",
+  "publisher_download_verified": false,
+  "raw_sha256": "a0d94ee950f5dcdb5bd753cb9050ddeda4a96d8493bc63772113bc31a39af293",
+  "summary_sha256": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
+  "workbook_items": 296
+}

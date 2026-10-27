@@ -8,7 +8,7 @@ from .io import canonical
 
 
 def generation_schema(item_id, cap):
-    return dict(
+    schema = dict(
         type="object",
         additionalProperties=False,
         required=["item_id", "features"],
@@ -17,6 +17,9 @@ def generation_schema(item_id, cap):
             "features": dict(type="array", maxItems=cap, items=dict(type="string")),
         },
     )
+    if cap is None:
+        schema["properties"]["features"].pop("maxItems")
+    return schema
 
 
 def judgment_schema(item_id, feature_id):
@@ -32,6 +35,30 @@ def judgment_schema(item_id, feature_id):
             "evidence": dict(type="string"),
         },
     )
+
+
+def build_payload(settings, *, system, user, schema, seed=None, temperature=0.8):
+    """Single request builder shared by token audit, reservation and transport."""
+    s = settings
+    payload = dict(
+        model=s["model_id"],
+        messages=[dict(role="system", content=system), dict(role="user", content=user)],
+        max_completion_tokens=s["max_output_tokens"],
+        stream=False,
+    )
+    if s.get("supports_temperature"):
+        payload["temperature"] = temperature
+    if s.get("supports_seed") and seed is not None:
+        payload["seed"] = seed
+    if s.get("reasoning_effort"):
+        payload["reasoning_effort"] = s["reasoning_effort"]
+    if not s.get("supports_structured_outputs"):
+        raise ValueError("Verified strict structured-output support is required")
+    payload["response_format"] = dict(
+        type="json_schema",
+        json_schema=dict(name="pilot_response", strict=True, schema=schema),
+    )
+    return payload
 
 
 class HostedClient:
@@ -70,28 +97,18 @@ class HostedClient:
             return json.load(r)
 
     def complete(self, *, system, user, schema, seed=None, temperature=0.8):
-        s = self.settings
-        payload = dict(
-            model=s["model_id"],
-            messages=[
-                dict(role="system", content=system),
-                dict(role="user", content=user),
-            ],
-            max_completion_tokens=s["max_output_tokens"],
-            stream=False,
+        payload = build_payload(
+            self.settings,
+            system=system,
+            user=user,
+            schema=schema,
+            seed=seed,
+            temperature=temperature,
         )
-        if s.get("supports_temperature"):
-            payload["temperature"] = temperature
-        if s.get("supports_seed") and seed is not None:
-            payload["seed"] = seed
-        if s.get("reasoning_effort"):
-            payload["reasoning_effort"] = s["reasoning_effort"]
-        if not s.get("supports_structured_outputs"):
-            raise ValueError("Verified strict structured-output support is required")
-        payload["response_format"] = dict(
-            type="json_schema",
-            json_schema=dict(name="pilot_response", strict=True, schema=schema),
-        )
+        if self.settings.get("token_counting"):
+            from .token_accounting import validate_payload
+
+            validate_payload(payload, self.settings)
         response = self.transport(payload)
         usage = response.get("usage") or {}
         choices = response.get("choices") or []
@@ -193,8 +210,8 @@ class FakeClient:
                 ),
                 usage,
             )
-        cap = schema["properties"]["features"]["maxItems"]
         props = self.properties(request["text"])
+        cap = schema["properties"]["features"].get("maxItems", len(props))
         if seed is not None and len(props) > 2:
             start = seed % len(props)
             props = props[start:] + props[:start]

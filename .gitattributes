@@ -6,3 +6,6 @@ data/feature_space_pilot/references/** -text
 # Supplied human CSV hashes include their original BOM and CRLF bytes.
 /human_norm_pilot_60_stimuli.csv -text
 /human_norm_pilot_abstract_24.csv -text
+"Data Sheet 1.xlsx" -text -diff
+/pilot_abstract_translation_review.csv -text
+data/feature_space_pilot/tokenizers/*.tiktoken -text -diff

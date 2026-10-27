@@ -37,6 +37,27 @@ def load_reference(spec, *, live=False, model_language=None):
         raise ValueError("Reference hash mismatch")
     if path.stat().st_mode & 0o222:
         raise ValueError("Reference must be read-only (chmod 444)")
+    if spec.get("raw_path"):
+        raw = materialized(spec["raw_path"])
+        if not spec.get("raw_sha256") or file_hash(raw) != spec["raw_sha256"]:
+            raise ValueError("Raw reference hash mismatch")
+        if raw.stat().st_mode & 0o222:
+            raise ValueError("Raw reference must be read-only (chmod 444)")
+        if spec.get("adapter") == "human_pilot_category_shares_v1":
+            from .source_adapters import verify_harpaintner_workbook
+
+            verified = verify_harpaintner_workbook(
+                raw, path, expected_sha256=spec["raw_sha256"]
+            )
+            crosswalk = materialized(spec["crosswalk_path"])
+            if file_hash(crosswalk) != spec.get("crosswalk_sha256"):
+                raise ValueError("Workbook crosswalk artifact hash mismatch")
+            import json
+
+            if json.loads(crosswalk.read_text()) != verified:
+                raise ValueError(
+                    "Workbook crosswalk artifact does not match raw source"
+                )
     if spec["data_level"] not in {
         "item_features",
         "participant_features",
@@ -105,6 +126,10 @@ def validate_item_alignment(item, ref):
             f"Human stimulus absent from verified reference: {item['item_id']}"
         )
     if item["language"] == ref["language"]:
+        if item.get("stimulus_condition") == "vinson_published_syntax":
+            prefix = "to" if item["selection_stratum"] == "actionV" else "the"
+            if item["text"] == prefix + " " + source_text.lower():
+                return
         if source_text != item["text"]:
             raise ValueError("Human item text does not match its same-language source")
         return

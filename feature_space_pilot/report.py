@@ -8,6 +8,7 @@ from pathlib import Path
 from .io import canonical, digest, file_hash, read_jsonl, write_csv, write_json
 from .metrics import (
     category_profile,
+    category_geometry,
     discovery_curves,
     geometry_comparison,
     human_recovery,
@@ -195,9 +196,8 @@ def _human_analysis(c, items, generations, bank, judgments):
                     )
                 )
             continue
-        cap = min(
-            10, generation_prompt(item, "P0", protocols=c.get("protocols"))["cap"]
-        )
+        source_cap = generation_prompt(item, "P0", protocols=c.get("protocols"))["cap"]
+        cap = min(10, source_cap) if source_cap is not None else 10
         for family in ["P0", "P1", "P2"]:
             group = [
                 r
@@ -222,6 +222,12 @@ def _human_analysis(c, items, generations, bank, judgments):
                     item_id=item["item_id"],
                     prompt_family=family,
                     comparison_cap=cap,
+                    source_feature_cap=source_cap,
+                    comparison_cap_policy=(
+                        "analysis_truncation_not_a_human_instruction_limit"
+                        if source_cap is None
+                        else "matched_source_protocol_cap"
+                    ),
                     split=item.get("split", "unspecified"),
                     **recovery,
                 )
@@ -335,11 +341,35 @@ def _human_analysis(c, items, generations, bank, judgments):
                     **result,
                 )
             )
+    category_rdms = []
+    for dataset, ref in sorted(refs.items()):
+        if ref["data_level"] != "category_counts":
+            continue
+        ids = {i["item_id"] for i in human if i["source_dataset"] == dataset}
+        selected_profiles = [p for p in profiles if p["item_id"] in ids]
+        for family in ["P0", "P1", "P2"]:
+            comparison = category_geometry(
+                {p["item_id"]: p["human_profile"] for p in selected_profiles},
+                {
+                    p["item_id"]: p["generated_profiles"].get(family, {})
+                    for p in selected_profiles
+                },
+                {
+                    p["item_id"]: p["coding_coverage"].get(family, {})
+                    for p in selected_profiles
+                },
+                bootstrap=c.get("bootstrap_resamples", 200),
+                seed=c["seed"],
+            )
+            category_rdms.append(
+                dict(source_dataset=dataset, prompt_family=family, **comparison)
+            )
     return dict(
         reference_role="Human production norms, not ontological truth",
         synthetic=bool(c.get("demo")),
         recovery=recoveries,
         category_profiles=profiles,
+        category_geometry=category_rdms,
         geometry=geometry,
         split_half=reliability,
         item_availability=availability,

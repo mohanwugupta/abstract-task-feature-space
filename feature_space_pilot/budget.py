@@ -52,6 +52,8 @@ class Ledger:
         }
         if any(not math.isfinite(v) or v < 0 for v in self.stage_caps.values()):
             raise ValueError("Invalid stage budget")
+        if sum(self.stage_caps.values()) > cap + 1e-12:
+            raise ValueError("Stage budget allocations exceed cumulative cap")
         self.events = []
         self.lock = None
 

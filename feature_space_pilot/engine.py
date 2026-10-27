@@ -110,6 +110,9 @@ def selected_items(c, stage):
                     abstract_sha256=c["human_abstract_summary_sha256"],
                     seed=c["seed"],
                 )
+                from .scientific import apply_language_condition
+
+                human = apply_language_condition(human, c)
             else:
                 human = load_items(path)
     if stage in {"tasks", "all"} or c.get("smoke"):
@@ -152,11 +155,34 @@ def smoke_config(c):
 
 def _source_specs(c):
     if c.get("source_registry"):
-        return json.loads(resolve(c, c["source_registry"]).read_text())["sources"]
-    return c.get("sources", [])
+        specs = json.loads(resolve(c, c["source_registry"]).read_text())["sources"]
+    else:
+        specs = c.get("sources", [])
+    result = []
+    for original in specs:
+        spec = dict(original)
+        for key in ["path", "raw_path", "crosswalk_path"]:
+            if spec.get(key):
+                spec[key] = str(resolve(c, spec[key]))
+        if spec.get("dataset_id") == "harpaintner_2018" and c.get(
+            "translation_review_file"
+        ):
+            from .scientific import load_translation_reviews
+
+            reviews = load_translation_reviews(
+                resolve(c, c["translation_review_file"]),
+                expected_sha256=c["translation_review_sha256"],
+            )
+            approved = [r for r in reviews.values() if r["approved"]]
+            spec["translation_reviewed"] = bool(approved)
+            spec["translation_mapping"] = {
+                r["german_original"]: r["reviewed_english"] for r in approved
+            }
+        result.append(spec)
+    return result
 
 
-def preflight(c, stage):
+def preflight(c, stage, *, campaign_check=True):
     if stage not in STAGES:
         raise ValueError("Unknown pilot stage")
     for role in ["generator", "judge"]:
@@ -192,7 +218,23 @@ def preflight(c, stage):
             warnings.append(
                 "Abstract human input contains rounded category proportions only; feature-string recovery, human feature RDMs and participant reliability are unavailable for that source"
             )
-    if not demo and stage == "human":
+    scientific = None
+    token_audit = None
+    if not demo and c.get("scientific_preflight_enabled") and stage == "human":
+        from .scientific import scientific_audit
+
+        scientific = scientific_audit(dict(c, smoke_item_ids=None, smoke=False))
+        blockers.extend(scientific["blockers"])
+        warnings.extend(scientific["warnings"])
+        for source in scientific["sources"]:
+            source_hashes[source["dataset_id"]] = source["sha256"]
+            if source.get("raw_sha256"):
+                source_hashes[source["dataset_id"] + ":raw"] = source["raw_sha256"]
+        if c.get("translation_review_file"):
+            input_hashes["translation_reviews"] = file_hash(
+                resolve(c, c["translation_review_file"])
+            )
+    elif not demo and stage == "human":
         from .references import load_reference, validate_item_alignment
 
         if len(human) != c.get("human_target_count", 60):
@@ -237,6 +279,18 @@ def preflight(c, stage):
     # Freeze both the complete literal template set and each constructed request.
     prompt_hashes = {p.name: file_hash(p) for p in sorted(DIRECTORY.glob("*.txt"))}
     settings = c["generator"]
+    if not demo and settings.get("token_counting"):
+        from .token_accounting import audit_prompts
+
+        try:
+            token_audit = audit_prompts(dict(c, smoke_item_ids=None, smoke=False))
+            token_audit = {
+                k: v
+                for k, v in token_audit.items()
+                if k not in {"generation_requests", "judgment_requests"}
+            }
+        except (ValueError, OSError, KeyError) as error:
+            blockers.append(f"Payload token audit: {error}")
     jobs = plan_generation(
         items,
         settings,
@@ -419,6 +473,36 @@ def preflight(c, stage):
         blockers.append(
             "Remaining plan plus prior cumulative liabilities exceeds budget"
         )
+    campaign_liability = None
+    if (
+        not demo
+        and c.get("scientific_preflight_enabled")
+        and campaign_check
+        and stage in {"human", "tasks"}
+        and not c.get("smoke")
+    ):
+        other = preflight(
+            c, "tasks" if stage == "human" else "human", campaign_check=False
+        )
+        if other["remaining_worst_case_usd"] is not None:
+            campaign_liability = (
+                prior.total + remaining_total + other["remaining_worst_case_usd"]
+            )
+            if campaign_liability > c["api_cap_usd"] + 1e-12:
+                blockers.append(
+                    "Combined human and task remaining liability exceeds cumulative budget"
+                )
+            for key in estimate:
+                if (
+                    key in other["estimates"]
+                    and prior.stage_total(key)
+                    + estimate[key]["remaining_worst_case_usd"]
+                    + other["estimates"][key]["remaining_worst_case_usd"]
+                    > c["stage_caps"][key] + 1e-12
+                ):
+                    blockers.append(
+                        f"Combined human and task {key} liability exceeds stage budget"
+                    )
     return dict(
         stage=stage,
         demo=demo,
@@ -441,6 +525,9 @@ def preflight(c, stage):
         prompt_hashes=prompt_hashes,
         source_hashes=source_hashes,
         input_hashes=input_hashes,
+        scientific_preflight=scientific,
+        prompt_token_audit=token_audit,
+        combined_campaign_liability_usd=campaign_liability,
         source_code_hashes=source_code,
         live_ready=not demo and not blockers,
     )
@@ -523,9 +610,28 @@ def _call(
         e["event"] == "reserve" and e.get("job_id") == job_id for e in ledger.events
     )
     for attempt in range(attempts, max_attempts):
-        input_bound = (
-            len(canonical([prompt["system"], prompt["user"], schema]).encode()) + 2048
-        )
+        token_count = None
+        if settings.get("token_counting"):
+            from .clients import build_payload
+            from .token_accounting import validate_payload
+
+            token_count = validate_payload(
+                build_payload(
+                    settings,
+                    system=prompt["system"],
+                    user=prompt["user"],
+                    schema=schema,
+                    seed=record_base.get("seed"),
+                    temperature=settings.get("temperature", 0),
+                ),
+                settings,
+            )
+            input_bound = token_count["input_token_bound"]
+        else:
+            input_bound = (
+                len(canonical([prompt["system"], prompt["user"], schema]).encode())
+                + 2048
+            )
         if input_bound > settings["max_input_tokens"]:
             raise ValueError("Request exceeds frozen input-token ceiling")
         amount = estimate_cost(
@@ -552,6 +658,13 @@ def _call(
         if error is None:
             try:
                 ledger.settle(ticket, usage, settings["prices"])
+                if (
+                    usage["input_tokens"] > input_bound
+                    or usage["output_tokens"] > settings["max_output_tokens"]
+                ):
+                    raise ValueError(
+                        "Provider usage exceeded frozen token envelope; actual cost recorded, execution halted"
+                    )
             except ValueError as e:
                 error = str(e)
                 fatal = True
@@ -573,6 +686,7 @@ def _call(
             usage=usage,
             latency_seconds=round(time.monotonic() - started, 6),
             budget_ticket=ticket,
+            token_budget=token_count,
             **(parsed or {}),
         )
         record["record_hash"] = digest(record)

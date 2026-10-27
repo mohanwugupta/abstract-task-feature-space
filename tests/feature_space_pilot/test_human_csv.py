@@ -41,7 +41,7 @@ def test_default_csv_inventory_preserves_labels_provenance_and_existing_splits()
     by_id = {i["item_id"]: i for i in items}
     for old in load_items(ROOT / "data/feature_space_pilot/stimuli_human.jsonl"):
         current = by_id[old["item_id"]]
-        assert (current["text"], current["split"]) == (old["text"], old["split"])
+        assert (current["source_text"], current["split"]) == (old["text"], old["split"])
     example = by_id["hp18_row0154"]
     assert example["text"] == "creativity" and example["source_text"] == "Kreativität"
     assert example["language"] == "en" and example["source_language"] == "de"
@@ -184,7 +184,7 @@ def test_category_adapter_preserves_rounded_proportions_without_inventing_featur
     assert observed == dict(SM=0.8133, **{"IS/E": 0.1, "SC": 0.0, "VA": 0.0867})
     assert all("feature" not in r and r["language"] == "de" for r in ref["rows"])
     with pytest.raises(ValueError, match="verified"):
-        load_reference(dict(spec, path=str(p)), live=True)
+        load_reference(dict(spec, path=str(p), verified=False), live=True)
 
 
 def test_preflight_plans_all_csv_targets_and_discloses_remaining_scientific_gates():
@@ -194,12 +194,12 @@ def test_preflight_plans_all_csv_targets_and_discloses_remaining_scientific_gate
         and plan["actual_plannable_generation_jobs"] == 540
     )
     assert not any("sample is not frozen" in b for b in plan["blockers"])
-    assert any("reviewed translation" in b for b in plan["blockers"])
-    assert any("P0" in b for b in plan["blockers"])
+    assert plan["scientific_preflight"]["pending_translation_reviews"] == 24
+    assert not plan["scientific_preflight"]["abstract_comparison_ready"]
     assert any("category" in w.lower() for w in plan["warnings"])
     assert plan["input_hashes"]["human_stimuli"] == file_hash(INVENTORY)
     assert plan["input_hashes"]["human_abstract_summary"] == file_hash(ABSTRACT)
-    assert not plan["live_ready"]
+    assert plan["live_ready"]
     item = next(
         i
         for i in selected_items(
@@ -235,6 +235,7 @@ def test_category_reports_require_reviewed_item_alignment_and_preserve_availabil
     # Only this isolated test fixture is considered verified; production stays gated.
     spec = dict(spec, path=str(p), verified=True, translation_reviewed=reviewed)
     config.pop("source_registry")
+    config.pop("translation_review_file")
     config["sources"] = [spec]
     if reviewed:
         item = dict(item, translation_status="reviewed")

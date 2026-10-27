@@ -2,8 +2,8 @@
   "human": {
     "stage": "human",
     "demo": false,
-    "design_hash": "b4f266fe04dbd31e255c8677925f1d5acb0631c375bfb10229197d621963ad7c",
-    "preflight_hash": "c971ed8db445c8953cb9bc340ffb54680ff9ddd35db02ca77ba4a12cf5490487",
+    "design_hash": "74608725aae4e0dc45235747fcc1e73bef42dda64a6e8154ea7d92b9d2eb4b5a",
+    "preflight_hash": "9e16d1816b5bd385e095ca7e50c994e9fc7b32ce4c7ffd691e563320a0fb6404",
     "selected_item_count": 60,
     "selected_item_ids": [
       "hp18_row0010",
@@ -69,65 +69,54 @@
     ],
     "generation_jobs": 540,
     "actual_plannable_generation_jobs": 540,
-    "judgment_cells_upper_bound": 12000,
+    "judgment_cells_upper_bound": 9000,
     "estimates": {
       "generation": {
         "calls": 540,
         "attempts_with_retries": 1080,
-        "input_tokens_per_attempt": 30000,
-        "output_tokens_per_attempt": 1000,
-        "worst_case_usd": 75.60000000000001,
+        "input_tokens_per_attempt": 7500,
+        "output_tokens_per_attempt": 700,
+        "worst_case_usd": 3.537,
         "prices": {
-          "input_per_million": 2,
-          "model_id": "gpt-6.1-sol",
-          "output_per_million": 10,
-          "revision": "gpt-6.1-sol",
-          "source_url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
-          "verified_at": "2026-10-26"
+          "input_per_million": 0.25,
+          "model_id": "gpt-5-mini-2025-08-07",
+          "output_per_million": 2,
+          "revision": "gpt-5-mini-2025-08-07",
+          "source_url": "https://developers.openai.com/api/docs/models/gpt-5-mini",
+          "verified_at": "2026-10-27"
         },
         "remaining_attempts_upper_bound": 1080,
-        "remaining_worst_case_usd": 75.60000000000001
+        "remaining_worst_case_usd": 3.537
       },
       "judgment": {
-        "calls": 12000,
-        "attempts_with_retries": 24000,
-        "input_tokens_per_attempt": 30000,
-        "output_tokens_per_attempt": 1000,
-        "worst_case_usd": 1680.0000000000002,
+        "calls": 9000,
+        "attempts_with_retries": 18000,
+        "input_tokens_per_attempt": 7500,
+        "output_tokens_per_attempt": 400,
+        "worst_case_usd": 48.15,
         "prices": {
-          "input_per_million": 2,
-          "model_id": "gpt-6.1-sol",
-          "output_per_million": 10,
-          "revision": "gpt-6.1-sol",
-          "source_url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
-          "verified_at": "2026-10-26"
+          "input_per_million": 0.25,
+          "model_id": "gpt-5-mini-2025-08-07",
+          "output_per_million": 2,
+          "revision": "gpt-5-mini-2025-08-07",
+          "source_url": "https://developers.openai.com/api/docs/models/gpt-5-mini",
+          "verified_at": "2026-10-27"
         },
-        "remaining_attempts_upper_bound": 24000,
-        "remaining_worst_case_usd": 1680.0000000000002
+        "remaining_attempts_upper_bound": 18000,
+        "remaining_worst_case_usd": 48.15
       }
     },
-    "worst_case_usd": 1755.6000000000001,
-    "remaining_worst_case_usd": 1755.6000000000001,
+    "worst_case_usd": 51.687,
+    "remaining_worst_case_usd": 51.687,
     "budget_cap_usd": 100,
-    "blockers": [
-      "Harpaintner P0 requires reviewed translated instructions for other languages",
-      "Human source gate (harpaintner_2018): Supplied 24-item category summary is integrated; original supplement bytes/codebook/terms and source provenance remain unverified.",
-      "Human source gate (vinson_2008): Human reference must be verified from the source and codebook",
-      "Human stimulus requires reviewed translation: harpaintner_2018",
-      "Missing verified human source for harpaintner_2018",
-      "Missing verified human source for vinson_2008",
-      "No verified human source data",
-      "P0 requires verified participant instructions for vinson_2008",
-      "Remaining plan plus prior cumulative liabilities exceeds budget",
-      "Worst-case plan exceeds cumulative budget",
-      "judgment remaining plan plus prior cumulative liabilities exceeds stage budget",
-      "judgment worst-case estimate exceeds stage budget; freeze a smaller bank/design"
-    ],
+    "blockers": [],
     "warnings": [
-      "Abstract human input contains rounded category proportions only; feature-string recovery, human feature RDMs and participant reliability are unavailable for that source"
+      "Abstract human input contains rounded category proportions only; feature-string recovery, human feature RDMs and participant reliability are unavailable for that source",
+      "Harpaintner source supplied by user; workbook/schema/selected rows verified, publisher-download chain not independently established",
+      "24 published loose English translations are exploratory stimuli; cross-language human category comparisons remain unavailable until named review"
     ],
-    "accounted_usd": 0.0028139999999999997,
-    "remaining_usd": 99.997186,
+    "accounted_usd": 0.0031579999999999998,
+    "remaining_usd": 99.996842,
     "capability_deviations": [
       "generator: seed omitted by frozen provider capability policy",
       "generator: temperature omitted by frozen provider capability policy",
@@ -141,40 +130,420 @@
       "P2.txt": "3f3e6bb745106f5f98a5472dbf02587b713d3b8906796609728309940e98f45f",
       "binary_v1.txt": "18825161634d12ce02743c6885309e4e7ebcfcb673fa25186ec7591a0953114f"
     },
-    "source_hashes": {},
+    "source_hashes": {
+      "vinson_2008": "29c160e8c2dec197ca2f402b2ba80eec25b4956933eb06220fd0bab1c685ef55",
+      "vinson_2008:raw": "3bb37252d5b6fadc13bfa93b971846b5005df5cd0e894e22b55dbf33f5b927c5",
+      "harpaintner_2018": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
+      "harpaintner_2018:raw": "a0d94ee950f5dcdb5bd753cb9050ddeda4a96d8493bc63772113bc31a39af293"
+    },
     "input_hashes": {
       "human_stimuli": "8778e68187120b318ac3828c99787af0995e1f7496f5c6ad48d00e8359008374",
-      "human_abstract_summary": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a"
+      "human_abstract_summary": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
+      "translation_reviews": "bff5e642436bb2838a348deff5c1a8c1445190be4418a1399e053ed95c120b74"
     },
+    "scientific_preflight": {
+      "generation_ready": true,
+      "primary_language_condition": "published_english_exploratory",
+      "selected_items": 60,
+      "sources": [
+        {
+          "dataset_id": "vinson_2008",
+          "available": true,
+          "raw_sha256": "3bb37252d5b6fadc13bfa93b971846b5005df5cd0e894e22b55dbf33f5b927c5",
+          "sha256": "29c160e8c2dec197ca2f402b2ba80eec25b4956933eb06220fd0bab1c685ef55",
+          "data_level": "item_features",
+          "verification_basis": "Publisher paper Methods p186 and Appendix p190 inspected; registered raw archive/derived table hashes and full adapter crosswalk verified"
+        },
+        {
+          "dataset_id": "harpaintner_2018",
+          "available": true,
+          "raw_sha256": "a0d94ee950f5dcdb5bd753cb9050ddeda4a96d8493bc63772113bc31a39af293",
+          "sha256": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
+          "data_level": "category_counts",
+          "verification_basis": "User-supplied original workbook digest, 296-row schema and exact 24-row numeric/label/rating crosswalk; primary publication Methods inspected"
+        }
+      ],
+      "pending_translation_reviews": 24,
+      "abstract_comparison_ready": false,
+      "item_comparison_availability": [
+        {
+          "item_id": "hp18_row0010",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0020",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0071",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0095",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0100",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0112",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0114",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0116",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0119",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0145",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0149",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0152",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0154",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0182",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0194",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0200",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0202",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0218",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0223",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0249",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0253",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0255",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0269",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "hp18_row0292",
+          "available": false,
+          "reason": "Human stimulus language requires reviewed translation"
+        },
+        {
+          "item_id": "vv_actionN_ascent",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_bombardment",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_clash",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_clatter",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_cough",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_flame",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_glow",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_hit",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_itch",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_pull",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_return",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionN_sparkle",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_argue",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_arrive",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_build",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_die",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_drill",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_drop",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_pull",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_roast",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_shave",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_smell",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_stagger",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_actionV_step",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_ankle",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_cabbage",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_carpet",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_couch",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_cow",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_elbow",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_goat",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_leg",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_lemon",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_pencil",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_potato",
+          "available": true,
+          "reason": null
+        },
+        {
+          "item_id": "vv_object_thumb",
+          "available": true,
+          "reason": null
+        }
+      ],
+      "blockers": [],
+      "warnings": [
+        "Harpaintner source supplied by user; workbook/schema/selected rows verified, publisher-download chain not independently established",
+        "24 published loose English translations are exploratory stimuli; cross-language human category comparisons remain unavailable until named review"
+      ]
+    },
+    "prompt_token_audit": {
+      "n_items": 75,
+      "generation": {
+        "n_templates": 225,
+        "max_input_token_bound": 3111,
+        "median_input_token_bound": 805,
+        "p95_input_token_bound": 3050,
+        "max_payload_bytes": 8272
+      },
+      "judgment": {
+        "n_templates": 75,
+        "max_input_token_bound": 3179,
+        "median_input_token_bound": 875,
+        "p95_input_token_bound": 3147,
+        "max_payload_bytes": 8550,
+        "max_input_token_bound_with_feature_reserve": 4979
+      },
+      "largest_generation": {
+        "item_id": "finance_S_both",
+        "prompt_family": "P2",
+        "payload_tokens": 2599,
+        "framing_margin_tokens": 512,
+        "input_token_bound": 3111,
+        "payload_bytes": 8272,
+        "encoding": "o200k_base",
+        "tokenizer_version": "0.12.0",
+        "tokenizer_sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+        "request_sha256": "39516e436331bba2063dc58e3f6761e8e31a84442ab47990c34930911da08ac3",
+        "method": "tiktoken_payload_plus_margin_v1",
+        "exact_provider_count": false
+      },
+      "declared_output_tokens": {
+        "generation": 700,
+        "judgment": 400
+      },
+      "byte_lengths_are_token_counts": false,
+      "provider_usage_is_billing_authority": true
+    },
+    "combined_campaign_liability_usd": 64.611908,
     "source_code_hashes": {
       "__init__.py": "1b21260acfae39d5a4241fdcdd5431f949a1ab39b951ddc413721b756f593bf9",
       "bank.py": "4493c0b9e6bc1ed76123d32c239d9710f88431f7532423bfd34f1b9b557cddb1",
-      "budget.py": "d77ab9306dafcccde81d05d00e49b080e94369c3d56b7509715f93157bb13380",
-      "clients.py": "9dad414fd86f35cad5b4d0b6287a1eb3683def30b71fca12f4c3defd957a02ec",
+      "budget.py": "3f257c6e123dda2cbaf78ef2888779582516360263f9e4475fbfa232d13e415c",
+      "calibrate.py": "4508a5d10aedb325ee6535eb6051b31f068d7042c3f49b2bc3cdc90d1ceb77f2",
+      "clients.py": "4fa98e5216ff157e2dcaab25b9c126b28e17096aba8fc075f2d76e12f34b9e74",
       "composition.py": "f13cf651ea6939f9052a17f2518bf9f88f39c28bb068f5aeb5b0bb14b9b39185",
-      "engine.py": "0d465ac80362e439b03cd8fe3665422dde019b2fb21e92dedc14f0f684fa6163",
+      "engine.py": "e6ddf92805328d3c5f2cdcf9c53d5d3d54bc0ec1b231ea76ebaa0c9ffe346c7b",
       "environment.py": "ccfbb1ba1a4ef0e68ea16fe14612ea8bb53d86f894930e8d678afdb66312dabd",
       "fixtures.py": "0679d33f32623593e1a12b9b2670f72f22afdbbdd8236a317555478fc02af782",
       "human_inputs.py": "9858d70bee65fcbcfebbdf4eededa37c54ca459abd3fcf85ce129654e3761c04",
       "io.py": "76caf415b30e113fc440a81577bdf25fc13d95b24de26d8b7d25d2972edc369b",
       "judge.py": "fc88f413df652eef13c4c55fe2402693513f7c97ae937d708b13db3e4128fbb8",
-      "metrics.py": "7c9da0fee2bc684cdb1e171742a6055752ab7b32e69a24a8c6bb0a3cb1b5248e",
+      "metrics.py": "1541bd930e57cf7d7a3f93116ef58f7693aa6187bfd338b139f8448d763bfe42",
       "planner.py": "d82dbfa02b536c34d01aea52e4ef2da54806d9a39d8d10daf73aef29817af1ee",
-      "preflight.py": "f8c293529b3e168e2339a91a2bbd24485ecc97506659f5cd73097e58a5652626",
-      "prompts.py": "e843f0c8c4984b06857981ce2f8e02ba15ddf8707369aaafb2b9f08b0101b656",
-      "references.py": "9f01cf8658dc68c27c92fa25b01b70ad6f824c393d1c1a95e23f3432c29a023f",
+      "preflight.py": "44dd5878ca87649829e01ee94826d5619148ed75e96ad603178a593b84b8f15f",
+      "prompts.py": "b6e1e2d68870c073ae73c9af50431ead7e160ea81275005d8a72c66905944d0c",
+      "references.py": "55a0342ce7553771fc17711677a70b3bbb80ecc2822b372e1bbe269e07755116",
       "registry.py": "f11f0a9251f1f109ec6daab88f0db323518dcc901dd73c6789f27283b0896ae1",
-      "report.py": "217d73005de32f7a1a554c040f1cf212b61195b12809622d17464d84d1a2a00f",
+      "report.py": "9dad1758fe91782b10cace245d0013fa0c486b6f1feae8f90269137fb4e8edba",
       "run.py": "60f3c4f9346944ea2c48139f4ec1bc0f2773d789bb5ece714c90d241175fedbf",
-      "source_adapters.py": "5eb8e3ff00aa150f18ba669788591fd9f22421cfba141faab4170ddfd94e5030"
+      "scientific.py": "6b67c313b70536c9f416d89d6f7d118bd03325b99f1da3b9b7587c990620847e",
+      "source_adapters.py": "5a16ecd7394e84b677c0fb4c12222574c5ba6e57ca8439537e49168c2f1ea0c5",
+      "token_accounting.py": "385b9b04d4b2b755d45dc2da50fff56e63d2e33ed5b2444fc632e7422efe9845"
     },
-    "live_ready": false
+    "live_ready": true
   },
   "tasks": {
     "stage": "tasks",
     "demo": false,
-    "design_hash": "198ff5b633905538a308e3022b5eb97227d8f1e74b1dc3ff168836edad941c70",
-    "preflight_hash": "5cdd7636a2951d1afb7adb68cc533647d6fe59f013a259d18148f95ffc86c609",
+    "design_hash": "084a1bb23672bf2f0c88e7c68f21ea3d7b871874ce28e5cab5a17f1f30d8603a",
+    "preflight_hash": "436600de985d5b47018e30753a9bd1a10848cdd00a6b4f23ecb6e48ccacc1258",
     "selected_item_count": 15,
     "selected_item_ids": [
       "S_deadline",
@@ -195,55 +564,50 @@
     ],
     "generation_jobs": 135,
     "actual_plannable_generation_jobs": 135,
-    "judgment_cells_upper_bound": 3000,
+    "judgment_cells_upper_bound": 2250,
     "estimates": {
       "generation": {
         "calls": 135,
         "attempts_with_retries": 270,
-        "input_tokens_per_attempt": 30000,
-        "output_tokens_per_attempt": 1000,
-        "worst_case_usd": 18.900000000000002,
+        "input_tokens_per_attempt": 7500,
+        "output_tokens_per_attempt": 700,
+        "worst_case_usd": 0.88425,
         "prices": {
-          "input_per_million": 2,
-          "model_id": "gpt-6.1-sol",
-          "output_per_million": 10,
-          "revision": "gpt-6.1-sol",
-          "source_url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
-          "verified_at": "2026-10-26"
+          "input_per_million": 0.25,
+          "model_id": "gpt-5-mini-2025-08-07",
+          "output_per_million": 2,
+          "revision": "gpt-5-mini-2025-08-07",
+          "source_url": "https://developers.openai.com/api/docs/models/gpt-5-mini",
+          "verified_at": "2026-10-27"
         },
         "remaining_attempts_upper_bound": 270,
-        "remaining_worst_case_usd": 18.900000000000002
+        "remaining_worst_case_usd": 0.88425
       },
       "judgment": {
-        "calls": 3000,
-        "attempts_with_retries": 6000,
-        "input_tokens_per_attempt": 30000,
-        "output_tokens_per_attempt": 1000,
-        "worst_case_usd": 420.00000000000006,
+        "calls": 2250,
+        "attempts_with_retries": 4500,
+        "input_tokens_per_attempt": 7500,
+        "output_tokens_per_attempt": 400,
+        "worst_case_usd": 12.0375,
         "prices": {
-          "input_per_million": 2,
-          "model_id": "gpt-6.1-sol",
-          "output_per_million": 10,
-          "revision": "gpt-6.1-sol",
-          "source_url": "https://developers.openai.com/api/docs/models/gpt-6.1-sol",
-          "verified_at": "2026-10-26"
+          "input_per_million": 0.25,
+          "model_id": "gpt-5-mini-2025-08-07",
+          "output_per_million": 2,
+          "revision": "gpt-5-mini-2025-08-07",
+          "source_url": "https://developers.openai.com/api/docs/models/gpt-5-mini",
+          "verified_at": "2026-10-27"
         },
-        "remaining_attempts_upper_bound": 6000,
-        "remaining_worst_case_usd": 420.00000000000006
+        "remaining_attempts_upper_bound": 4500,
+        "remaining_worst_case_usd": 12.0375
       }
     },
-    "worst_case_usd": 438.90000000000003,
-    "remaining_worst_case_usd": 438.90000000000003,
+    "worst_case_usd": 12.92175,
+    "remaining_worst_case_usd": 12.92175,
     "budget_cap_usd": 100,
-    "blockers": [
-      "Remaining plan plus prior cumulative liabilities exceeds budget",
-      "Worst-case plan exceeds cumulative budget",
-      "judgment remaining plan plus prior cumulative liabilities exceeds stage budget",
-      "judgment worst-case estimate exceeds stage budget; freeze a smaller bank/design"
-    ],
+    "blockers": [],
     "warnings": [],
-    "accounted_usd": 0.0028139999999999997,
-    "remaining_usd": 99.997186,
+    "accounted_usd": 0.0031579999999999998,
+    "remaining_usd": 99.996842,
     "capability_deviations": [
       "generator: seed omitted by frozen provider capability policy",
       "generator: temperature omitted by frozen provider capability policy",
@@ -259,28 +623,71 @@
     },
     "source_hashes": {},
     "input_hashes": {},
+    "scientific_preflight": null,
+    "prompt_token_audit": {
+      "n_items": 75,
+      "generation": {
+        "n_templates": 225,
+        "max_input_token_bound": 3111,
+        "median_input_token_bound": 805,
+        "p95_input_token_bound": 3050,
+        "max_payload_bytes": 8272
+      },
+      "judgment": {
+        "n_templates": 75,
+        "max_input_token_bound": 3179,
+        "median_input_token_bound": 875,
+        "p95_input_token_bound": 3147,
+        "max_payload_bytes": 8550,
+        "max_input_token_bound_with_feature_reserve": 4979
+      },
+      "largest_generation": {
+        "item_id": "finance_S_both",
+        "prompt_family": "P2",
+        "payload_tokens": 2599,
+        "framing_margin_tokens": 512,
+        "input_token_bound": 3111,
+        "payload_bytes": 8272,
+        "encoding": "o200k_base",
+        "tokenizer_version": "0.12.0",
+        "tokenizer_sha256": "446a9538cb6c348e3516120d7c08b09f57c36495e2acfffe59a5bf8b0cfb1a2d",
+        "request_sha256": "39516e436331bba2063dc58e3f6761e8e31a84442ab47990c34930911da08ac3",
+        "method": "tiktoken_payload_plus_margin_v1",
+        "exact_provider_count": false
+      },
+      "declared_output_tokens": {
+        "generation": 700,
+        "judgment": 400
+      },
+      "byte_lengths_are_token_counts": false,
+      "provider_usage_is_billing_authority": true
+    },
+    "combined_campaign_liability_usd": 64.611908,
     "source_code_hashes": {
       "__init__.py": "1b21260acfae39d5a4241fdcdd5431f949a1ab39b951ddc413721b756f593bf9",
       "bank.py": "4493c0b9e6bc1ed76123d32c239d9710f88431f7532423bfd34f1b9b557cddb1",
-      "budget.py": "d77ab9306dafcccde81d05d00e49b080e94369c3d56b7509715f93157bb13380",
-      "clients.py": "9dad414fd86f35cad5b4d0b6287a1eb3683def30b71fca12f4c3defd957a02ec",
+      "budget.py": "3f257c6e123dda2cbaf78ef2888779582516360263f9e4475fbfa232d13e415c",
+      "calibrate.py": "4508a5d10aedb325ee6535eb6051b31f068d7042c3f49b2bc3cdc90d1ceb77f2",
+      "clients.py": "4fa98e5216ff157e2dcaab25b9c126b28e17096aba8fc075f2d76e12f34b9e74",
       "composition.py": "f13cf651ea6939f9052a17f2518bf9f88f39c28bb068f5aeb5b0bb14b9b39185",
-      "engine.py": "0d465ac80362e439b03cd8fe3665422dde019b2fb21e92dedc14f0f684fa6163",
+      "engine.py": "e6ddf92805328d3c5f2cdcf9c53d5d3d54bc0ec1b231ea76ebaa0c9ffe346c7b",
       "environment.py": "ccfbb1ba1a4ef0e68ea16fe14612ea8bb53d86f894930e8d678afdb66312dabd",
       "fixtures.py": "0679d33f32623593e1a12b9b2670f72f22afdbbdd8236a317555478fc02af782",
       "human_inputs.py": "9858d70bee65fcbcfebbdf4eededa37c54ca459abd3fcf85ce129654e3761c04",
       "io.py": "76caf415b30e113fc440a81577bdf25fc13d95b24de26d8b7d25d2972edc369b",
       "judge.py": "fc88f413df652eef13c4c55fe2402693513f7c97ae937d708b13db3e4128fbb8",
-      "metrics.py": "7c9da0fee2bc684cdb1e171742a6055752ab7b32e69a24a8c6bb0a3cb1b5248e",
+      "metrics.py": "1541bd930e57cf7d7a3f93116ef58f7693aa6187bfd338b139f8448d763bfe42",
       "planner.py": "d82dbfa02b536c34d01aea52e4ef2da54806d9a39d8d10daf73aef29817af1ee",
-      "preflight.py": "f8c293529b3e168e2339a91a2bbd24485ecc97506659f5cd73097e58a5652626",
-      "prompts.py": "e843f0c8c4984b06857981ce2f8e02ba15ddf8707369aaafb2b9f08b0101b656",
-      "references.py": "9f01cf8658dc68c27c92fa25b01b70ad6f824c393d1c1a95e23f3432c29a023f",
+      "preflight.py": "44dd5878ca87649829e01ee94826d5619148ed75e96ad603178a593b84b8f15f",
+      "prompts.py": "b6e1e2d68870c073ae73c9af50431ead7e160ea81275005d8a72c66905944d0c",
+      "references.py": "55a0342ce7553771fc17711677a70b3bbb80ecc2822b372e1bbe269e07755116",
       "registry.py": "f11f0a9251f1f109ec6daab88f0db323518dcc901dd73c6789f27283b0896ae1",
-      "report.py": "217d73005de32f7a1a554c040f1cf212b61195b12809622d17464d84d1a2a00f",
+      "report.py": "9dad1758fe91782b10cace245d0013fa0c486b6f1feae8f90269137fb4e8edba",
       "run.py": "60f3c4f9346944ea2c48139f4ec1bc0f2773d789bb5ece714c90d241175fedbf",
-      "source_adapters.py": "5eb8e3ff00aa150f18ba669788591fd9f22421cfba141faab4170ddfd94e5030"
+      "scientific.py": "6b67c313b70536c9f416d89d6f7d118bd03325b99f1da3b9b7587c990620847e",
+      "source_adapters.py": "5a16ecd7394e84b677c0fb4c12222574c5ba6e57ca8439537e49168c2f1ea0c5",
+      "token_accounting.py": "385b9b04d4b2b755d45dc2da50fff56e63d2e33ed5b2444fc632e7422efe9845"
     },
-    "live_ready": false
+    "live_ready": true
   }
 }

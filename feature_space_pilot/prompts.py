@@ -81,7 +81,7 @@ def parse_generation(raw, item_id, *, cap):
     ):
         raise ValueError("Invalid generation schema or wrong item_id")
     features = record["features"]
-    if not isinstance(features, list) or len(features) > cap:
+    if not isinstance(features, list) or (cap is not None and len(features) > cap):
         raise ValueError("Feature cap exceeded or invalid list")
     seen = set()
     normalized = []

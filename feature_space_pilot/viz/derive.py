@@ -418,7 +418,8 @@ def discovery_rows(run, *, representation="canonical", item_ids=None, facet=None
                     run.jobs[x["job_id"]]["cap"]
                     for x in records
                     if x["job_id"] in run.jobs
-                }
+                },
+                key=lambda value: (value is None, value if value is not None else 0),
             )
             output.append(
                 dict(

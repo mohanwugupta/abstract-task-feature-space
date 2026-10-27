@@ -144,3 +144,20 @@ def test_discovery_pools_exact_union_and_preserves_exclusions(viz_run_path):
         contributions[0]["selected_unique"] == 1
         and contributions[0]["excluded_unique"] == 1
     )
+
+
+def test_discovery_reports_uncapped_source_protocol_alongside_numeric_caps(
+    viz_run_path,
+):
+    from dataclasses import replace
+    from feature_space_pilot.viz.load import load_run
+    from feature_space_pilot.viz.derive import discovery_rows
+
+    run = load_run(viz_run_path)
+    jobs = {k: dict(v) for k, v in run.jobs.items()}
+    first = next(k for k, j in jobs.items() if j["prompt_family"] == "P0")
+    jobs[first]["cap"] = None
+    toy = replace(run, jobs=jobs)
+    rows = discovery_rows(toy)
+    p0 = [r for r in rows if r["prompt_family"] == "P0"]
+    assert p0 and any(None in r["output_caps"] and 10 in r["output_caps"] for r in p0)

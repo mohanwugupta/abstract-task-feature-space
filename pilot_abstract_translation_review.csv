@@ -1,0 +1,25 @@
+item_id,german_original,published_loose_english,review_priority,reason,reviewed_english,reviewer,decision
+hp18_row0154,Kreativität,creativity,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0100,Fitneß,fitness,low,"Historic German spelling Fitneß; translation is plausible, document normalization",,,pending
+hp18_row0020,Anstrengung,effort,medium,Anstrengung may emphasize exertion or strenuous effort,,,pending
+hp18_row0145,Katastrophe,catastrophe,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0071,Ekel,disgust,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0010,Aktivität,activity,low,Aktivität is broad; review any differences in intended sense,,,pending
+hp18_row0095,Erwartung,expectation,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0249,Überraschung,surprise,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0255,Verachtung,contempt,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0218,Sehnsucht,desire,high,Sehnsucht may be better rendered as longing/yearning than generic desire; compare sense to human norms,,,pending
+hp18_row0112,Gedanke,thought,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0114,Gefühl,emotion,high,Gefühl can mean feeling/sensation/emotion; avoid a narrower sense without justification,,,pending
+hp18_row0194,Rat,advice,medium,Rat may denote advice or counsel; verify stimulus interpretation,,,pending
+hp18_row0152,Kooperation,cooperation,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0269,Vertrauen,trust,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0253,Unterstützung,support,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0149,Kompromiss,compromise,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0116,Gehorsam,obedience,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0119,Gerechtigkeit,justice,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0223,Sitte,convention,high,Sitte commonly means custom or social mores; convention may change the concept,,,pending
+hp18_row0202,Ritual,ritual,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0182,Perfektion,perfection,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0200,Revolution,revolution,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending
+hp18_row0292,Würde,dignity,routine,Original spreadsheet specifies a loose translation; verify semantic equivalence before human–English comparison,,,pending

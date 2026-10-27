@@ -11,5 +11,6 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install -r requirements-feature-space-viz.txt
+      - run: python -m feature_space_pilot.scientific --config configs/feature_space_pilot.json --prepare
       - run: python -m pytest -q tests/feature_space_pilot
       - run: python -m feature_space_pilot.run --config configs/feature_space_pilot.json --stage tasks --dry-run

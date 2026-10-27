@@ -181,6 +181,7 @@ def test_preflight_includes_existing_cumulative_liabilities(tmp_path):
     c["replicates"] = 2
     c["demo_human_count"] = 3
     c["api_cap_usd"] = 100
+    c["stage_caps"] = {"generation": 90, "judgment": 10}
     for role in ["generator", "judge"]:
         c[role]["prices"]["input_per_million"] = 2
         c[role]["prices"]["output_per_million"] = 8
@@ -289,7 +290,9 @@ def test_completed_resume_preflight_reserves_only_remaining_work(tmp_path):
     for role in ["generator", "judge"]:
         c[role]["prices"]["input_per_million"] = 2
         c[role]["prices"]["output_per_million"] = 8
-    c["api_cap_usd"] = preflight(c, "human")["worst_case_usd"]
+    initial = preflight(c, "human")
+    c["api_cap_usd"] = initial["worst_case_usd"]
+    c["stage_caps"] = {k: v["worst_case_usd"] for k, v in initial["estimates"].items()}
     client = FakeClient()
     first = run_pipeline(c, "human", client=client)
     calls = client.calls

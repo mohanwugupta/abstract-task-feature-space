@@ -4,7 +4,7 @@ from pathlib import Path
 from feature_space_pilot.clients import HostedClient
 
 
-def test_sol_low_default_is_configured_without_unsupported_sampling():
+def test_user_selected_mini_low_default_without_unsupported_sampling():
     config = json.loads(
         (
             Path(__file__).resolve().parents[2] / "configs/feature_space_pilot.json"
@@ -13,15 +13,15 @@ def test_sol_low_default_is_configured_without_unsupported_sampling():
     assert config["replicates"] == 3 and config["api_cap_usd"] == 100
     for role in ["generator", "judge"]:
         model = config[role]
-        assert model["model_id"] == "gpt-6.1-sol"
-        assert model["revision"] == "gpt-6.1-sol"
+        assert model["model_id"] == "gpt-5-mini-2025-08-07"
+        assert model["revision"] == "gpt-5-mini-2025-08-07"
         assert model["reasoning_effort"] == "low"
         assert model["supports_structured_outputs"] is True
         assert (
             model["supports_seed"] is False and model["supports_temperature"] is False
         )
-        assert model["prices"]["input_per_million"] == 2
-        assert model["prices"]["output_per_million"] == 10
+        assert model["prices"]["input_per_million"] == 0.25
+        assert model["prices"]["output_per_million"] == 2
         client = HostedClient(model)
         captured = []
 

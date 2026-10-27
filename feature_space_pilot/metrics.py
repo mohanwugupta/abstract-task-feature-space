@@ -16,12 +16,15 @@ def rdm(matrix, *, metric="jaccard"):
     x = np.asarray(matrix, dtype=float)
     if x.ndim != 2 or not np.isfinite(x).all():
         raise ValueError("Invalid feature matrix")
-    if metric not in {"jaccard", "cosine"}:
+    if metric not in {"jaccard", "cosine", "euclidean"}:
         raise ValueError("Unknown distance metric")
     n = len(x)
     d = np.zeros((n, n))
     for i in range(n):
         for j in range(i):
+            if metric == "euclidean":
+                d[i, j] = d[j, i] = float(np.linalg.norm(x[i] - x[j]))
+                continue
             if metric == "jaccard":
                 a = x[i] != 0
                 b = x[j] != 0
@@ -82,6 +85,57 @@ def geometry_comparison(human, generated, *, metric="jaccard", bootstrap=500, se
         zero_vector_policy="both_empty=0;one_empty=1",
         caveat="Item pairs are dependent; small item-resample intervals are descriptive.",
     )
+
+
+def category_geometry(
+    human_profiles, generated_profiles, coverage, *, bootstrap=200, seed=42
+):
+    """Supplementary category-space geometry, with complete independently coded rows."""
+    ids = sorted(human_profiles)
+    if len(ids) < 4:
+        return unavailable("At least four reviewed aligned category profiles required")
+    for iid in ids:
+        c = coverage.get(iid, {})
+        if (
+            not generated_profiles.get(iid)
+            or generated_profiles[iid].get("available") is False
+            or c.get("applicable_features", 0) < 1
+            or c.get("coded_applicable_features") != c.get("applicable_features")
+        ):
+            return unavailable(
+                "Category RDM requires complete reviewed coding for every compared applicable-feature profile"
+            )
+    categories = sorted(set().union(*(p.keys() for p in human_profiles.values())))
+
+    def matrix(profiles):
+        rows = []
+        for iid in ids:
+            profile = profiles[iid]
+            if set(profile) - set(categories):
+                raise ValueError("Incompatible source category vocabularies")
+            row = [float(profile.get(cat, 0)) for cat in categories]
+            if any(not math.isfinite(v) or v < 0 for v in row) or not math.isclose(
+                sum(row), 1, abs_tol=0.0005
+            ):
+                raise ValueError("Category RDM requires normalized finite proportions")
+            rows.append(row)
+        return rows
+
+    h, g = matrix(human_profiles), matrix(generated_profiles)
+    result = geometry_comparison(
+        h, g, metric="euclidean", bootstrap=bootstrap, seed=seed
+    )
+    result.update(
+        metric="euclidean_category_proportions",
+        representation="reviewed_category_proportions",
+        item_ids=ids,
+        categories=categories,
+        human_rdm=rdm(h, metric="euclidean").tolist(),
+        generated_rdm=rdm(g, metric="euclidean").tolist(),
+        range=[0, math.sqrt(2)],
+        zero_vector_policy="undefined_empty_profiles_unavailable",
+    )
+    return result
 
 
 def human_recovery(generated, human, *, aligned_language, equivalences=None):

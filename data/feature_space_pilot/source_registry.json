@@ -34,7 +34,7 @@
       "data_level": "item_features",
       "dataset_id": "vinson_2008",
       "feature_count": 1029,
-      "instructions": "Blocked: exact participant protocol and feature limits require full-method verification; no default matched P0 supplied",
+      "instructions": "Versioned single-target adaptation of Appendix p190: short separate descriptive features, comprehensive coverage, no dictionary-style definitions or pure associations, no fixed feature count.",
       "item_count": 456,
       "kind": "human",
       "language": "en",
@@ -42,14 +42,22 @@
       "paper_url": "https://doi.org/10.3758/BRM.40.1.183",
       "participant_level_available": false,
       "participants": 280,
-      "participants_note": "Approximately 280 total per publisher abstract; per-item participation not verified",
+      "participants_note": "280 participants total; 20 participants assigned to each 30–40-item list (Methods p186).",
+      "participants_per_word": 20,
       "path": "data/feature_space_pilot/references/vinson_derived.csv",
       "primary": true,
+      "protocol_verified_at": "2026-10-27",
       "raw_path": "data/feature_space_pilot/references/Vinson-BRM-2008a.zip",
       "raw_sha256": "3bb37252d5b6fadc13bfa93b971846b5005df5cd0e894e22b55dbf33f5b927c5",
       "sha256": "29c160e8c2dec197ca2f402b2ba80eec25b4956933eb06220fd0bab1c685ef55",
+      "source_feature_cap": null,
+      "source_pages": [
+        186,
+        190
+      ],
       "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.3758%2FBRM.40.1.183/MediaObjects/Vinson-BRM-2008a.zip",
-      "verified": false
+      "verification_basis": "Publisher paper Methods p186 and Appendix p190 inspected; registered raw archive/derived table hashes and full adapter crosswalk verified",
+      "verified": true
     },
     {
       "adapter": "human_pilot_category_shares_v1",
@@ -58,13 +66,12 @@
         "https://www.frontiersin.org/api/v4/articles/412259/file/Data_Sheet_1.xlsx"
       ],
       "available": true,
-      "blocker": "Supplied 24-item category summary is integrated; original supplement bytes/codebook/terms and source provenance remain unverified.",
       "candidate_supplements": [
         "Table_1.docx",
         "Table_2.XLSX",
         "Data_Sheet_1.xlsx"
       ],
-      "codebook": "Supplied CSV: human_sm=SM, human_is_e=IS/E, human_sc=SC, human_va=VA; original publication codebook and supplement terms await independent verification.",
+      "codebook": "Workbook Wortliste row4 names original German, loose English, %SM, %IS/E, %SC, %VA; published Methods defines averaged per-subject category proportions.",
       "columns": {
         "IS/E": "human_is_e",
         "SC": "human_sc",
@@ -73,18 +80,21 @@
         "item": "original_german",
         "language": "source_language"
       },
+      "crosswalk_path": "data/feature_space_pilot/references/harpaintner_crosswalk.json",
+      "crosswalk_sha256": "d26a0fd46ef83741ee41dcbb181528e5f767eac4ca91a830de72ab85a83d118d",
       "data_level": "category_counts",
       "dataset_id": "harpaintner_2018",
       "feature_level_available": false,
-      "instructions": "Methods: spontaneous properties/associations/situations; about four; avoid synonyms; no time limit. Prompt is an adaptation, not a verbatim replication.",
+      "instructions": "Published Methods: approximately four spontaneous properties, associations or situations, avoid synonyms, no time limit. English P0 is a documented adaptation.",
       "item_count": 24,
       "kind": "human",
       "language": "de",
-      "license": "Article is CC-BY; supplement-specific terms not yet inspected",
+      "license": "CC-BY publication with attribution; supplied workbook is the cited supplementary data, no separate restrictive notice found in workbook",
       "limitations": [
         "Rounded category proportions, not integer production counts or feature strings",
-        "No lexical human recovery, binary human feature RDM or participant split-half from this summary",
-        "Original supplement SHA-256 is reported metadata, not verification of materialized publication bytes"
+        "No lexical human recovery, binary human feature RDM or participant split-half from this workbook",
+        "Publisher download chain not independently established; user-supplied workbook hash and selected-row derivation verified",
+        "English stimulus condition is cross-language; pending translation reviews suppress human quantitative comparisons"
       ],
       "measurement": "rounded_category_proportions",
       "paper_url": "https://doi.org/10.3389/fpsyg.2018.01748",
@@ -93,7 +103,10 @@
       "participants_per_word": 10,
       "path": "human_norm_pilot_abstract_24.csv",
       "primary": true,
-      "provenance_status": "user_supplied_summary_not_independently_verified",
+      "provenance_status": "supplied_workbook_internal_derivation_verified",
+      "publisher_download_verified": false,
+      "raw_path": "Data Sheet 1.xlsx",
+      "raw_sha256": "a0d94ee950f5dcdb5bd753cb9050ddeda4a96d8493bc63772113bc31a39af293",
       "reported_raw_sha256": "a0d94ee950f5dcdb5bd753cb9050ddeda4a96d8493bc63772113bc31a39af293",
       "sha256": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
       "translation_mapping": {
@@ -122,10 +135,11 @@
         "Würde": "dignity",
         "Überraschung": "surprise"
       },
-      "translation_policy": "Preserve English stimulus labels and German originals. The CSV marks published English translations as not independently reviewed; aligned human comparisons and translated P0 remain gated.",
+      "translation_policy": "Primary English condition requested by user; published loose translations remain exploratory unless approved by named review. German originals retained and German-primary condition available.",
       "translation_reviewed": false,
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6156367/",
-      "verified": false
+      "verification_basis": "User-supplied original workbook digest, 296-row schema and exact 24-row numeric/label/rating crosswalk; primary publication Methods inspected",
+      "verified": true
     },
     {
       "available": false,

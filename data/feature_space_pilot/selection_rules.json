@@ -9,6 +9,8 @@
   "abstract_summary": "human_norm_pilot_abstract_24.csv",
   "abstract_summary_sha256": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
   "available_frozen_items": 60,
+  "candidate_bank_cap": 150,
+  "candidate_bank_policy": "Existing deterministic normalized-phrase SHA-256 order before any judgments; retain excluded provenance",
   "held_out_item_ids": [
     "hp18_row0010",
     "hp18_row0116",
@@ -36,10 +38,13 @@
   },
   "seed": 42,
   "selection_note": "Uploaded selection is accepted as supplied; only previously unassigned splits use seed 42. This does not claim to reproduce sampling from the full publication supplement.",
+  "source_workbook_sha256": "a0d94ee950f5dcdb5bd753cb9050ddeda4a96d8493bc63772113bc31a39af293",
   "split_counts": {
     "development": 47,
     "held_out": 13
   },
+  "stimulus_language_condition": "published_english_exploratory",
   "tuning_rule": "No prompt tuning on held-out human data or downstream case results",
-  "version": "selection_v2_csv_inventory"
+  "version": "selection_v2_csv_inventory",
+  "vinson_syntax_markers": true
 }

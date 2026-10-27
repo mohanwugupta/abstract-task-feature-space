@@ -59,3 +59,16 @@ Interactive/export state semantics: `1` applicable, `0` independently judged ina
 Imported registry items retain `source_dataset_original`, `source_language`, `source_text`, publication row/reported digest, translation status, raw CSV hash and `source_split`; canonical source IDs and deterministic frozen `split` assignments are separate. The source files themselves are never rewritten. The historical 36-item JSONL remains available for older configurations.
 
 The offline input-audit CLI writes `stimuli.jsonl` (60 hashed items), `abstract_category_shares.csv` (96 source-item/category rows) and `input_manifest.json` (input/output hashes, counts and scientific limits) under a separate output directory. Its `count` field contains rounded proportions, explicitly marked `rounded_category_proportions`, rather than integer production counts. An audit is not a scientific run or publication verification. See [HUMAN_INPUTS.md](HUMAN_INPUTS.md).
+
+
+## Scientific and budget preflight amendment
+
+`Data Sheet 1.xlsx` is the pinned, read-only user-supplied Harpaintner workbook. `references/harpaintner_crosswalk.json` records the exact 24-row match against its 296-concept sheet; `publisher_download_verified=false` preserves chain-of-custody limits. Vinson raw/derived rows are independently cross-checked. `budget_amendment.json` records English, GPT-5-mini-low, three repetitions, label-blind bank150, role token envelopes, <=$100 summed stage allocations and combined 75×150 scope.
+
+`pilot_abstract_translation_review.csv` holds original German, published loose English, reviewed English, named reviewer and pending/approved/rejected decisions. It is hash-pinned; no pending entry is treated as reviewed. Registry `stimulus_condition`, `english_text`, `original_german` and `translation_review` preserve the declared cross-language condition. Vinson `text` adds the published noun/verb marker while `source_text` retains the norm lookup key.
+
+`preflight --campaign` returns both stage plans, combined remaining liability plus actual cumulative prior spend, stage/cumulative blockers and readiness. Individual stage entrypoints also enforce combined budgets. Token audits distinguish payload bytes, model-tokenizer payload tokens, explicit framing reserve and conservative input bound; detailed tables are exported separately. Unknown mappings and oversize payloads fail before reservations/transport. Journals record `token_budget`; actual provider usage settles cost and envelope breaches stop execution.
+
+`human_norm_comparison.json.category_geometry` contains conditional supplementary Euclidean RDMs of reviewed category proportions, common item/category order and item-bootstrap comparison. It requires >=4 aligned items and complete independent coding for compared generated profiles; it is separate from `geometry` binary-feature Jaccard. Unsupported feature recall/participant reliability remain unavailable.
+
+`calibration_<id>/attempt.jsonl` and `result.json` are isolated explicit one-call diagnostics with real schema/usage/ledger settlement, not scientific pilot rows. The original supplied `pilot_prompt_size_audit.json` remains historical byte-only data, not the current tokenizer audit. Full preparation/execution instructions: [PREFLIGHT_WORKFLOW.md](PREFLIGHT_WORKFLOW.md).
