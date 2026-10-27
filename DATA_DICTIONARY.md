@@ -20,9 +20,9 @@ All run artifacts live under `artifacts/feature_space_pilot/<run_id>/`. Text use
 | `frozen_prompts.json` | Literal versioned template texts; constructed per-request texts also appear in job plans. |
 | `frozen_source_registry.json` | Reference kind, source paths/URLs, codebook, language, instructions, permission constraints and hashes. Synthetic sources remain labeled synthetic. |
 | `synthetic_human_reference.csv` | Offline-only read-only fake norm table, hashed and ingested by the reference loader. It does not represent human participants. |
-| `preflight.json` | Initial read-only planning result copied into the run after execution begins: complete/plannable counts, worst-case token and USD bounds, blockers, model capability deviations and design/preflight hashes. |
+| `preflight.json` | Initial read-only planning result copied into the run after execution begins: CSV/JSONL input byte hashes in `input_hashes`, complete/plannable counts, worst-case token and USD bounds, blockers, model capability deviations and design/preflight hashes. |
 | `evaluation_inputs.json` | Current manual adjudications, relational review, category coding and embedding artifact references. Separate from frozen generation inputs. |
-| `human_norm_comparison.json` | Per-item/family cap-normalized list-relative recovery, source-specific human/category profiles and reviewed generated profiles with coding coverage; source/subset geometry and participant split-half availability flags. |
+| `human_norm_comparison.json` | Per-item/family cap-normalized list-relative recovery, source-specific human/category profiles and reviewed generated profiles with coding coverage; source/subset geometry and participant split-half availability flags; `item_availability` reports missing source or unreviewed alignment per item. |
 | `embedding_rdm_comparison.json` | Pinned vector-model provenance and generated/human geometry comparisons, or explicit unavailable reason. No automatic paid embedding calls. |
 | `discovery_curves.csv` | Item/family/replicate cumulative produced and unique discoveries, lexical redundancy and confirmed valid unique yield. Unjudged propositions are not classified false. |
 | `task_level_feature_audit.csv` | Every case feature at every level: source item/task/parent/situations, phrase, family/replicate/canonical ID, selection/applicability, inherited discovery, newly generated and newly applicable indicators. |
@@ -50,3 +50,12 @@ Source inventory and selection files live in `data/feature_space_pilot/`; retain
 The offline `index.html` gallery links PNG/SVG/PDF, tidy JSON/CSV, and `feature_inspector.html` (canonical propositions, source phrases/items/prompts/replicates, full target text, independent evidence and merge/manual-review provenance). Synthetic exports have `synthetic_` filenames and an explicit nonempirical banner. Gated or integrity-blocked figures get status pages rather than fabricated values.
 
 Interactive/export state semantics: `1` applicable, `0` independently judged inapplicable, `?` unresolved/missing, `N/A` outside declared scope. Excluded candidates remain unjudged proposals; origin filters do not relabel applicability. See `VISUALIZATION_EXPLORER.md` for exact commands and interpretation rules.
+
+
+## Supplied human CSV inputs
+
+`human_norm_pilot_60_stimuli.csv` is the default model-target inventory; `human_norm_pilot_abstract_24.csv` is its cross-checked evaluation-only abstract companion. Both byte hashes are pinned in config and recorded as `input_hashes` in preflight/design/manifest provenance. Human category values and ratings are excluded from model prompts.
+
+Imported registry items retain `source_dataset_original`, `source_language`, `source_text`, publication row/reported digest, translation status, raw CSV hash and `source_split`; canonical source IDs and deterministic frozen `split` assignments are separate. The source files themselves are never rewritten. The historical 36-item JSONL remains available for older configurations.
+
+The offline input-audit CLI writes `stimuli.jsonl` (60 hashed items), `abstract_category_shares.csv` (96 source-item/category rows) and `input_manifest.json` (input/output hashes, counts and scientific limits) under a separate output directory. Its `count` field contains rounded proportions, explicitly marked `rounded_category_proportions`, rather than integer production counts. An audit is not a scientific run or publication verification. See [HUMAN_INPUTS.md](HUMAN_INPUTS.md).

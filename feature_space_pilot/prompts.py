@@ -29,12 +29,23 @@ def generation_prompt(item, family, *, live=False, protocols=None):
         source = item["source_dataset"]
         if source == "harpaintner_2018":
             if item["language"] != "de":
-                raise ValueError(
-                    "Harpaintner P0 requires reviewed translated instructions for other languages"
-                )
-            template = (DIRECTORY / "P0_harpaintner.txt").read_text()
-            cap = 4
-            protocol = "harpaintner_2018_adaptation"
+                if protocols and source in protocols:
+                    p = protocols[source]
+                    if live and not p.get("verified"):
+                        raise ValueError("P0 study protocol is not verified")
+                    template, cap, protocol = p["text"], p["cap"], p["version"]
+                elif live:
+                    raise ValueError(
+                        "Harpaintner P0 requires reviewed translated instructions for other languages"
+                    )
+                else:
+                    # Inspectable plan only; the live branch above still blocks.
+                    protocol = "awaiting_reviewed_harpaintner_translated_instructions"
+                    cap = 4
+            else:
+                template = (DIRECTORY / "P0_harpaintner.txt").read_text()
+                cap = 4
+                protocol = "harpaintner_2018_adaptation"
         elif protocols and source in protocols:
             p = protocols[source]
             if live and not p.get("verified"):

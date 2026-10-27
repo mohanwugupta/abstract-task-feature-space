@@ -39,6 +39,17 @@ Open [the example offline gallery](artifacts/feature_space_visualizations/demo_a
 
 See [visualization usage and interpretation](VISUALIZATION_EXPLORER.md) and the [visualization TDD/QA record](scratchpad_feature_space_visualizations.md).
 
+## Human CSV inputs
+
+The default configuration now reads both supplied human CSVs: **60 stimuli**, cross-checked against the **24-item abstract category summary**. Original labels, German source text, translation status and existing Vinson splits are preserved. The abstract summary supplies rounded category proportions rather than feature strings.
+
+```bash
+python -m feature_space_pilot.human_inputs --config configs/feature_space_pilot.json --output-dir artifacts/human_input_audit/v1
+python -m feature_space_pilot.run --config configs/feature_space_pilot.json --stage human --dry-run
+```
+
+The audit is offline; the normal human dry run now plans all **540 generation jobs**. Source/protocol/translation verification and budget sizing still gate paid execution. See [human input mapping, audit and remaining gates](HUMAN_INPUTS.md).
+
 ## Documentation
 
 - [Setup, hosted API configuration, source gates, and live-run instructions](FEATURE_SPACE_PILOT.md)
@@ -57,7 +68,7 @@ The live runner loads it automatically. An existing exported `OPENAI_API_KEY` ta
 
 Generator and judge default to **GPT-6.1 Sol (`gpt-6.1-sol`) with low reasoning**; unsupported seed/temperature parameters are omitted. Model IDs remain configurable. Paid execution requires verified model pricing/capabilities, a successful dry run, its matching preflight hash, and explicit `--execute-live`. The current configured cumulative API cap is **$100** (hard maximum $500). Conservative full-bank estimates can still block a paid run; visualization never makes API calls.
 
-The human benchmark remains blocked pending acquisition/verification of the abstract-concept supplement and the exact Vinson participant protocol. Thirty-six Vinson labels and all fifteen task targets are frozen; missing human stimuli are not fabricated. No paid model calls were made during implementation.
+All 60 supplied human stimuli and 15 task targets are integrated. The human benchmark remains blocked pending source/codebook/terms, participant-protocol and translation verification, plus budget sizing. A two-request live connectivity diagnostic passed (estimated $0.002814); no full live pilot has run.
 
 ## Validation and reference data
 

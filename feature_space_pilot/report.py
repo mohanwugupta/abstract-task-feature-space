@@ -87,9 +87,31 @@ def _references(c, items):
 def _human_analysis(c, items, generations, bank, judgments):
     from .engine import resolve
     from .prompts import generation_prompt
+    from .references import validate_item_alignment
 
     human = [i for i in items if i["target_type"] in {"concept", "event", "object"}]
     refs = _references(c, items)
+    availability = []
+    aligned_ids = set()
+    for item in human:
+        ref = refs.get(item["source_dataset"])
+        reason = "Verified human reference unavailable"
+        if ref:
+            try:
+                validate_item_alignment(item, ref)
+            except ValueError as error:
+                reason = str(error)
+            else:
+                reason = None
+                aligned_ids.add(item["item_id"])
+        availability.append(
+            dict(
+                item_id=item["item_id"],
+                source_dataset=item["source_dataset"],
+                available=reason is None,
+                reason=reason,
+            )
+        )
     coding = {}
     if c.get("category_coding_file"):
         path = resolve(c, c["category_coding_file"])
@@ -135,7 +157,16 @@ def _human_analysis(c, items, generations, bank, judgments):
     # Same output cap for within-item family comparisons; no outcome-based prompt choice.
     for item in human:
         ref = refs.get(item["source_dataset"])
-        if not ref:
+        if item["item_id"] not in aligned_ids:
+            reason = next(
+                r["reason"] for r in availability if r["item_id"] == item["item_id"]
+            )
+            recoveries.extend(
+                dict(
+                    item_id=item["item_id"], prompt_family=family, **unavailable(reason)
+                )
+                for family in ["P0", "P1", "P2"]
+            )
             continue
         rows = [
             r for r in ref["rows"] if r["item"] == item.get("source_text", item["text"])
@@ -248,7 +279,11 @@ def _human_analysis(c, items, generations, bank, judgments):
                 interpretation="Profiles cover independently coded features; overlapping category memberships retained",
             )
     for dataset, ref in sorted(refs.items()):
-        selected = [i for i in human if i["source_dataset"] == dataset]
+        selected = [
+            i
+            for i in human
+            if i["source_dataset"] == dataset and i["item_id"] in aligned_ids
+        ]
         reliability.append(
             dict(
                 source_dataset=dataset,
@@ -259,7 +294,9 @@ def _human_analysis(c, items, generations, bank, judgments):
         )
         for subset in ["all", "development", "held_out"]:
             group = [i for i in selected if subset == "all" or i.get("split") == subset]
-            if ref["data_level"] == "category_counts":
+            if not group:
+                result = unavailable("No verified aligned items in this subset")
+            elif ref["data_level"] == "category_counts":
                 result = unavailable(
                     "Category summaries do not support item-by-feature geometry"
                 )
@@ -305,8 +342,11 @@ def _human_analysis(c, items, generations, bank, judgments):
         category_profiles=profiles,
         geometry=geometry,
         split_half=reliability,
+        item_availability=availability,
         unavailable_reason=(
-            None if refs else "Verified human references not available in this stage"
+            None
+            if aligned_ids
+            else "Verified aligned human references not available in this stage"
         ),
         category_coding_rule="Only supplied source categories; generated-category coding requires independent review",
     )

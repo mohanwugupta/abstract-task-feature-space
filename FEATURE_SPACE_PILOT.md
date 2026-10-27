@@ -2,7 +2,7 @@
 
 The standalone pilot is implemented in `feature_space_pilot/` and uses hosted, OpenAI-compatible frontier-model APIs. The offline workflow needs only Python, NumPy, SciPy, and pytest.
 
-Generator and judge now default to **GPT-6.1 Sol (`gpt-6.1-sol`), low reasoning**, per the latest user request. Three repetitions and the $100 live cap remain unchanged. No paid model calls were made during implementation. A synthetic offline run demonstrates the engineering workflow; it is not a scientific benchmark result.
+Generator and judge now default to **GPT-6.1 Sol (`gpt-6.1-sol`), low reasoning**, per the latest user request. Three repetitions and the $100 live cap remain unchanged. A two-request isolated live API connectivity diagnostic passed (estimated $0.002814); no full live pilot has run. A synthetic offline run demonstrates the engineering workflow; it is not a scientific benchmark result.
 
 ## Quick start
 
@@ -10,6 +10,7 @@ From the repository root, using Python 3.11:
 
 ```bash
 python -m pip install -r requirements-feature-space-pilot.txt
+python -m feature_space_pilot.human_inputs --config configs/feature_space_pilot.json --output-dir artifacts/human_input_audit/v1
 python -m feature_space_pilot.preflight --config configs/feature_space_pilot.json
 python -m feature_space_pilot.run --config configs/feature_space_pilot.json --stage human --dry-run
 python -m feature_space_pilot.run --config configs/feature_space_pilot.json --stage tasks --dry-run
@@ -29,12 +30,12 @@ Artifacts are in `artifacts/feature_space_pilot/demo_all_<design-hash>/`. Repeat
 See `data/feature_space_pilot/source_registry.json` and `selection_rules.json`.
 
 - **Vinson & Vigliocco (2008):** downloaded the verbatim publisher ZIP, inspected its terms, and validated **456 items × 1,029 features**. The raw frequency blocks have feature rows and item columns; the adapter verifies and transposes them. `vinson_derived.csv` is evaluation-only. Raw ZIP and derived CSV are read-only, with SHA-256 hashes. The source permits non-commercial research/education with citation of both the article and downloaded materials. The exact participant protocol and feature cap still require verification; `verified=false` prevents live matched-P0 execution until that gate is resolved.
-- **Harpaintner et al. (2018):** inspected the paper's methods and located the named supplemental files. Attempted publisher/PMC downloads returned HTML challenges or 404, not valid workbooks. Actual columns, supplements and supplement terms remain unverified. **No abstract human labels or feature strings were fabricated.** The model-language policy is German originals. Any English mapping, including features for lexical recovery, requires documented review.
+- **Harpaintner et al. (2018):** the supplied `human_norm_pilot_abstract_24.csv` now provides 24 selected source labels, German originals, reported publication-row/digest metadata and four rounded category proportions. The CSV is integrated as `category_counts` with explicit `measurement=rounded_category_proportions`. It contains no individual human feature strings or participant records. The original supplement bytes, codebook and supplement terms remain independently unverified; `verified=false` is retained. English translations remain explicitly unreviewed. Original failed download attempts remain recorded as history, rather than a claim that the supplied summary is absent.
 - **Wiemer-Hastings & Xu (2005):** conceptual reference only; no unverified quantitative data are used.
 
-`stimuli_human.jsonl` freezes the **36 currently supported Vinson labels**: 12 event nouns, 12 event verbs, 12 objects; nine are held out. The 24 abstract slots remain unfilled, so the full human stage is intentionally blocked. Its dry run reports the declared 540 generation jobs and 12,000-cell bank upper bound, separately from currently plannable work.
+The default `human_stimuli` now points to the supplied **60-item CSV**, with the **24-item abstract companion** pinned separately. Both SHA-256 values are checked on every human-stage load; the old 36-item JSONL is retained for historical configurations. The 36 Vinson labels/splits are unchanged. Previously unassigned abstract splits are frozen by sorted ID and seed 42 within four six-item strata: 20 development and four held-out. Overall there are 47 development / 13 held-out targets. The ordinary human dry run now constructs all 540 jobs. See [HUMAN_INPUTS.md](HUMAN_INPUTS.md) for the offline input-audit command, mappings, source limits and update policy.
 
-Acquire and inspect the actual abstract supplement, retain verbatim bytes read-only, implement/document its column mapping, and freeze the remaining 24 stimuli before any live benchmark. The existing selection function sorts source labels, samples with seed 42 within strata, and reserves a quarter per sufficiently large stratum. Add reviewed participant instructions and source provenance; do not toggle `verified` just to bypass a blocker. Unsupported category-only sources may be loaded as `category_counts`; string recovery and feature geometry will then be unavailable.
+Verified publication provenance, reviewed participant instructions and exact translation mappings are still required before a live benchmark. Do not toggle `verified` to bypass a blocker. Category-only abstract data support reviewed category composition, while string recovery, binary human feature geometry and participant reliability remain unavailable for that source. Human category values and ratings never enter the generation prompts.
 
 Primary sources: [Vinson & Vigliocco](https://link.springer.com/article/10.3758/BRM.40.1.183), [Harpaintner et al.](https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.01748/full).
 
@@ -87,7 +88,7 @@ Each attempt is reserved and fsynced **before** transmission. Failed parses are 
 
 A process lock serializes spending across stages. Existing liabilities enter preflight; resume estimates only remaining attempts. Candidate selection uses a predeclared phrase-hash order and a maximum of 200, independent of human matches/judge outcomes. If the upper bound is too high for a chosen frontier model, freeze a smaller cap before execution and document the coverage trade-off. All excluded candidate phrases remain auditable.
 
-Use `--stage human --smoke --dry-run` for the predeclared eight-target smoke: one item per human class plus the poem task, standalone deadline, direct composition and hierarchy parents, two replicates per family, cap 10 (48 generation requests plus binary judgments). It retains source/protocol/model/price gates and requires all three source classes; it is currently blocked by the unavailable abstract source. Execute only with `--smoke --execute-live --preflight-hash HASH_FROM_SMOKE_DRY_RUN`. Responses and usage are captured in the ordinary journals and manifest (`smoke=true`). For an offline smoke, add `--demo`. No billed smoke was performed during implementation.
+Use `--stage human --smoke --dry-run` for the predeclared eight-target smoke: one item per human class plus the poem task, standalone deadline, direct composition and hierarchy parents, two replicates per family, cap 10 (48 generation requests plus binary judgments). It retains source/protocol/model/price gates and requires all three source classes; the selected CSV inventory now includes all three classes, but source/protocol/translation gates still block it. Execute only with `--smoke --execute-live --preflight-hash HASH_FROM_SMOKE_DRY_RUN`. Responses and usage are captured in the ordinary journals and manifest (`smoke=true`). For an offline smoke, add `--demo`. No billed smoke was performed during implementation.
 
 `--max-jobs N` separately limits pending generation jobs for an interruption checkpoint and writes a partial manifest.
 

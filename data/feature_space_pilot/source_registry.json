@@ -1,5 +1,5 @@
 {
-  "audit_date": "2026-10-26",
+  "audit_date": "2026-10-27",
   "sources": [
     {
       "actual_raw_columns": {
@@ -52,28 +52,78 @@
       "verified": false
     },
     {
+      "adapter": "human_pilot_category_shares_v1",
       "attempted_urls": [
         "https://pmc.ncbi.nlm.nih.gov/articles/instance/6156367/bin/Data_Sheet_1.xlsx",
         "https://www.frontiersin.org/api/v4/articles/412259/file/Data_Sheet_1.xlsx"
       ],
-      "available": false,
-      "blocker": "Publisher/PMC supplement endpoints returned HTML challenge pages or 404. No materialized reference or exact columns verified.",
+      "available": true,
+      "blocker": "Supplied 24-item category summary is integrated; original supplement bytes/codebook/terms and source provenance remain unverified.",
       "candidate_supplements": [
         "Table_1.docx",
         "Table_2.XLSX",
         "Data_Sheet_1.xlsx"
       ],
-      "data_level": "unverified",
+      "codebook": "Supplied CSV: human_sm=SM, human_is_e=IS/E, human_sc=SC, human_va=VA; original publication codebook and supplement terms await independent verification.",
+      "columns": {
+        "IS/E": "human_is_e",
+        "SC": "human_sc",
+        "SM": "human_sm",
+        "VA": "human_va",
+        "item": "original_german",
+        "language": "source_language"
+      },
+      "data_level": "category_counts",
       "dataset_id": "harpaintner_2018",
+      "feature_level_available": false,
       "instructions": "Methods: spontaneous properties/associations/situations; about four; avoid synonyms; no time limit. Prompt is an adaptation, not a verbatim replication.",
+      "item_count": 24,
       "kind": "human",
       "language": "de",
       "license": "Article is CC-BY; supplement-specific terms not yet inspected",
+      "limitations": [
+        "Rounded category proportions, not integer production counts or feature strings",
+        "No lexical human recovery, binary human feature RDM or participant split-half from this summary",
+        "Original supplement SHA-256 is reported metadata, not verification of materialized publication bytes"
+      ],
+      "measurement": "rounded_category_proportions",
       "paper_url": "https://doi.org/10.3389/fpsyg.2018.01748",
+      "participant_level_available": false,
       "participants": 60,
       "participants_per_word": 10,
+      "path": "human_norm_pilot_abstract_24.csv",
       "primary": true,
-      "translation_policy": "Model sees German originals; published translations preserved when available; any English mapping requires review; exclude polysemous items",
+      "provenance_status": "user_supplied_summary_not_independently_verified",
+      "reported_raw_sha256": "a0d94ee950f5dcdb5bd753cb9050ddeda4a96d8493bc63772113bc31a39af293",
+      "sha256": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
+      "translation_mapping": {
+        "Aktivität": "activity",
+        "Anstrengung": "effort",
+        "Ekel": "disgust",
+        "Erwartung": "expectation",
+        "Fitneß": "fitness",
+        "Gedanke": "thought",
+        "Gefühl": "emotion",
+        "Gehorsam": "obedience",
+        "Gerechtigkeit": "justice",
+        "Katastrophe": "catastrophe",
+        "Kompromiss": "compromise",
+        "Kooperation": "cooperation",
+        "Kreativität": "creativity",
+        "Perfektion": "perfection",
+        "Rat": "advice",
+        "Revolution": "revolution",
+        "Ritual": "ritual",
+        "Sehnsucht": "desire",
+        "Sitte": "convention",
+        "Unterstützung": "support",
+        "Verachtung": "contempt",
+        "Vertrauen": "trust",
+        "Würde": "dignity",
+        "Überraschung": "surprise"
+      },
+      "translation_policy": "Preserve English stimulus labels and German originals. The CSV marks published English translations as not independently reviewed; aligned human comparisons and translated P0 remain gated.",
+      "translation_reviewed": false,
       "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6156367/",
       "verified": false
     },

@@ -91,7 +91,27 @@ def selected_items(c, stage):
         if c.get("demo"):
             human = demo_human_items()[: c.get("demo_human_count", 60)]
         elif c.get("human_stimuli"):
-            human = load_items(resolve(c, c["human_stimuli"]))
+            path = resolve(c, c["human_stimuli"])
+            if path.suffix.lower() == ".csv":
+                from .human_inputs import load_human_csv
+
+                if (
+                    not c.get("human_stimuli_sha256")
+                    or not c.get("human_abstract_summary")
+                    or not c.get("human_abstract_summary_sha256")
+                ):
+                    raise ValueError(
+                        "Human CSV inventory and abstract companion require pinned paths and hashes"
+                    )
+                human = load_human_csv(
+                    path,
+                    expected_sha256=c["human_stimuli_sha256"],
+                    abstract_path=resolve(c, c["human_abstract_summary"]),
+                    abstract_sha256=c["human_abstract_summary_sha256"],
+                    seed=c["seed"],
+                )
+            else:
+                human = load_items(path)
     if stage in {"tasks", "all"} or c.get("smoke"):
         tasks = (
             load_items(resolve(c, c["task_stimuli"]))
@@ -163,8 +183,17 @@ def preflight(c, stage):
     human = [x for x in items if x["target_type"] in {"concept", "event", "object"}]
     refs = []
     source_hashes = {}
+    input_hashes = {}
+    if not demo and stage in {"human", "all"}:
+        for key in ["human_stimuli", "human_abstract_summary"]:
+            if c.get(key):
+                input_hashes[key] = file_hash(resolve(c, c[key]))
+        if c.get("human_abstract_summary"):
+            warnings.append(
+                "Abstract human input contains rounded category proportions only; feature-string recovery, human feature RDMs and participant reliability are unavailable for that source"
+            )
     if not demo and stage == "human":
-        from .references import load_reference
+        from .references import load_reference, validate_item_alignment
 
         if len(human) != c.get("human_target_count", 60):
             blockers.append("Human source sample is not frozen at the declared size")
@@ -184,22 +213,25 @@ def preflight(c, stage):
         by_source = {r["dataset_id"]: r for r in refs}
         for item in human:
             ref = by_source.get(item["source_dataset"])
+            source_language = item.get(
+                "source_language", ref["language"] if ref else item["language"]
+            )
+            if (
+                item["language"] != source_language
+                and item.get("translation_status") != "reviewed"
+            ):
+                blockers.append(
+                    f'Human stimulus requires reviewed translation: {item["source_dataset"]}'
+                )
             if ref is None:
                 blockers.append(
                     f'Missing verified human source for {item["source_dataset"]}'
                 )
                 continue
-            if (
-                item["language"] != ref["language"]
-                and item.get("translation_status") != "reviewed"
-            ):
-                blockers.append("Human stimulus requires reviewed translation")
-            if item["text"] not in {r["item"] for r in ref["rows"]} and item.get(
-                "source_text"
-            ) not in {r["item"] for r in ref["rows"]}:
-                blockers.append(
-                    f'Human stimulus absent from verified reference: {item["item_id"]}'
-                )
+            try:
+                validate_item_alignment(item, ref)
+            except ValueError as error:
+                blockers.append(str(error))
         if not refs:
             blockers.append("No verified human source data")
     # Freeze both the complete literal template set and each constructed request.
@@ -334,6 +366,7 @@ def preflight(c, stage):
             item_hashes=[x["content_hash"] for x in items],
             prompts=prompt_hashes,
             source_hashes=source_hashes,
+            input_hashes=input_hashes,
             code=source_code,
             fixture_hash=digest(reconciliation_fixture()),
         )
@@ -407,6 +440,7 @@ def preflight(c, stage):
         capability_deviations=deviations,
         prompt_hashes=prompt_hashes,
         source_hashes=source_hashes,
+        input_hashes=input_hashes,
         source_code_hashes=source_code,
         live_ready=not demo and not blockers,
     )
@@ -962,6 +996,7 @@ def run_pipeline(
             seed=c["seed"],
             prompt_hashes=plan["prompt_hashes"],
             source_hashes=source_hashes,
+            input_hashes=plan["input_hashes"],
             config_hash=digest(c),
             evaluation_inputs_hash=evaluation_inputs_hash(c),
             selected_item_ids=[x["item_id"] for x in items],

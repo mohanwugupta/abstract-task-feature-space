@@ -1,8 +1,33 @@
 {
-  "abstract_status": "Blocked: actual Harpaintner supplement could not be downloaded/verified",
-  "available_frozen_items": 36,
-  "missing_abstract_items": 24,
-  "policy": "Sort unique source labels, seeded sampling within stratum, exclude ambiguous items, hold out floor(n/4) per stratum; freeze before model outcomes",
+  "abstract_status": "All 24 uploaded abstract stimuli integrated; source/protocol/translation verification remains pending",
+  "abstract_stratum_quotas": {
+    "internal_state_emotion": 6,
+    "sensorimotor": 6,
+    "social_constellation": 6,
+    "verbal_association": 6
+  },
+  "abstract_summary": "human_norm_pilot_abstract_24.csv",
+  "abstract_summary_sha256": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
+  "available_frozen_items": 60,
+  "held_out_item_ids": [
+    "hp18_row0010",
+    "hp18_row0116",
+    "hp18_row0255",
+    "hp18_row0292",
+    "vv_actionN_clash",
+    "vv_actionN_clatter",
+    "vv_actionN_sparkle",
+    "vv_actionV_argue",
+    "vv_actionV_die",
+    "vv_actionV_drop",
+    "vv_object_lemon",
+    "vv_object_pencil",
+    "vv_object_thumb"
+  ],
+  "inventory": "human_norm_pilot_60_stimuli.csv",
+  "inventory_sha256": "8778e68187120b318ac3828c99787af0995e1f7496f5c6ad48d00e8359008374",
+  "missing_abstract_items": 0,
+  "policy": "Preserve the supplied 60-item inventory without resampling. Keep the 36 Vinson splits. Freeze unassigned abstract splits by sorted item ID and seeded sampling within each supplied stratum: floor(6/4)=1 held-out per stratum. No model outcomes used.",
   "quotas": {
     "abstract": 24,
     "actionN": 12,
@@ -10,6 +35,11 @@
     "object": 12
   },
   "seed": 42,
+  "selection_note": "Uploaded selection is accepted as supplied; only previously unassigned splits use seed 42. This does not claim to reproduce sampling from the full publication supplement.",
+  "split_counts": {
+    "development": 47,
+    "held_out": 13
+  },
   "tuning_rule": "No prompt tuning on held-out human data or downstream case results",
-  "version": "selection_v1"
+  "version": "selection_v2_csv_inventory"
 }

@@ -43,19 +43,20 @@ def load_reference(spec, *, live=False, model_language=None):
         "category_counts",
     }:
         raise ValueError("Unsupported reference data_level")
-    with path.open(newline="", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        columns = spec["columns"]
-        needed = (
-            {"item", "category", "count"}
-            if spec["data_level"] == "category_counts"
-            else {"item", "feature"}
+    if spec.get("adapter") == "human_pilot_category_shares_v1":
+        from .human_inputs import CATEGORY_COLUMNS, load_abstract_category_rows
+
+        expected_columns = dict(
+            item="original_german", language="source_language", **CATEGORY_COLUMNS
         )
-        if not needed <= columns.keys() or not set(columns.values()) <= set(
-            reader.fieldnames or []
+        if (
+            spec["data_level"] != "category_counts"
+            or spec["columns"] != expected_columns
         ):
-            raise ValueError("Unsupported reference columns")
-        rows = [{k: r[v] for k, v in columns.items()} for r in reader]
+            raise ValueError("Unsupported category-proportion reference columns")
+        rows = load_abstract_category_rows(path)
+    else:
+        rows = _read_reference_csv(path, spec)
     if not rows or any(not r.get("item", "").strip() for r in rows):
         raise ValueError("Empty reference or missing item strings")
     if any(r.get("language", spec["language"]) != spec["language"] for r in rows):
@@ -78,6 +79,44 @@ def load_reference(spec, *, live=False, model_language=None):
                 "Feature translation must also be reviewed for lexical recovery"
             )
     return dict(spec, rows=rows, model_language=language)
+
+
+def _read_reference_csv(path, spec):
+    with path.open(newline="", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        columns = spec["columns"]
+        needed = (
+            {"item", "category", "count"}
+            if spec["data_level"] == "category_counts"
+            else {"item", "feature"}
+        )
+        if not needed <= columns.keys() or not set(columns.values()) <= set(
+            reader.fieldnames or []
+        ):
+            raise ValueError("Unsupported reference columns")
+        return [{k: r[v] for k, v in columns.items()} for r in reader]
+
+
+def validate_item_alignment(item, ref):
+    """Check the actual source label and reviewed cross-language mapping."""
+    source_text = item.get("source_text", item["text"])
+    if source_text not in {r["item"] for r in ref["rows"]}:
+        raise ValueError(
+            f"Human stimulus absent from verified reference: {item['item_id']}"
+        )
+    if item["language"] == ref["language"]:
+        if source_text != item["text"]:
+            raise ValueError("Human item text does not match its same-language source")
+        return
+    if item.get("translation_status") != "reviewed":
+        raise ValueError("Human stimulus language requires reviewed translation")
+    if (
+        not ref.get("translation_reviewed")
+        or ref.get("translation_mapping", {}).get(source_text) != item["text"]
+    ):
+        raise ValueError(
+            "Human stimulus requires an exact reviewed translation mapping"
+        )
 
 
 def select_stimuli(rows, quotas, *, seed):

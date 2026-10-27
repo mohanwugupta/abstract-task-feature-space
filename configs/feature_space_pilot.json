@@ -29,7 +29,10 @@
     "temperature": 0.8,
     "timeout_seconds": 90
   },
-  "human_stimuli": "data/feature_space_pilot/stimuli_human.jsonl",
+  "human_abstract_summary": "human_norm_pilot_abstract_24.csv",
+  "human_abstract_summary_sha256": "561d90c652cf62b2c506683bfe89d05490214fff17ca505ab5a9e80e9a44f97a",
+  "human_stimuli": "human_norm_pilot_60_stimuli.csv",
+  "human_stimuli_sha256": "8778e68187120b318ac3828c99787af0995e1f7496f5c6ad48d00e8359008374",
   "human_target_count": 60,
   "judge": {
     "api_key_env": "OPENAI_API_KEY",

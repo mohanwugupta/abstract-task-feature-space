@@ -15,7 +15,7 @@ from .load import CellState, SYMBOLS
 from ..io import digest, file_hash
 from ..metrics import rdm
 from ..prompts import normalize_phrase
-from ..references import load_reference
+from ..references import load_reference, validate_item_alignment
 
 FAMILIES = ("P0", "P1", "P2")
 LEVELS = ("domain", "task_type", "task_instance", "situated_task", "situation")
@@ -551,17 +551,8 @@ def human_sources(run):
             ref = load_reference(
                 dict(spec, path=str(_external_path(run, spec["path"]))), live=True
             )
-            if any(run.items[i]["language"] != ref["language"] for i in items):
-                raise ValueError(
-                    "Unmatched human/model feature language; no aligned reviewed mapping"
-                )
-            available_items = {r["item"] for r in ref["rows"]}
-            if any(
-                run.items[i].get("source_text", run.items[i]["text"])
-                not in available_items
-                for i in items
-            ):
-                raise ValueError("Human item alignment mismatch")
+            for iid in items:
+                validate_item_alignment(run.items[iid], ref)
             recovery = [
                 r
                 for r in run.human_summary.get("recovery", [])
