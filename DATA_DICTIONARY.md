@@ -16,7 +16,7 @@ All run artifacts live under `artifacts/feature_space_pilot/<run_id>/`. Text use
 | `binary_judgments.csv` | Unique resolved `(item_id,feature_id,rubric_version,judge_model)` rows; integer `applies` 0/1, `evidence,prompt_hash`. Human adjudications name the reviewer in judge_model. |
 | `matrix_scope.json` | Frozen `item_ids,feature_ids`, declared policy and `excluded_combinations`. Scope is the complete stage cross product. Different stages are excluded, not padded with zeros. |
 | `binary_matrix.csv` | `item_id` then columns by feature ID; every value is 0/1. File exists only after the complete scope is resolved. |
-| `frozen_config.json` | Initial config snapshot; stores key environment variable names only. Never contains credential values. |
+| `frozen_config.json` | Initial config snapshot; stores key environment variable names only. Never contains credential values. Local `.env` credentials are loaded only for explicit live execution and are never included as run artifacts. |
 | `frozen_prompts.json` | Literal versioned template texts; constructed per-request texts also appear in job plans. |
 | `frozen_source_registry.json` | Reference kind, source paths/URLs, codebook, language, instructions, permission constraints and hashes. Synthetic sources remain labeled synthetic. |
 | `synthetic_human_reference.csv` | Offline-only read-only fake norm table, hashed and ingested by the reference loader. It does not represent human participants. |

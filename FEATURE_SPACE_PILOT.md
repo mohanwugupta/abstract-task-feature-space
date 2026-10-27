@@ -57,9 +57,19 @@ Edit `generator` and `judge` independently in `configs/feature_space_pilot.json`
 
 `prices` must include `model_id`, `revision`, numeric `input_per_million`, numeric `output_per_million`, `verified_at`, and `source_url`. Model/revision must match the associated role. Verify current provider pricing and account availability before setting these values; no default dollar rates are asserted. Counts and conservative upper bounds are reported instead of unsupported price estimates.
 
-The adapter uses HTTPS Chat Completions, strict `response_format.json_schema`, and `max_completion_tokens`. The selected provider must support that contract. Native Anthropic/Gemini request formats require a separately verified adapter; merely changing the base URL does not make them compatible. API keys are read only at request time and are never stored in configs/manifests. Inline keys are rejected. The official [structured-output documentation](https://developers.openai.com/api/docs/guides/structured-outputs) was inspected for this adapter.
+The adapter uses HTTPS Chat Completions, strict `response_format.json_schema`, and `max_completion_tokens`. The selected provider must support that contract. Native Anthropic/Gemini request formats require a separately verified adapter; merely changing the base URL does not make them compatible. The live runner loads the configured API-key variables from the project-root `.env` after source/model/budget preflight passes and before any artifact or reservation is created. Nonempty exported variables take precedence. Values are literal; `.env` content is never executed as shell code. Only the generator/judge variables named by `api_key_env` are loaded. Dry runs, reports and offline demos do not read credentials. Actual values are never stored in configs, prompts, manifests or logs; inline keys are rejected. The official [structured-output documentation](https://developers.openai.com/api/docs/guides/structured-outputs) was inspected for this adapter.
 
 P0 study-specific protocols are configured in `protocols[dataset_id]` with `text`, positive `cap`, `version`, and `verified`. Harpaintner's supplied German adaptation has cap 4 and is explicitly not a verbatim instruction replication. Task P0 is a predeclared general analogue. Family recovery comparisons downsample each response to the configured P0 cap (maximum 10). Prompts never receive human feature strings, category/stratum labels, other targets, previous generations, judge results, or norm ratings.
+
+## API key setup
+
+Copy `.env.example` to `.env` in the project root if you do not already have a local `.env`, then set:
+
+```dotenv
+OPENAI_API_KEY=your-openai-api-key-here
+```
+
+No manual `source` or `export` is required. Both generator and judge already use `api_key_env: "OPENAI_API_KEY"` in the default config. Previously exported values remain supported and take precedence over the file. The file may contain comments, quoted values, or `export KEY=value` syntax. Variable interpolation and shell commands are not evaluated. Missing/blank keys or malformed selected entries fail with a value-free error before execution. `.env` is ignored by Git; only its empty example template is committed.
 
 ## Live execution and cost accounting
 

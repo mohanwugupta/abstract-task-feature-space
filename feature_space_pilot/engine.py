@@ -25,6 +25,7 @@ from .clients import FakeClient, HostedClient, generation_schema, judgment_schem
 from .bank import consolidate
 from .judge import RUBRIC, judge_prompt, parse_judgment, build_matrix
 from .budget import Ledger, estimate_cost, validate_prices
+from .environment import load_api_credentials
 
 STAGES = ("human", "tasks", "all")
 
@@ -564,6 +565,7 @@ def run_pipeline(
             raise ValueError("Run --dry-run and supply its matching --preflight-hash")
         if client is not None:
             raise ValueError("Injected/fake client is prohibited during live execution")
+        load_api_credentials(c)
     elif not c.get("demo"):
         raise ValueError(
             "Paid execution requires --execute-live and a matching dry-run preflight hash"

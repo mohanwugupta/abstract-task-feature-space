@@ -25,6 +25,14 @@ The full synthetic demonstration runs 675 generation requests (three repetitions
 - [Incremental implementation and test record](scratchpad_feature_space_pilot.md)
 - [Human reference source registry](data/feature_space_pilot/source_registry.json)
 
+For live runs, put your key in a project-root `.env` file:
+
+```dotenv
+OPENAI_API_KEY=your-openai-api-key-here
+```
+
+The live runner loads it automatically. An existing exported `OPENAI_API_KEY` takes precedence. `.env` is ignored by Git; `.env.example` provides the blank template. Offline demos and dry runs do not read credentials.
+
 Generator and judge model IDs remain configurable. Paid execution requires verified model pricing/capabilities, a successful dry run, its matching preflight hash, and explicit `--execute-live`. The configured cumulative API cap is at most $500.
 
 The human benchmark remains blocked pending acquisition/verification of the abstract-concept supplement and the exact Vinson participant protocol. Thirty-six Vinson labels and all fifteen task targets are frozen; missing human stimuli are not fabricated. No paid model calls were made during implementation.
@@ -33,6 +41,6 @@ The human benchmark remains blocked pending acquisition/verification of the abst
 
 This is a standalone pilot project. Execution uses hosted APIs, and the offline workflow needs only Python, NumPy, SciPy, and pytest.
 
-The pilot's **45 offline tests** cover schemas, source gates, prompts, independent jobs, budget controls, binary judgments, metrics, compositionality, checkpoint recovery, and full CLI runs. CI runs without credentials.
+The pilot's **50 offline tests** cover schemas, source gates, prompts, independent jobs, budget controls, binary judgments, metrics, compositionality, checkpoint recovery, and full CLI runs. CI runs without credentials.
 
 Generated run directories are excluded from Git. Reproduce the sample report with the offline command above. Pilot fixtures and references are committed directly with their byte hashes preserved. Downloaded human norm files retain their source-specific terms recorded in the source registry; this project does not grant additional rights to those data.

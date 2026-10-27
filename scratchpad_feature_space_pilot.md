@@ -231,3 +231,26 @@
 - Recorded the sampling amendment before any live evaluation. Original PRD and earlier completed artifacts are preserved as historical designs; the new default and sample report use three repetitions. No paid requests were made.
 - Report: `/Users/mg9965/Desktop/abstract-task-feature-space/artifacts/feature_space_pilot/demo_all_cebc8c4d0142b011/pilot_report.md`; manifest: `/Users/mg9965/Desktop/abstract-task-feature-space/artifacts/feature_space_pilot/demo_all_cebc8c4d0142b011/manifest.json`; config SHA-256: `8d2ab30c00ef0c87ce04802c13126dcfcc029d5e56da66aaadaa90014afc06ba`.
 - Next: commit and publish the reviewed sampling/config/documentation update to the existing private repository.
+
+## 2026-10-26 — API environment-variable integration RED
+
+- User requested adding the API key variable to the scripts. Implement automatic project-root `.env` loading for explicit live execution and provide `.env.example` with `OPENAI_API_KEY=`. Preserve any existing local `.env` and exported values; never put actual credentials into config, prompts, artifacts or Git.
+- New `test_environment.py` criteria: named credentials only; exported values win; quotes/comments/export syntax; literal values with no shell execution; malformed-file errors omit credential text; missing keys fail before artifacts/reservations; live script resolves `.env` from configured root even from another directory; offline execution never reads credentials; no key values in captured output artifacts.
+- Tests use fake sentinel credentials and a mocked provider only. No actual key is needed, read or submitted during implementation; no paid calls are authorized by this setup request.
+- Next: capture RED, implement minimal loader, run targeted/regression checks, update setup docs and publish the template/code only.
+
+## 2026-10-26 — API environment-variable integration GREEN / REFACTOR
+
+- RED observed: new environment suite → **5 failed**: missing loader, missing early key check, live `.env` not loaded, and absent offline-loader hook. Fake fixtures only; no network requests.
+- GREEN: `python3 -m pytest -q tests/feature_space_pilot/test_environment.py` → **5 passed**. Added a small standard-library loader for configured generator/judge key names, preserving exported values and treating `.env` values literally. No dependency added.
+- The explicit live path validates preflight first, then loads keys from the configured project root before creating artifacts or reserving budget. Missing keys now fail before a request/reservation. Credential values are not returned or serialized; selected-entry parse errors contain names/line numbers only. Dry runs/offline/report paths do not load credentials.
+- Added `.env.example` containing empty `OPENAI_API_KEY=`. Created a local ignored `.env` with the same empty variable only because no file existed; did not read an existing user key. The new local file uses owner-only permissions. No actual key was entered, read, committed or submitted.
+- Updated setup/README/data dictionary. Verified `.env` is ignored/untracked and `.env.example` is publishable with no value. Existing three-repetition default and $100 live cap are preserved.
+- Refactor: formatted new loader/tests with Black. Full offline regression verification is recorded next. No paid API calls; live spending $0.
+
+
+## 2026-10-26 — API environment setup final verification
+
+- Final REFACTOR/regression: `python3 -m pytest -q tests` → **50 passed**. Environment integration covers mocked live entry, different working directory, exported-key precedence, literal parsing, sanitized errors, no credential artifacts and no offline credential reads.
+- Refreshed the read-only preflight example; key loading is never part of preflight and does not alter its config/design identity. Actual `.env` remains ignored and untracked.
+- Publishing only the loader, integration tests, blank `.env.example`, docs, scratchpad and nonsecret preflight example. Model selections, source gates, three repetitions and the user's $100 cap are unchanged. No paid API requests were made.
