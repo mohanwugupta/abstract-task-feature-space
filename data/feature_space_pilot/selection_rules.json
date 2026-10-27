@@ -1,0 +1,15 @@
+{
+  "abstract_status": "Blocked: actual Harpaintner supplement could not be downloaded/verified",
+  "available_frozen_items": 36,
+  "missing_abstract_items": 24,
+  "policy": "Sort unique source labels, seeded sampling within stratum, exclude ambiguous items, hold out floor(n/4) per stratum; freeze before model outcomes",
+  "quotas": {
+    "abstract": 24,
+    "actionN": 12,
+    "actionV": 12,
+    "object": 12
+  },
+  "seed": 42,
+  "tuning_rule": "No prompt tuning on held-out human data or downstream case results",
+  "version": "selection_v1"
+}

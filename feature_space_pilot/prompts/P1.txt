@@ -1,0 +1,1 @@
+Discover at most {cap} specific descriptive or relational properties of the target. Consider varied characteristics, operations, roles, contexts, constraints and feedback when applicable. Avoid generic associations and synonyms. Do not infer an agent's preferences. Write in the target's language.

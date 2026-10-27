@@ -1,0 +1,90 @@
+{
+  "audit_date": "2026-10-26",
+  "sources": [
+    {
+      "actual_raw_columns": {
+        "feature_list_and_types.txt": [
+          "feature#",
+          "feature",
+          "Visual",
+          "Perceptual",
+          "Functional",
+          "Motoric"
+        ],
+        "feature_weight_matrices": "1029 feature rows × 456 ordered item columns; two blocks 256+200",
+        "word_categories.txt": [
+          "ID#",
+          "word",
+          "type",
+          "semantic"
+        ]
+      },
+      "adapter": "feature_space_pilot.source_adapters.load_vinson_zip",
+      "available": true,
+      "category_note": "Overlapping Visual/Perceptual/Functional/Motoric memberships; retain unclassified rows with empty category",
+      "codebook": "Vinson-BRM-2008/feature_list_and_types.txt and word_categories.txt inside verbatim ZIP",
+      "columns": {
+        "category": "category",
+        "feature": "feature",
+        "frequency": "frequency",
+        "item": "item",
+        "language": "language",
+        "stratum": "stratum"
+      },
+      "data_level": "item_features",
+      "dataset_id": "vinson_2008",
+      "feature_count": 1029,
+      "instructions": "Blocked: exact participant protocol and feature limits require full-method verification; no default matched P0 supplied",
+      "item_count": 456,
+      "kind": "human",
+      "language": "en",
+      "license": "Non-commercial research/education with citation of paper and web materials; author rights retained. Verbatim terms inside ZIP.",
+      "paper_url": "https://doi.org/10.3758/BRM.40.1.183",
+      "participant_level_available": false,
+      "participants": 280,
+      "participants_note": "Approximately 280 total per publisher abstract; per-item participation not verified",
+      "path": "data/feature_space_pilot/references/vinson_derived.csv",
+      "primary": true,
+      "raw_path": "data/feature_space_pilot/references/Vinson-BRM-2008a.zip",
+      "raw_sha256": "3bb37252d5b6fadc13bfa93b971846b5005df5cd0e894e22b55dbf33f5b927c5",
+      "sha256": "29c160e8c2dec197ca2f402b2ba80eec25b4956933eb06220fd0bab1c685ef55",
+      "url": "https://media.springernature.com/original/springer-static/esm/art%3A10.3758%2FBRM.40.1.183/MediaObjects/Vinson-BRM-2008a.zip",
+      "verified": false
+    },
+    {
+      "attempted_urls": [
+        "https://pmc.ncbi.nlm.nih.gov/articles/instance/6156367/bin/Data_Sheet_1.xlsx",
+        "https://www.frontiersin.org/api/v4/articles/412259/file/Data_Sheet_1.xlsx"
+      ],
+      "available": false,
+      "blocker": "Publisher/PMC supplement endpoints returned HTML challenge pages or 404. No materialized reference or exact columns verified.",
+      "candidate_supplements": [
+        "Table_1.docx",
+        "Table_2.XLSX",
+        "Data_Sheet_1.xlsx"
+      ],
+      "data_level": "unverified",
+      "dataset_id": "harpaintner_2018",
+      "instructions": "Methods: spontaneous properties/associations/situations; about four; avoid synonyms; no time limit. Prompt is an adaptation, not a verbatim replication.",
+      "kind": "human",
+      "language": "de",
+      "license": "Article is CC-BY; supplement-specific terms not yet inspected",
+      "paper_url": "https://doi.org/10.3389/fpsyg.2018.01748",
+      "participants": 60,
+      "participants_per_word": 10,
+      "primary": true,
+      "translation_policy": "Model sees German originals; published translations preserved when available; any English mapping requires review; exclude polysemous items",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6156367/",
+      "verified": false
+    },
+    {
+      "available": false,
+      "blocker": "Conceptual reference only; no verified item-level data; excluded from quantitative analyses",
+      "dataset_id": "wiemer_hastings_xu_2005",
+      "kind": "human",
+      "paper_url": "https://doi.org/10.1207/s15516709cog0000_33",
+      "primary": false,
+      "verified": false
+    }
+  ]
+}

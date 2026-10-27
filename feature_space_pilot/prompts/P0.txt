@@ -1,0 +1,1 @@
+List properties or situations that come to mind spontaneously for the target. Avoid synonyms of the target. Give at most {cap} short propositions in the target's language. This is a general free-listing analogue, not an exact replication of participant instructions.

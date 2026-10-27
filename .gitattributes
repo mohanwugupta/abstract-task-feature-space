@@ -1,0 +1,4 @@
+* text=auto
+
+# Reference hashes cover exact downloaded/derived bytes.
+data/feature_space_pilot/references/** -text

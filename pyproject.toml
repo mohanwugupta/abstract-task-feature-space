@@ -1,0 +1,4 @@
+# Standalone feature-space pilot test configuration.
+[tool.pytest.ini_options]
+testpaths = ["tests/feature_space_pilot"]
+pythonpath = ["."]

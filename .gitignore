@@ -1,0 +1,20 @@
+# Python and local environments
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+dist/
+build/
+
+# Generated reports, usage ledgers and test caches
+artifacts/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Credentials and operating-system files
+.env
+.env.*
+!.env.example
+*.key
+.DS_Store

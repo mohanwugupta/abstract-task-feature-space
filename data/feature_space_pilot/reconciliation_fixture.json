@@ -1,0 +1,468 @@
+{
+  "expected_report_schema": [
+    "invoice_id",
+    "status",
+    "invoice_cents",
+    "paid_unique_cents",
+    "balance_cents",
+    "payment_ids"
+  ],
+  "invoices": [
+    {
+      "amount_cents": 10125,
+      "currency": "USD",
+      "customer": "Synthetic customer 01",
+      "invoice_id": "INV-001"
+    },
+    {
+      "amount_cents": 10250,
+      "currency": "USD",
+      "customer": "Synthetic customer 02",
+      "invoice_id": "INV-002"
+    },
+    {
+      "amount_cents": 10375,
+      "currency": "USD",
+      "customer": "Synthetic customer 03",
+      "invoice_id": "INV-003"
+    },
+    {
+      "amount_cents": 10500,
+      "currency": "USD",
+      "customer": "Synthetic customer 04",
+      "invoice_id": "INV-004"
+    },
+    {
+      "amount_cents": 10625,
+      "currency": "USD",
+      "customer": "Synthetic customer 05",
+      "invoice_id": "INV-005"
+    },
+    {
+      "amount_cents": 10750,
+      "currency": "USD",
+      "customer": "Synthetic customer 06",
+      "invoice_id": "INV-006"
+    },
+    {
+      "amount_cents": 10875,
+      "currency": "USD",
+      "customer": "Synthetic customer 07",
+      "invoice_id": "INV-007"
+    },
+    {
+      "amount_cents": 11000,
+      "currency": "USD",
+      "customer": "Synthetic customer 08",
+      "invoice_id": "INV-008"
+    },
+    {
+      "amount_cents": 11125,
+      "currency": "USD",
+      "customer": "Synthetic customer 09",
+      "invoice_id": "INV-009"
+    },
+    {
+      "amount_cents": 11250,
+      "currency": "USD",
+      "customer": "Synthetic customer 10",
+      "invoice_id": "INV-010"
+    },
+    {
+      "amount_cents": 11375,
+      "currency": "USD",
+      "customer": "Synthetic customer 11",
+      "invoice_id": "INV-011"
+    },
+    {
+      "amount_cents": 11500,
+      "currency": "USD",
+      "customer": "Synthetic customer 12",
+      "invoice_id": "INV-012"
+    },
+    {
+      "amount_cents": 11625,
+      "currency": "USD",
+      "customer": "Synthetic customer 13",
+      "invoice_id": "INV-013"
+    },
+    {
+      "amount_cents": 11750,
+      "currency": "USD",
+      "customer": "Synthetic customer 14",
+      "invoice_id": "INV-014"
+    },
+    {
+      "amount_cents": 11875,
+      "currency": "USD",
+      "customer": "Synthetic customer 15",
+      "invoice_id": "INV-015"
+    },
+    {
+      "amount_cents": 12000,
+      "currency": "USD",
+      "customer": "Synthetic customer 16",
+      "invoice_id": "INV-016"
+    },
+    {
+      "amount_cents": 12125,
+      "currency": "USD",
+      "customer": "Synthetic customer 17",
+      "invoice_id": "INV-017"
+    },
+    {
+      "amount_cents": 12250,
+      "currency": "USD",
+      "customer": "Synthetic customer 18",
+      "invoice_id": "INV-018"
+    },
+    {
+      "amount_cents": 12375,
+      "currency": "USD",
+      "customer": "Synthetic customer 19",
+      "invoice_id": "INV-019"
+    },
+    {
+      "amount_cents": 12500,
+      "currency": "USD",
+      "customer": "Synthetic customer 20",
+      "invoice_id": "INV-020"
+    }
+  ],
+  "matching_policy": "Exact invoice_id and currency. Integer cents. Identical transaction_ref and amount are duplicate records; count once. Duplicate status takes precedence; otherwise missing, matched, or partial. List every invoice and its payment IDs.",
+  "payments": [
+    {
+      "amount_cents": 10125,
+      "currency": "USD",
+      "invoice_id": "INV-001",
+      "payment_id": "PAY-001",
+      "transaction_ref": "TXN-001"
+    },
+    {
+      "amount_cents": 10250,
+      "currency": "USD",
+      "invoice_id": "INV-002",
+      "payment_id": "PAY-002",
+      "transaction_ref": "TXN-002"
+    },
+    {
+      "amount_cents": 10375,
+      "currency": "USD",
+      "invoice_id": "INV-003",
+      "payment_id": "PAY-003",
+      "transaction_ref": "TXN-003"
+    },
+    {
+      "amount_cents": 10500,
+      "currency": "USD",
+      "invoice_id": "INV-004",
+      "payment_id": "PAY-004",
+      "transaction_ref": "TXN-004"
+    },
+    {
+      "amount_cents": 10750,
+      "currency": "USD",
+      "invoice_id": "INV-006",
+      "payment_id": "PAY-005",
+      "transaction_ref": "TXN-006"
+    },
+    {
+      "amount_cents": 5437,
+      "currency": "USD",
+      "invoice_id": "INV-007",
+      "payment_id": "PAY-006",
+      "transaction_ref": "TXN-007"
+    },
+    {
+      "amount_cents": 11000,
+      "currency": "USD",
+      "invoice_id": "INV-008",
+      "payment_id": "PAY-007",
+      "transaction_ref": "TXN-008"
+    },
+    {
+      "amount_cents": 11125,
+      "currency": "USD",
+      "invoice_id": "INV-009",
+      "payment_id": "PAY-008",
+      "transaction_ref": "TXN-009"
+    },
+    {
+      "amount_cents": 11125,
+      "currency": "USD",
+      "invoice_id": "INV-009",
+      "payment_id": "PAY-009",
+      "transaction_ref": "TXN-009"
+    },
+    {
+      "amount_cents": 11250,
+      "currency": "USD",
+      "invoice_id": "INV-010",
+      "payment_id": "PAY-010",
+      "transaction_ref": "TXN-010"
+    },
+    {
+      "amount_cents": 11375,
+      "currency": "USD",
+      "invoice_id": "INV-011",
+      "payment_id": "PAY-011",
+      "transaction_ref": "TXN-011"
+    },
+    {
+      "amount_cents": 11625,
+      "currency": "USD",
+      "invoice_id": "INV-013",
+      "payment_id": "PAY-012",
+      "transaction_ref": "TXN-013"
+    },
+    {
+      "amount_cents": 5875,
+      "currency": "USD",
+      "invoice_id": "INV-014",
+      "payment_id": "PAY-013",
+      "transaction_ref": "TXN-014"
+    },
+    {
+      "amount_cents": 11875,
+      "currency": "USD",
+      "invoice_id": "INV-015",
+      "payment_id": "PAY-014",
+      "transaction_ref": "TXN-015"
+    },
+    {
+      "amount_cents": 12000,
+      "currency": "USD",
+      "invoice_id": "INV-016",
+      "payment_id": "PAY-015",
+      "transaction_ref": "TXN-016"
+    },
+    {
+      "amount_cents": 12125,
+      "currency": "USD",
+      "invoice_id": "INV-017",
+      "payment_id": "PAY-016",
+      "transaction_ref": "TXN-017"
+    },
+    {
+      "amount_cents": 12250,
+      "currency": "USD",
+      "invoice_id": "INV-018",
+      "payment_id": "PAY-017",
+      "transaction_ref": "TXN-018"
+    },
+    {
+      "amount_cents": 12250,
+      "currency": "USD",
+      "invoice_id": "INV-018",
+      "payment_id": "PAY-018",
+      "transaction_ref": "TXN-018"
+    },
+    {
+      "amount_cents": 12375,
+      "currency": "USD",
+      "invoice_id": "INV-019",
+      "payment_id": "PAY-019",
+      "transaction_ref": "TXN-019"
+    }
+  ],
+  "reference_report": [
+    {
+      "balance_cents": 0,
+      "invoice_cents": 10125,
+      "invoice_id": "INV-001",
+      "paid_unique_cents": 10125,
+      "payment_ids": [
+        "PAY-001"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 10250,
+      "invoice_id": "INV-002",
+      "paid_unique_cents": 10250,
+      "payment_ids": [
+        "PAY-002"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 10375,
+      "invoice_id": "INV-003",
+      "paid_unique_cents": 10375,
+      "payment_ids": [
+        "PAY-003"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 10500,
+      "invoice_id": "INV-004",
+      "paid_unique_cents": 10500,
+      "payment_ids": [
+        "PAY-004"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 10625,
+      "invoice_cents": 10625,
+      "invoice_id": "INV-005",
+      "paid_unique_cents": 0,
+      "payment_ids": [],
+      "status": "missing"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 10750,
+      "invoice_id": "INV-006",
+      "paid_unique_cents": 10750,
+      "payment_ids": [
+        "PAY-005"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 5438,
+      "invoice_cents": 10875,
+      "invoice_id": "INV-007",
+      "paid_unique_cents": 5437,
+      "payment_ids": [
+        "PAY-006"
+      ],
+      "status": "partial"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 11000,
+      "invoice_id": "INV-008",
+      "paid_unique_cents": 11000,
+      "payment_ids": [
+        "PAY-007"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 11125,
+      "invoice_id": "INV-009",
+      "paid_unique_cents": 11125,
+      "payment_ids": [
+        "PAY-008",
+        "PAY-009"
+      ],
+      "status": "duplicate"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 11250,
+      "invoice_id": "INV-010",
+      "paid_unique_cents": 11250,
+      "payment_ids": [
+        "PAY-010"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 11375,
+      "invoice_id": "INV-011",
+      "paid_unique_cents": 11375,
+      "payment_ids": [
+        "PAY-011"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 11500,
+      "invoice_cents": 11500,
+      "invoice_id": "INV-012",
+      "paid_unique_cents": 0,
+      "payment_ids": [],
+      "status": "missing"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 11625,
+      "invoice_id": "INV-013",
+      "paid_unique_cents": 11625,
+      "payment_ids": [
+        "PAY-012"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 5875,
+      "invoice_cents": 11750,
+      "invoice_id": "INV-014",
+      "paid_unique_cents": 5875,
+      "payment_ids": [
+        "PAY-013"
+      ],
+      "status": "partial"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 11875,
+      "invoice_id": "INV-015",
+      "paid_unique_cents": 11875,
+      "payment_ids": [
+        "PAY-014"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 12000,
+      "invoice_id": "INV-016",
+      "paid_unique_cents": 12000,
+      "payment_ids": [
+        "PAY-015"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 12125,
+      "invoice_id": "INV-017",
+      "paid_unique_cents": 12125,
+      "payment_ids": [
+        "PAY-016"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 12250,
+      "invoice_id": "INV-018",
+      "paid_unique_cents": 12250,
+      "payment_ids": [
+        "PAY-017",
+        "PAY-018"
+      ],
+      "status": "duplicate"
+    },
+    {
+      "balance_cents": 0,
+      "invoice_cents": 12375,
+      "invoice_id": "INV-019",
+      "paid_unique_cents": 12375,
+      "payment_ids": [
+        "PAY-019"
+      ],
+      "status": "matched"
+    },
+    {
+      "balance_cents": 12500,
+      "invoice_cents": 12500,
+      "invoice_id": "INV-020",
+      "paid_unique_cents": 0,
+      "payment_ids": [],
+      "status": "missing"
+    }
+  ],
+  "synthetic": true,
+  "version": "1"
+}
