@@ -118,3 +118,87 @@ def test_continuation_rejects_execution_code_changes_after_submission(
     monkeypatch.setattr(module, "preflight", changed)
     with pytest.raises(ValueError, match="Execution code"):
         module.continuation_plan(out)
+
+
+def test_watch_reconnects_after_transient_error_using_fresh_preflight(monkeypatch):
+    import feature_space_pilot.continuation as module
+    from feature_space_pilot.batch import BatchTransientError
+
+    calls, sleeps, events = [], [], []
+
+    def attempt(out, **kwargs):
+        calls.append(kwargs["preflight_hash"])
+        if len(calls) == 1:
+            raise BatchTransientError("network disconnected")
+        return dict(status="batch_pending" if len(calls) == 2 else "needs_adjudication")
+
+    monkeypatch.setattr(module, "continue_batch", attempt)
+    monkeypatch.setattr(
+        module, "continuation_plan", lambda out: dict(preflight_hash="fresh")
+    )
+    monkeypatch.setattr(module.time, "sleep", sleeps.append)
+    result = module.watch_continuation(
+        "fixture",
+        preflight_hash="first",
+        watch=True,
+        poll_seconds=5,
+        progress=events.append,
+    )
+    assert result["status"] == "needs_adjudication"
+    assert calls == ["first", "fresh", "fresh"] and sleeps == [5, 5]
+    assert any(e["event"] == "collector_retry" for e in events)
+
+
+def test_collector_repair_keeps_original_amendment_and_scientific_pins(
+    tmp_path, monkeypatch
+):
+    import feature_space_pilot.continuation as module
+
+    out = interrupted_run(tmp_path)
+    advance(out, FakeBatchAPI())
+    old = json.loads((out / "execution_amendment.json").read_text())
+    original = module.preflight
+
+    def changed(*args, **kwargs):
+        result = original(*args, **kwargs)
+        result["source_code_hashes"]["batch.py"] = "1" * 64
+        return result
+
+    monkeypatch.setattr(module, "preflight", changed)
+    plan = module.collector_repair_plan(out)
+    module.repair_collector(
+        out,
+        reason="User requested network recovery fix",
+        preflight_hash=plan["preflight_hash"],
+    )
+    new = json.loads((out / "execution_amendment.json").read_text())
+    for field in [
+        "config",
+        "frozen_hashes",
+        "original_judgment_checkpoint",
+        "original_design_hash",
+    ]:
+        assert new[field] == old[field]
+    assert json.loads((out / "execution_amendment_history.jsonl").read_text()) == old
+    assert new["collector_repairs"][-1]["changed_files"] == ["batch.py"]
+    assert module.continuation_plan(out)["pending_judgments"] == 29
+
+
+def test_collector_repair_cannot_authorize_scientific_code_changes(
+    tmp_path, monkeypatch
+):
+    import feature_space_pilot.continuation as module
+
+    out = interrupted_run(tmp_path)
+    advance(out, FakeBatchAPI())
+    original = module.preflight
+
+    def changed(*args, **kwargs):
+        result = original(*args, **kwargs)
+        result["source_code_hashes"]["judge.py"] = "2" * 64
+        return result
+
+    monkeypatch.setattr(module, "preflight", changed)
+    with pytest.raises(ValueError, match="Execution code"):
+        module.collector_repair_plan(out)
+    assert not (out / "execution_amendment_history.jsonl").exists()

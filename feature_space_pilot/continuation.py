@@ -10,7 +10,7 @@ from pathlib import Path
 import time
 
 from .bank import consolidate
-from .batch import BatchSession
+from .batch import BatchSession, BatchTransientError, BatchCreationUncertain
 from .budget import Ledger, estimate_cost, validate_prices
 from .clients import judgment_schema
 from .engine import (
@@ -80,7 +80,7 @@ def _execution(c):
     return execution_config(result, "batch")
 
 
-def _context(out):
+def _context(out, *, allow_collector_update=False):
     out = Path(out).expanduser().resolve()
     c = json.loads((out / "frozen_config.json").read_text())
     expected_parent = resolve(
@@ -121,9 +121,21 @@ def _context(out):
         execution = _execution(c)
     current = preflight(c, stage)
     if amendment and amendment["source_code_hashes"] != current["source_code_hashes"]:
-        raise ValueError(
-            "Execution code changed after handoff; retain the frozen continuation implementation"
-        )
+        changed = {
+            name
+            for name in set(amendment["source_code_hashes"])
+            | set(current["source_code_hashes"])
+            if amendment["source_code_hashes"].get(name)
+            != current["source_code_hashes"].get(name)
+        }
+        if not allow_collector_update or not changed <= {
+            "batch.py",
+            "continuation.py",
+            "status.py",
+        }:
+            raise ValueError(
+                "Execution code changed after handoff; only an explicitly recorded collector repair may update batch.py, continuation.py or status.py"
+            )
     if current["blockers"]:
         raise ValueError("; ".join(current["blockers"]))
     for key in ("source_hashes", "input_hashes", "prompt_hashes"):
@@ -290,6 +302,132 @@ def continuation_plan(out):
     return _context(out)[-1]
 
 
+def collector_repair_plan(out):
+    context = _context(out, allow_collector_update=True)
+    amendment, current, plan = context[4], context[-2], context[-1]
+    if amendment is None:
+        raise ValueError("Collector repair requires an existing execution amendment")
+    changed = sorted(
+        name
+        for name in set(amendment["source_code_hashes"])
+        | set(current["source_code_hashes"])
+        if amendment["source_code_hashes"].get(name)
+        != current["source_code_hashes"].get(name)
+    )
+    return dict(plan, changed_collector_files=changed)
+
+
+def repair_collector(out, *, reason, preflight_hash):
+    """Audited local code amendment; never changes scientific inputs or submits work."""
+    if not reason or not reason.strip():
+        raise ValueError("Record the explicit reason for the collector repair")
+    context = _context(out, allow_collector_update=True)
+    (
+        out,
+        c,
+        original,
+        execution,
+        amendment,
+        frozen,
+        items,
+        jobs,
+        generations,
+        bank,
+        judge_jobs,
+        records,
+        ledger_path,
+        current,
+        plan,
+    ) = context
+    if amendment is None or preflight_hash != plan["preflight_hash"]:
+        raise ValueError("Obtain a fresh collector-repair dry-run hash")
+    changed = collector_repair_plan(out)["changed_collector_files"]
+    with Ledger(
+        ledger_path, cap=c["api_cap_usd"], stage_caps=c["stage_caps"]
+    ) as ledger:
+        if collector_repair_plan(out)["preflight_hash"] != preflight_hash:
+            raise ValueError("Collector repair inputs changed; obtain a fresh dry run")
+        if not changed:
+            return dict(status="unchanged", changed_collector_files=[])
+        history = out / "execution_amendment_history.jsonl"
+        prior = read_jsonl(history) if history.exists() else []
+        if not prior or prior[-1] != amendment:
+            append_jsonl(history, amendment)
+        updated = copy.deepcopy(amendment)
+        updated.setdefault("collector_repairs", []).append(
+            dict(
+                reason=reason.strip(),
+                date_utc=datetime.now(timezone.utc).isoformat(),
+                changed_files=changed,
+                previous_amendment_hash=amendment["amendment_hash"],
+            )
+        )
+        updated["source_code_hashes"] = current["source_code_hashes"]
+        updated.pop("amendment_hash", None)
+        updated["amendment_hash"] = digest(updated)
+        if (out / "manifest.json").exists():
+            append_jsonl(out / "manifest_history.jsonl", _resume_manifest(out))
+        write_json(out / "execution_amendment.json", updated)
+        judgments = [r for r in records if r["parse_status"] == "ok"]
+        judgments, status = _write_judgment_outputs(c, out, items, bank, judgments)
+        state = json.loads((out / "batch_state.json").read_text())
+        if any(not b.get("ingested") for b in state["batches"]):
+            status = "batch_pending"
+        result = _finish_run(
+            c=c,
+            out=out,
+            plan=original,
+            stage=original["stage"],
+            jobs=jobs,
+            items=items,
+            generations=generations,
+            bank=bank,
+            judgments=judgments,
+            ledger=ledger,
+            execute_live=not c.get("demo"),
+            evaluation_config=c,
+            source_hashes=original["source_hashes"],
+            status=status,
+            execution_amendment=updated,
+        )
+        return dict(
+            status=result["status"],
+            changed_collector_files=changed,
+            execution_amendment_hash=updated["amendment_hash"],
+        )
+
+
+def watch_continuation(
+    out, *, preflight_hash, watch=False, poll_seconds=30, progress=None
+):
+    """Reconnect safely; uncertain POSTs are reconciled, never automatically replayed."""
+    while True:
+        try:
+            if preflight_hash is None:
+                preflight_hash = continuation_plan(out)["preflight_hash"]
+            result = continue_batch(
+                out, execute_live=True, preflight_hash=preflight_hash, progress=progress
+            )
+        except (BatchTransientError, BatchCreationUncertain):
+            if not watch:
+                raise
+            emit(
+                progress,
+                "collector_retry",
+                message="Temporary connection failure or uncertain acknowledgement; retaining reservations and retrying reconciliation after the next poll",
+            )
+        else:
+            if not watch or result["status"] != "batch_pending":
+                return result
+        emit(
+            progress,
+            "waiting",
+            message=f"Waiting {poll_seconds:g}s; reconnection is automatic, Ctrl+C detaches without cancelling provider work",
+        )
+        preflight_hash = None
+        time.sleep(poll_seconds)
+
+
 def continue_batch(
     out, *, execute_live=False, preflight_hash=None, api=None, progress=None
 ):
@@ -416,33 +554,36 @@ def main():
     parser.add_argument("--watch", action="store_true")
     parser.add_argument("--poll-seconds", type=float, default=30)
     parser.add_argument("--quiet", action="store_true")
+    parser.add_argument(
+        "--repair-collector",
+        metavar="REASON",
+        help="Explicitly record a collector-only code update, preserving scientific pins",
+    )
     args = parser.parse_args()
     try:
         if args.poll_seconds < 5:
             raise ValueError("Polling interval must be at least five seconds")
-        if args.dry_run:
+        if args.repair_collector:
+            result = (
+                collector_repair_plan(args.run_dir)
+                if args.dry_run
+                else repair_collector(
+                    args.run_dir,
+                    reason=args.repair_collector,
+                    preflight_hash=args.preflight_hash,
+                )
+            )
+        elif args.dry_run:
             result = continuation_plan(args.run_dir)
         else:
             reporter = None if args.quiet else console_reporter()
-            result = continue_batch(
+            result = watch_continuation(
                 args.run_dir,
-                execute_live=True,
                 preflight_hash=args.preflight_hash,
+                watch=args.watch,
+                poll_seconds=args.poll_seconds,
                 progress=reporter,
             )
-            while args.watch and result["status"] == "batch_pending":
-                emit(
-                    reporter,
-                    "waiting",
-                    message=f"Waiting {args.poll_seconds:g}s; Ctrl+C detaches without cancelling provider work",
-                )
-                time.sleep(args.poll_seconds)
-                result = continue_batch(
-                    args.run_dir,
-                    execute_live=True,
-                    preflight_hash=continuation_plan(args.run_dir)["preflight_hash"],
-                    progress=reporter,
-                )
         print(json.dumps(result, ensure_ascii=False, indent=2))
     except KeyboardInterrupt:
         parser.exit(

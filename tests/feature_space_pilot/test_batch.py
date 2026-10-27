@@ -188,6 +188,86 @@ def test_uncertain_creation_recovers_by_metadata_without_resubmission(tmp_path):
         assert ledger.report()["unsettled_reservations"] == 0
 
 
+def test_unmatched_create_does_not_block_other_collections_or_resubmit(tmp_path):
+    api = FakeBatchAPI()
+    create = api.create
+    api.create = lambda *args: (_ for _ in ()).throw(
+        TimeoutError("lost before acknowledgement")
+    )
+    with Ledger(
+        tmp_path / "ledger.jsonl", cap=1, stage_caps=dict(generation=1)
+    ) as ledger:
+        session = setup_session(tmp_path, api, ledger)
+        session.max_in_flight = 2
+        enqueue(session, 1)
+        with pytest.raises(ValueError, match="uncertain"):
+            session.flush("generation")
+        api.create = create
+        # Resume as after a crash; the unmatched job stays reserved/in flight.
+        resumed = setup_session(tmp_path, api, ledger)
+        resumed.max_in_flight = 2
+        enqueue(resumed, 2)
+        resumed.flush("generation")
+        resumed.refresh()
+        from feature_space_pilot.engine import _read
+
+        assert [r["job_id"] for r in _read(tmp_path / "run/generations.jsonl")] == [
+            "job1"
+        ]
+        assert ledger.report()["unsettled_reservations"] == 1
+        assert api.creates == 1 and resumed.active
+        resumed.refresh()
+        assert api.creates == 1
+
+
+def test_one_transient_batch_read_does_not_block_other_results(tmp_path):
+    from feature_space_pilot.batch import BatchSession, BatchTransientError
+    from feature_space_pilot.engine import _read
+
+    api = FakeBatchAPI()
+    c = load_config(ROOT / "configs/feature_space_pilot.json")
+    c.update(batch_max_requests=1, batch_max_in_flight=2)
+    out = tmp_path / "run"
+    out.mkdir()
+    with Ledger(
+        tmp_path / "ledger.jsonl", cap=1, stage_caps=dict(generation=1)
+    ) as ledger:
+        session = BatchSession(c, out, ledger, api=api)
+        enqueue(session, 2)
+        session.flush("generation")
+        retrieve = api.retrieve
+
+        def interrupted(bid):
+            if bid == "batch-1":
+                raise BatchTransientError("temporary network failure")
+            return retrieve(bid)
+
+        api.retrieve = interrupted
+        session.refresh()
+        assert len(_read(out / "generations.jsonl")) == 1
+        assert ledger.report()["unsettled_reservations"] == 1
+        api.retrieve = retrieve
+        session.refresh()
+        assert len(_read(out / "generations.jsonl")) == 2 and api.creates == 2
+
+
+def test_transport_classifies_connection_failure_without_logging_details(monkeypatch):
+    import urllib.error
+    import urllib.request
+    from feature_space_pilot.batch import OpenAIBatchAPI, BatchTransientError
+
+    c = load_config(ROOT / "configs/feature_space_pilot.json")
+    monkeypatch.setenv("OPENAI_API_KEY", "fixture-not-a-real-key")
+
+    def unavailable(*args, **kwargs):
+        raise urllib.error.URLError("provider-private-detail")
+
+    monkeypatch.setattr(urllib.request, "urlopen", unavailable)
+    with pytest.raises(BatchTransientError, match="connection failure") as error:
+        OpenAIBatchAPI(c["judge"]).list()
+    assert "provider-private-detail" not in str(error.value)
+
+
 def test_unknown_output_id_never_settles_or_creates_journal(tmp_path):
     api = FakeBatchAPI()
     with Ledger(

@@ -25,6 +25,14 @@ from .progress import emit
 TERMINAL = {"completed", "failed", "expired", "cancelled"}
 
 
+class BatchTransientError(OSError):
+    """Temporary provider/network failure; durable state decides what can be retried."""
+
+
+class BatchCreationUncertain(ValueError):
+    """Never repeat create until its original outcome has been reconciled."""
+
+
 class OpenAIBatchAPI:
     def __init__(self, settings):
         self.settings = settings
@@ -56,8 +64,16 @@ class OpenAIBatchAPI:
             ) as response:
                 data = response.read()
         except urllib.error.HTTPError as error:
+            if error.code in {408, 409, 429} or error.code >= 500:
+                raise BatchTransientError(
+                    f"Temporary Batch API HTTP {error.code}"
+                ) from None
             raise ValueError(
                 f"Batch API HTTP {error.code}; no automatic request retry"
+            ) from None
+        except (urllib.error.URLError, TimeoutError, ConnectionError):
+            raise BatchTransientError(
+                "Temporary Batch API connection failure"
             ) from None
         return data.decode("utf-8") if raw else json.loads(data)
 
@@ -178,7 +194,10 @@ class BatchSession:
 
     def _save(self):
         content = {k: v for k, v in self.state.items() if k != "state_hash"}
-        self.state["state_hash"] = digest(content)
+        checksum = digest(content)
+        if self.state.get("state_hash") == checksum and self.path.exists():
+            return
+        self.state["state_hash"] = checksum
         write_json(self.path, self.state)
 
     def _slots(self):
@@ -402,7 +421,7 @@ class BatchSession:
         try:
             created = api.create(uploaded["id"], metadata)
         except Exception:
-            raise ValueError(
+            raise BatchCreationUncertain(
                 "Batch creation acknowledgement uncertain; reservations retained. Resume reconciles metadata; do not manually resubmit."
             ) from None
         batch.update(id=created["id"], status=created["status"])
@@ -415,84 +434,104 @@ class BatchSession:
 
     def refresh(self):
         for batch in self.state["batches"]:
-            if batch.get("ingested"):
-                continue
-            api = self._api(batch["stage"])
-            if not batch.get("id"):
-                if batch["status"] == "preparing":
-                    self._submit_prepared(batch)
-                else:
-                    if batch["status"] != "creating":
-                        raise ValueError("Invalid interrupted Batch state")
-                    matches = [
-                        b
-                        for b in api.list()
-                        if b.get("metadata", {}).get("pilot_batch_key") == batch["key"]
-                        and b.get("input_file_id") == batch["input_file_id"]
-                    ]
-                    if len(matches) != 1:
-                        raise ValueError(
-                            "Uncertain Batch creation; no unique provider match. Reservations retained; do not resubmit."
-                        )
-                    batch.update(id=matches[0]["id"], status=matches[0]["status"])
-                    self._save()
-            remote = api.retrieve(batch["id"])
-            batch.update(
-                status=remote["status"], request_counts=remote.get("request_counts")
-            )
-            self._save()
-            emit(
-                self.progress,
-                "batch_status",
-                message=f"Batch {batch['id']}: {batch['status']} {batch.get('request_counts')}",
-            )
-            if batch["status"] not in TERMINAL:
-                continue
-            rows = []
-            for field in ["output_file_id", "error_file_id"]:
-                if remote.get(field):
-                    content = api.content(remote[field])
-                    name = "batch_" + field + "_" + batch["key"] + ".jsonl"
-                    (self.out / name).write_text(content, encoding="utf-8")
-                    rows.extend(
-                        json.loads(line)
-                        for line in content.splitlines()
-                        if line.strip()
-                    )
-            ids = [r.get("custom_id") for r in rows]
-            if len(ids) != len(set(ids)) or any(
-                i not in batch["task_ids"] for i in ids
-            ):
-                raise ValueError(
-                    "Unknown or duplicate Batch custom_id/request ID; nothing settled"
+            try:
+                self._refresh_one(batch)
+            except (BatchTransientError, BatchCreationUncertain) as error:
+                batch["last_transport_error"] = type(error).__name__
+                if not batch.get("id") and batch["status"] == "creating":
+                    batch["reconciliation_pending"] = True
+                self._save()
+                emit(
+                    self.progress,
+                    "collector_retry",
+                    message="Temporary Batch connection failure; durable results and reservations retained, will retry on the next poll",
                 )
-            if (
-                batch["status"] == "failed"
-                and not rows
-                and (remote.get("request_counts") or {}).get("completed", 0) == 0
-            ):
-                rows = [
-                    dict(
-                        custom_id=cid,
-                        error=dict(code="batch_validation_failed"),
-                        response=None,
-                    )
-                    for cid in batch["task_ids"]
+
+    def _refresh_one(self, batch):
+        if batch.get("ingested"):
+            return
+        api = self._api(batch["stage"])
+        if not batch.get("id"):
+            if batch["status"] == "preparing":
+                self._submit_prepared(batch)
+            else:
+                if batch["status"] != "creating":
+                    raise ValueError("Invalid interrupted Batch state")
+                matches = [
+                    b
+                    for b in api.list()
+                    if b.get("metadata", {}).get("pilot_batch_key") == batch["key"]
+                    and b.get("input_file_id") == batch["input_file_id"]
                 ]
-            for row in rows:
-                self._ingest(batch, row)
-            # Missing terminal outputs are unknown usage, never fabricated zero.
-            for cid in set(batch["task_ids"]) - {r["custom_id"] for r in rows}:
-                self._ingest(
-                    batch,
-                    dict(
-                        custom_id=cid,
-                        response=None,
-                        error=dict(code="missing_terminal_output"),
-                    ),
+                if not matches:
+                    batch["reconciliation_pending"] = True
+                    self._save()
+                    emit(
+                        self.progress,
+                        "reconciliation_pending",
+                        message=f"Holding {len(batch['task_ids'])} request(s) pending provider confirmation; continuing other batches without resubmitting {batch['key']}",
+                    )
+                    return
+                if len(matches) > 1:
+                    raise ValueError(
+                        "Uncertain Batch creation; no unique provider match. Reservations retained; do not resubmit."
+                    )
+                batch.update(id=matches[0]["id"], status=matches[0]["status"])
+                batch.pop("reconciliation_pending", None)
+                self._save()
+        remote = api.retrieve(batch["id"])
+        batch.update(
+            status=remote["status"], request_counts=remote.get("request_counts")
+        )
+        self._save()
+        emit(
+            self.progress,
+            "batch_status",
+            message=f"Batch {batch['id']}: {batch['status']} {batch.get('request_counts')}",
+        )
+        if batch["status"] not in TERMINAL:
+            return
+        rows = []
+        for field in ["output_file_id", "error_file_id"]:
+            if remote.get(field):
+                content = api.content(remote[field])
+                name = "batch_" + field + "_" + batch["key"] + ".jsonl"
+                (self.out / name).write_text(content, encoding="utf-8")
+                rows.extend(
+                    json.loads(line) for line in content.splitlines() if line.strip()
                 )
-            batch["ingested"] = True
-            self._save()
+        ids = [r.get("custom_id") for r in rows]
+        if len(ids) != len(set(ids)) or any(i not in batch["task_ids"] for i in ids):
+            raise ValueError(
+                "Unknown or duplicate Batch custom_id/request ID; nothing settled"
+            )
+        if (
+            batch["status"] == "failed"
+            and not rows
+            and (remote.get("request_counts") or {}).get("completed", 0) == 0
+        ):
+            rows = [
+                dict(
+                    custom_id=cid,
+                    error=dict(code="batch_validation_failed"),
+                    response=None,
+                )
+                for cid in batch["task_ids"]
+            ]
+        for row in rows:
+            self._ingest(batch, row)
+        # Missing terminal outputs are unknown usage, never fabricated zero.
+        for cid in set(batch["task_ids"]) - {r["custom_id"] for r in rows}:
+            self._ingest(
+                batch,
+                dict(
+                    custom_id=cid,
+                    response=None,
+                    error=dict(code="missing_terminal_output"),
+                ),
+            )
+        batch["ingested"] = True
+        self._save()
 
     def _ingest(self, batch, row):
         from .engine import _read

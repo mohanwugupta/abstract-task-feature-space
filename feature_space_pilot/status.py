@@ -111,6 +111,8 @@ def inspect_run(path):
                 stage=b["stage"],
                 status=b["status"],
                 request_counts=b.get("request_counts"),
+                reconciliation_pending=b.get("reconciliation_pending", False),
+                requests=len(b.get("task_ids", [])),
             )
             for b in state.get("batches", [])
         ]
@@ -140,6 +142,11 @@ def format_status(result):
             "A partially written final line will be included on the next refresh."
         )
     for batch in result.get("batches", []):
+        if batch.get("reconciliation_pending"):
+            lines.append(
+                f"Batch awaiting provider confirmation: {batch['requests']} request(s) held; other batches continue"
+            )
+            continue
         lines.append(
             f"Batch {batch['id'] or '(not submitted)'}: {batch['stage']} / {batch['status']} / {batch.get('request_counts')}"
         )
