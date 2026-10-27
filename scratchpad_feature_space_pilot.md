@@ -195,3 +195,13 @@
 - Previous unpublished `.git` metadata is backed up outside the workspace. The fresh Git repository has only `origin`, no upstream remote or inherited commit history.
 - Updated standalone sample manifest and dry-run examples. Current report: `/Users/mg9965/Desktop/abstract-task-feature-space/artifacts/feature_space_pilot/demo_all_3104758f653fa4f9/pilot_report.md`.
 - New private repository exists at `https://github.com/mohanwugupta/abstract-task-feature-space`; verified empty before publishing the cleaned initial commit. Next: stage the allowlisted pilot files, verify reference-byte hashes and zero LFS entries, commit, push, and inspect the remote branch/CI.
+
+
+## 2026-10-26 — Standalone GitHub publication complete
+
+- Published cleaned standalone source to private repository `https://github.com/mohanwugupta/abstract-task-feature-space`, branch `main`, initial source commit `ac46294`. Remote repository is verified nonempty/private with main as its default branch.
+- Initial Git history contains only the new standalone commit; no inherited ISC-CI commit or upstream remote was retained. The repository contains 51 pilot source/configuration/documentation/fixture files and zero Git LFS entries.
+- Removed inherited experiment material from both the working tree and the published history. The original archive and discarded unpublished Git metadata remain only in the local `/private/tmp/abstract-task-feature-space-precleanup` recovery directory, outside this repository.
+- Validation: 42 standalone tests pass; fresh full synthetic demo completes 2,250 generations and 1,200 resolved binary cells; reference byte hashes are preserved. GitHub Actions offline workflow was triggered by publication.
+- Whitespace inspection flags the deliberately preserved CRLF reference CSV and the user's original Markdown line breaks; those source bytes were retained to preserve reference hashes and the requested PRD.
+- No paid API calls or credentials were uploaded. Model/price selection and human-source scientific gates remain pending as documented.
