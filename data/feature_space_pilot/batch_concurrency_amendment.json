@@ -1,0 +1,12 @@
+{
+  "batch_max_in_flight": 16,
+  "batch_max_queued_input_tokens": 10000000,
+  "batch_max_requests": 1000,
+  "current_run_policy": "User authorized saved-response-boundary stop of Mini and Batch continuation of unfinished judgments, retaining original models/prompts/job IDs/receipts/ledger",
+  "date": "2026-10-27",
+  "future_model": "gpt-6-luna",
+  "prior_amendment": "batch_execution_amendment.json",
+  "provider_queue_policy": "Local cumulative token window; provider account queue limits also apply",
+  "scope": "Execution scheduling only; freeze generation bank before judging; individual jobs independent",
+  "version": "batch_concurrency_v4"
+}

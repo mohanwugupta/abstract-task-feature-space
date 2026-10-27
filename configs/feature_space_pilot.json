@@ -1,5 +1,7 @@
 {
   "api_cap_usd": 100,
+  "batch_max_in_flight": 16,
+  "batch_max_queued_input_tokens": 10000000,
   "batch_max_requests": 1000,
   "bootstrap_resamples": 500,
   "candidate_cap": 150,
@@ -110,7 +112,7 @@
       "analysis_comparison_cap": 10,
       "cap": null,
       "deviations": [
-        "Single isolated target instead of 30–40-word sheet",
+        "Single isolated target instead of 30\u201340-word sheet",
         "Original noun/verb demonstrations omitted to preserve target isolation",
         "JSON binary-proposition contract and finite output-token ceiling are engineering adaptations; no human feature-count cap imposed"
       ],

@@ -2,7 +2,7 @@
 
 The standalone pilot is implemented in `feature_space_pilot/` and uses hosted, OpenAI-compatible frontier-model APIs. The offline workflow needs only Python, NumPy, SciPy, and pytest.
 
-Future generator and judge runs default to user-selected **GPT-6 Luna (`gpt-6-luna`), low reasoning, using OpenAI Batch**. The current Mini pilot continues with its existing frozen settings. Three repetitions, the $100 cumulative cap and the 150-feature bank remain. Pending abstract translation/coding reviews still suppress affected comparisons. See [BATCH_AND_PROGRESS.md](BATCH_AND_PROGRESS.md) for live progress monitoring and future asynchronous runs, and [PREFLIGHT_WORKFLOW.md](PREFLIGHT_WORKFLOW.md) for source and budget checks. Offline demos are engineering fixtures, not scientific benchmark results.
+Future generator and judge runs default to user-selected **GPT-6 Luna (`gpt-6-luna`), low reasoning, using OpenAI Batch**. The current Mini pilot retains its scientific settings, with unfinished judgments handed off to Batch under a separate execution amendment. Three repetitions, the $100 cumulative cap and the 150-feature bank remain. Pending abstract translation/coding reviews still suppress affected comparisons. See [BATCH_AND_PROGRESS.md](BATCH_AND_PROGRESS.md) for live progress monitoring and future asynchronous runs, and [PREFLIGHT_WORKFLOW.md](PREFLIGHT_WORKFLOW.md) for source and budget checks. Offline demos are engineering fixtures, not scientific benchmark results.
 
 ## Quick start
 

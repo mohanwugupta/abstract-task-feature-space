@@ -1107,157 +1107,213 @@ def run_pipeline(
             if batch_session:
                 batch_session.flush("judgment")
             judgments = [r for r in _read(judge_path) if r["parse_status"] == "ok"]
-            # Human adjudications resolve ambiguous/missing cells, never overwrite a primary judgment silently.
-            by_cell = {(r["item_id"], r["feature_id"]): r for r in judgments}
-            for a in c.get("adjudications", []):
-                if not a.get("reviewer") or not a.get("evidence"):
-                    raise ValueError("Named adjudication reviewer/evidence required")
-                key = (a["item_id"], a["feature_id"])
-                validated = parse_judgment(
-                    canonical(
-                        {
-                            k: a[k]
-                            for k in [
-                                "item_id",
-                                "feature_id",
-                                "applies",
-                                "status",
-                                "evidence",
-                            ]
-                        }
-                    ),
-                    *key,
-                )
-                prior = by_cell.get(key)
-                if (
-                    prior
-                    and prior["status"] == "ok"
-                    and prior["applies"] != a["applies"]
-                ):
-                    raise ValueError(
-                        "Conflicting resolved judgment requires a new rubric/design"
-                    )
-                by_cell[key] = dict(
-                    validated,
-                    rubric_version=RUBRIC,
-                    judge_model="human:" + a["reviewer"],
-                    prompt_hash="manual_adjudication",
-                )
-            judgments = list(by_cell.values())
-            resolved = [r for r in judgments if r["status"] == "ok"]
-            fields = [
-                "item_id",
-                "feature_id",
-                "rubric_version",
-                "judge_model",
-                "applies",
-                "evidence",
-                "prompt_hash",
-            ]
-            write_csv(
-                out / "binary_judgments.csv",
-                [{k: r[k] for k in fields} for r in resolved],
-                fields,
-            )
-            scope = dict(
-                item_ids=[x["item_id"] for x in items],
-                feature_ids=[f["feature_id"] for f in bank],
-                excluded_combinations=[],
-                policy="complete_selected_stage_cross_product",
-            )
-            write_json(out / "matrix_scope.json", scope)
-            try:
-                matrix = build_matrix(
-                    scope["item_ids"], scope["feature_ids"], judgments
-                )
-            except ValueError:
-                status = "needs_adjudication"
-            else:
-                write_csv(
-                    out / "binary_matrix.csv",
-                    [
-                        dict(item_id=i, **dict(zip(scope["feature_ids"], row)))
-                        for i, row in zip(scope["item_ids"], matrix)
-                    ],
-                    ["item_id"] + scope["feature_ids"],
-                )
-                status = "complete"
+            judgments, status = _write_judgment_outputs(c, out, items, bank, judgments)
         if batch_session and batch_session.active:
             status = "batch_pending"
-        all_run_attempts = _read(gen_path) + _read(out / "judgments.jsonl")
-        write_json(
-            out / "cost_report.json",
-            dict(
-                ledger.report(),
-                billed_execution=execute_live,
-                run_input_tokens=sum(
-                    r["usage"].get("input_tokens", 0) or 0 for r in all_run_attempts
-                ),
-                run_output_tokens=sum(
-                    r["usage"].get("output_tokens", 0) or 0 for r in all_run_attempts
-                ),
-                run_provider_attempts=len(all_run_attempts),
-                ledger_path=str(ledger_path),
-                billing_note="USD estimates based on provider token usage; provider invoice remains external authority",
-                demo_billed_usd=0 if c.get("demo") else None,
-            ),
-        )
-        try:
-            commit = subprocess.run(
-                ["git", "rev-parse", "HEAD"],
-                cwd=c["root"],
-                capture_output=True,
-                text=True,
-                check=True,
-            ).stdout.strip()
-        except (OSError, subprocess.CalledProcessError):
-            commit = None
-        manifest = dict(
-            schema_version="pilot_v1",
-            run_id=run_id,
-            design_hash=plan["design_hash"],
+        return _finish_run(
+            c=c,
+            out=out,
+            plan=plan,
             stage=stage,
-            demo=bool(c.get("demo")),
-            smoke=bool(c.get("smoke")),
-            status=status,
-            planned_generation_jobs=len(jobs),
-            completed_generation_jobs=len(generations),
-            planned_judgments=len(items) * len(bank),
-            resolved_judgments=sum(r.get("status") == "ok" for r in judgments),
-            judgment_cells_upper_bound=plan["judgment_cells_upper_bound"],
-            judgment_plan_status="frozen" if bank else "awaiting_candidate_bank",
-            source_code_hashes=plan["source_code_hashes"],
-            model_snapshots={"generator": c["generator"], "judge": c["judge"]},
-            seed=c["seed"],
-            prompt_hashes=plan["prompt_hashes"],
+            jobs=jobs,
+            items=items,
+            generations=generations,
+            bank=bank,
+            judgments=judgments,
+            ledger=ledger,
+            execute_live=execute_live,
+            evaluation_config=evaluation_config,
             source_hashes=source_hashes,
-            input_hashes=plan["input_hashes"],
-            config_hash=digest(c),
-            evaluation_inputs_hash=evaluation_inputs_hash(c),
-            selected_item_ids=[x["item_id"] for x in items],
-            git_commit=commit,
-            fixture_hash=digest(reconciliation_fixture()),
-            candidate_inventory_hash=bank[0]["inventory_hash"] if bank else None,
-            journal_checkpoints={
-                p.name: dict(bytes=p.stat().st_size, sha256=file_hash(p))
-                for p in [out / "generations.jsonl", out / "judgments.jsonl"]
-                if p.exists()
-            },
-            artifacts={},
-            limitations=(
-                ["Synthetic engineering demonstration; no scientific results"]
-                if c.get("demo")
-                else []
-            ),
+            status=status,
+            progress=progress,
         )
-        write_json(out / "manifest.json", manifest)
-        from .report import write_reports, seal_manifest
 
-        write_reports(out, evaluation_config, generations, items, bank, judgments)
-        manifest = seal_manifest(out)
-        emit(
-            progress,
-            "finished",
-            message=f"{run_id}: {status}; {len(generations)}/{len(jobs)} generation jobs; {manifest['resolved_judgments']}/{manifest['planned_judgments']} resolved judgments",
+
+def _write_judgment_outputs(c, out, items, bank, judgments):
+    # Batch collection can recover after a primary append. Reconcile the audit
+    # from durable primary receipts so ambiguity evidence is also idempotent.
+    audit_path = out / "judgment_audit.jsonl"
+    audited = {r["job_id"] for r in _read(audit_path)}
+    for record in judgments:
+        if record.get("status") == "ambiguous" and record["job_id"] not in audited:
+            append_jsonl(audit_path, record)
+            audited.add(record["job_id"])
+    # Human adjudications resolve ambiguous/missing cells, never overwrite a primary judgment silently.
+    by_cell = {(r["item_id"], r["feature_id"]): r for r in judgments}
+    for a in c.get("adjudications", []):
+        if not a.get("reviewer") or not a.get("evidence"):
+            raise ValueError("Named adjudication reviewer/evidence required")
+        key = (a["item_id"], a["feature_id"])
+        validated = parse_judgment(
+            canonical(
+                {
+                    k: a[k]
+                    for k in [
+                        "item_id",
+                        "feature_id",
+                        "applies",
+                        "status",
+                        "evidence",
+                    ]
+                }
+            ),
+            *key,
         )
-        return dict(manifest, output_dir=str(out))
+        prior = by_cell.get(key)
+        if prior and prior["status"] == "ok" and prior["applies"] != a["applies"]:
+            raise ValueError(
+                "Conflicting resolved judgment requires a new rubric/design"
+            )
+        by_cell[key] = dict(
+            validated,
+            rubric_version=RUBRIC,
+            judge_model="human:" + a["reviewer"],
+            prompt_hash="manual_adjudication",
+        )
+    judgments = list(by_cell.values())
+    resolved = [r for r in judgments if r["status"] == "ok"]
+    fields = [
+        "item_id",
+        "feature_id",
+        "rubric_version",
+        "judge_model",
+        "applies",
+        "evidence",
+        "prompt_hash",
+    ]
+    write_csv(
+        out / "binary_judgments.csv",
+        [{k: r[k] for k in fields} for r in resolved],
+        fields,
+    )
+    scope = dict(
+        item_ids=[x["item_id"] for x in items],
+        feature_ids=[f["feature_id"] for f in bank],
+        excluded_combinations=[],
+        policy="complete_selected_stage_cross_product",
+    )
+    write_json(out / "matrix_scope.json", scope)
+    try:
+        matrix = build_matrix(scope["item_ids"], scope["feature_ids"], judgments)
+    except ValueError:
+        status = "needs_adjudication"
+    else:
+        write_csv(
+            out / "binary_matrix.csv",
+            [
+                dict(item_id=i, **dict(zip(scope["feature_ids"], row)))
+                for i, row in zip(scope["item_ids"], matrix)
+            ],
+            ["item_id"] + scope["feature_ids"],
+        )
+        status = "complete"
+    return judgments, status
+
+
+def _finish_run(
+    *,
+    c,
+    out,
+    plan,
+    stage,
+    jobs,
+    items,
+    generations,
+    bank,
+    judgments,
+    ledger,
+    execute_live,
+    evaluation_config,
+    source_hashes,
+    status,
+    progress=None,
+    execution_amendment=None,
+):
+    gen_path = out / "generations.jsonl"
+    run_id = out.name
+    all_run_attempts = _read(gen_path) + _read(out / "judgments.jsonl")
+    write_json(
+        out / "cost_report.json",
+        dict(
+            ledger.report(),
+            billed_execution=execute_live,
+            run_input_tokens=sum(
+                r["usage"].get("input_tokens", 0) or 0 for r in all_run_attempts
+            ),
+            run_output_tokens=sum(
+                r["usage"].get("output_tokens", 0) or 0 for r in all_run_attempts
+            ),
+            run_provider_attempts=len(all_run_attempts),
+            ledger_path=str(ledger.path),
+            billing_note="USD estimates based on provider token usage; provider invoice remains external authority",
+            demo_billed_usd=0 if c.get("demo") else None,
+        ),
+    )
+    try:
+        commit = subprocess.run(
+            ["git", "rev-parse", "HEAD"],
+            cwd=c["root"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.strip()
+    except (OSError, subprocess.CalledProcessError):
+        commit = None
+    manifest = dict(
+        schema_version="pilot_v1",
+        run_id=run_id,
+        design_hash=plan["design_hash"],
+        stage=stage,
+        demo=bool(c.get("demo")),
+        smoke=bool(c.get("smoke")),
+        status=status,
+        planned_generation_jobs=len(jobs),
+        completed_generation_jobs=len(generations),
+        planned_judgments=len(items) * len(bank),
+        resolved_judgments=sum(r.get("status") == "ok" for r in judgments),
+        judgment_cells_upper_bound=plan["judgment_cells_upper_bound"],
+        judgment_plan_status="frozen" if bank else "awaiting_candidate_bank",
+        source_code_hashes=plan["source_code_hashes"],
+        model_snapshots={"generator": c["generator"], "judge": c["judge"]},
+        seed=c["seed"],
+        prompt_hashes=plan["prompt_hashes"],
+        source_hashes=source_hashes,
+        input_hashes=plan["input_hashes"],
+        config_hash=digest(c),
+        evaluation_inputs_hash=evaluation_inputs_hash(c),
+        selected_item_ids=[x["item_id"] for x in items],
+        git_commit=commit,
+        fixture_hash=digest(reconciliation_fixture()),
+        candidate_inventory_hash=bank[0]["inventory_hash"] if bank else None,
+        journal_checkpoints={
+            p.name: dict(bytes=p.stat().st_size, sha256=file_hash(p))
+            for p in [out / "generations.jsonl", out / "judgments.jsonl"]
+            if p.exists()
+        },
+        artifacts={},
+        limitations=(
+            ["Synthetic engineering demonstration; no scientific results"]
+            if c.get("demo")
+            else []
+        ),
+    )
+    if execution_amendment:
+        manifest.update(
+            execution_amendment_hash=digest(execution_amendment),
+            execution_source_code_hashes=execution_amendment["source_code_hashes"],
+            execution_model_snapshots={
+                role: execution_amendment["config"][role]
+                for role in ["generator", "judge"]
+            },
+        )
+    write_json(out / "manifest.json", manifest)
+    from .report import write_reports, seal_manifest
+
+    write_reports(out, evaluation_config, generations, items, bank, judgments)
+    manifest = seal_manifest(out)
+    emit(
+        progress,
+        "finished",
+        message=f"{run_id}: {status}; {len(generations)}/{len(jobs)} generation jobs; {manifest['resolved_judgments']}/{manifest['planned_judgments']} resolved judgments",
+    )
+    return dict(manifest, output_dir=str(out))

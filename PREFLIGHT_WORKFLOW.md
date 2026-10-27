@@ -1,6 +1,6 @@
 # Scientific and $100 budget preflight
 
-Future iterations use **GPT-6 Luna (`gpt-6-luna`), low reasoning, OpenAI Batch**. The running Mini pilot continues unchanged. Both retain **three repetitions**, a **150-feature bank**, and **English stimuli**. German originals remain source metadata. See [BATCH_AND_PROGRESS.md](BATCH_AND_PROGRESS.md) for monitoring the current process and collecting future Batch work.
+Future iterations use **GPT-6 Luna (`gpt-6-luna`), low reasoning, OpenAI Batch**. The Mini pilot retains its frozen scientific design and continues unfinished judgments through Batch; see the continuation commands linked below. Both retain **three repetitions**, a **150-feature bank**, and **English stimuli**. German originals remain source metadata. See [BATCH_AND_PROGRESS.md](BATCH_AND_PROGRESS.md) for monitoring the current process and collecting future Batch work.
 
 ## Validate this checkout
 

@@ -416,6 +416,7 @@ def test_batch_chunk_limit_advances_only_unfinished_jobs(tmp_path):
     api = FakeBatchAPI()
     c = load_config(ROOT / "configs/feature_space_pilot.json")
     c["batch_max_requests"] = 1
+    c["batch_max_in_flight"] = 1
     out = tmp_path / "run"
     out.mkdir()
     with Ledger(
@@ -452,4 +453,53 @@ def test_batch_chunk_limit_advances_only_unfinished_jobs(tmp_path):
             assert api.creates == n + 1
         session.refresh()
         assert len(_read(out / "generations.jsonl")) == 2
+        assert ledger.report()["unsettled_reservations"] == 0
+
+
+def test_multiple_chunks_submit_before_waiting_and_never_duplicate_active_jobs(
+    tmp_path,
+):
+    from feature_space_pilot.batch import BatchSession
+
+    api = FakeBatchAPI()
+    c = load_config(ROOT / "configs/feature_space_pilot.json")
+    c.update(
+        batch_max_requests=1, batch_max_in_flight=2, batch_max_queued_input_tokens=2000
+    )
+    out = tmp_path / "run"
+    out.mkdir()
+    with Ledger(
+        tmp_path / "ledger.jsonl", cap=1, stage_caps=dict(generation=1)
+    ) as ledger:
+        session = BatchSession(c, out, ledger, api=api)
+        enqueue(session, 3)
+        session.flush("generation")
+        assert api.creates == 2
+        assert len(session.state["tasks"]) == 2
+        resumed = BatchSession(c, out, ledger, api=api)
+        enqueue(resumed, 3)
+        resumed.flush("generation")
+        assert api.creates == 2 and len(ledger.events) == 2
+        resumed.refresh()
+        assert ledger.report()["unsettled_reservations"] == 0
+
+
+def test_concurrent_chunks_obey_combined_input_token_window(tmp_path):
+    from feature_space_pilot.batch import BatchSession
+
+    api = FakeBatchAPI()
+    c = load_config(ROOT / "configs/feature_space_pilot.json")
+    c.update(
+        batch_max_requests=1, batch_max_in_flight=4, batch_max_queued_input_tokens=700
+    )
+    out = tmp_path / "run"
+    out.mkdir()
+    with Ledger(
+        tmp_path / "ledger.jsonl", cap=1, stage_caps=dict(generation=1)
+    ) as ledger:
+        session = BatchSession(c, out, ledger, api=api)
+        enqueue(session, 3)
+        session.flush("generation")
+        assert api.creates == 1  # Each exact count + reserve is 612 tokens.
+        session.refresh()
         assert ledger.report()["unsettled_reservations"] == 0

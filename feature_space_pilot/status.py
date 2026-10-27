@@ -97,6 +97,12 @@ def inspect_run(path):
         else "running_or_interrupted"
     )
     batches = path / "batch_state.json"
+    amendment = path / "execution_amendment.json"
+    if amendment.exists():
+        execution = json.loads(amendment.read_text())["config"]
+        result["original_execution_mode"] = result["execution_mode"]
+        result["execution_mode"] = "mixed_online_batch"
+        result["judge_model"] = execution["judge"]["model_id"]
     if batches.exists():
         state = json.loads(batches.read_text())
         result["batches"] = [

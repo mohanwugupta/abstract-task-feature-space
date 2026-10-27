@@ -149,6 +149,15 @@ class BatchSession:
             }
         )
         self.path = self.out / "batch_state.json"
+        self.max_in_flight = config.get("batch_max_in_flight", 1)
+        self.max_queued_tokens = config.get("batch_max_queued_input_tokens", 10_000_000)
+        self.chunk_size = config.get("batch_max_requests", 1000)
+        if type(self.max_in_flight) is not int or not 1 <= self.max_in_flight <= 100:
+            raise ValueError("Batch in-flight chunk limit must be 1–100")
+        if type(self.max_queued_tokens) is not int or self.max_queued_tokens < 1:
+            raise ValueError("Batch queued-input-token limit must be positive")
+        if type(self.chunk_size) is not int or not 1 <= self.chunk_size <= 50_000:
+            raise ValueError("Batch size must be 1–50000")
         self.pending = {}
         self._journals = {}
         if self.path.exists():
@@ -172,18 +181,29 @@ class BatchSession:
         self.state["state_hash"] = digest(content)
         write_json(self.path, self.state)
 
+    def _slots(self):
+        return self.max_in_flight - sum(
+            not b.get("ingested") for b in self.state["batches"]
+        )
+
+    def _queued_tokens(self):
+        active = {
+            cid
+            for b in self.state["batches"]
+            if not b.get("ingested")
+            for cid in b["task_ids"]
+        }
+        return sum(
+            self.state["tasks"][cid]["token_budget"]["input_token_bound"]
+            for cid in active
+        ) + sum(t["token_budget"]["input_token_bound"] for t in self.pending.values())
+
     def enqueue(
         self, *, prompt, schema, settings, job_id, stage, journal_name, record_base
     ):
         if journal_name not in {"generations.jsonl", "judgments.jsonl"}:
             raise ValueError("Invalid Batch journal path")
-        if any(
-            b["stage"] == stage and not b.get("ingested") for b in self.state["batches"]
-        ):
-            return None
-        if sum(t["stage"] == stage for t in self.pending.values()) >= self.config.get(
-            "batch_max_requests", 1000
-        ):
+        if len(self.pending) >= self.chunk_size * self._slots():
             return None
         if any(
             t["job_id"] == job_id and not t.get("recorded")
@@ -220,6 +240,13 @@ class BatchSession:
                     payload, settings, self._api(stage).count
                 )
             counted = cache[key]
+        if counted["input_token_bound"] > self.max_queued_tokens:
+            raise ValueError("One request exceeds Batch queued-input-token window")
+        if (
+            self._queued_tokens() + counted["input_token_bound"]
+            > self.max_queued_tokens
+        ):
+            return None
         cid = digest([job_id, attempts])
         self.pending[cid] = dict(
             custom_id=cid,
@@ -237,12 +264,13 @@ class BatchSession:
         return None
 
     def flush(self, stage):
-        # One outstanding chunk per stage keeps queued-token use bounded. --watch
-        # collects it and automatically submits the next chunk/phase.
-        if any(
-            b["stage"] == stage and not b.get("ingested") for b in self.state["batches"]
+        # Submit independent chunks up to both the chunk and input-token windows.
+        while self._slots() > 0 and any(
+            t["stage"] == stage for t in self.pending.values()
         ):
-            return
+            self._flush_one(stage)
+
+    def _flush_one(self, stage):
         queued = [t for t in self.pending.values() if t["stage"] == stage]
         if not queued:
             return
