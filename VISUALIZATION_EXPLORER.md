@@ -95,3 +95,22 @@ python -m pytest -q tests
 Tests include typed adapters, four states, toy set identities, independent atlas truth, pooled discovery, external alignment gates, exact Jaccard/cosine distances, partial-run exports, deterministic/source-preserving outputs, rendered layout bounds and headless navigation/feature-selection interactions.
 
 The append-only QA/TDD record is [scratchpad_feature_space_visualizations.md](scratchpad_feature_space_visualizations.md). It includes commands, source IDs, failed attempts and manual inspection notes for the primary figures. Native browser integration was unavailable in the implementation session; Streamlit's official headless AppTest exercised the app, and exported PNG/PDF figures were visually inspected.
+
+
+## Human-only empirical pilot analysis
+
+For a run that is still being monitored, first copy an exact verified checkpoint. Snapshot creation neither pauses the collector nor reseals/edits its source. The snapshot's original manifest and every listed artifact must verify; a changing source is retried. Source-path/capture metadata is kept outside the sealed snapshot.
+
+```bash
+python -m feature_space_pilot.viz.snapshot --run-dir artifacts/feature_space_pilot/live_human_74608725aae4e0dc
+python -m feature_space_pilot.viz.cli --run-dir SNAPSHOT_DIR --output-dir artifacts/feature_space_visualizations/live_human_74608725aae4e0dc/v1
+streamlit run feature_space_pilot/viz/app.py -- --run-dir SNAPSHOT_DIR --page Matrix
+```
+
+`SNAPSHOT_DIR` is printed by the first command. It lives under `artifacts/feature_space_analysis_snapshots/RUN_ID/<manifest-hash>/`. Each new checkpoint gets its own immutable identity; use a new analysis output directory for subsequent scientific revisions.
+
+The human-only Matrix displays all human targets and offers concept/event/object filters. Coverage distinguishes applicable, inapplicable, ambiguous and missing/failed cells over the full frozen bank; discovery filters do not change that denominator. The offline human gallery adds judgment coverage and feature-applicability counts, alongside discovery curves, the partial matrix and supported human correspondence. Feature rankings are explicitly exploratory display selections; they do not alter the frozen bank. Full declared-scope matrix cells are in `data_exports/full_matrix_cells.csv`, with unresolved cells retained as `?`.
+
+Task atlas/composition figures are unavailable for a human-only run. Complete judged-feature Jaccard geometry and clustering remain gated by unresolved cells, raw embeddings and independent coding are not fabricated, and translated abstract human comparisons remain gated by named review. Human recovery uses frozen reviewed equivalences where supplied, otherwise exact normalized phrase matching; zero lexical overlap does not rule out semantic correspondence.
+
+The initial empirical gallery contains five rendered figures (PNG/SVG/PDF), supported/unavailable panels, full feature evidence, underlying data and a separately generated `analysis_summary.md`/JSON describing the actual pilot snapshot. Initial exports are exploratory while ambiguity/missingness and review gates remain.

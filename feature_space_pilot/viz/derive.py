@@ -61,6 +61,74 @@ def ordered_task_ids(run):
     )
 
 
+def ordered_matrix_ids(run):
+    tasks = ordered_task_ids(run)
+    if tasks:
+        return tasks
+    order = {"concept": 0, "event": 1, "object": 2}
+    return sorted(
+        run.items,
+        key=lambda i: (
+            run.items[i].get("source_dataset", ""),
+            order.get(run.items[i]["target_type"], 3),
+            run.items[i]["text"].lower(),
+            i,
+        ),
+    )
+
+
+def coverage_rows(run, *, by="item"):
+    if by not in {"item", "feature"}:
+        raise ValueError("Coverage grouping must be item or feature")
+    primary = {
+        (r["item_id"], r["feature_id"]): r
+        for r in run.attempts
+        if r.get("parse_status") == "ok"
+    }
+    keys = ordered_matrix_ids(run) if by == "item" else list(run.features)
+    rows = []
+    for key in keys:
+        row = dict(applies=0, inapplicable=0, ambiguous=0, missing=0, out_of_scope=0)
+        if by == "item":
+            row.update(
+                item_id=key,
+                text=run.items[key]["text"],
+                source_dataset=run.items[key].get("source_dataset"),
+                target_type=run.items[key]["target_type"],
+            )
+            pairs = ((key, f) for f in run.features)
+        else:
+            row.update(feature_id=key, text=run.features[key]["text"])
+            pairs = ((i, key) for i in run.items)
+        for item, feature in pairs:
+            value = run.cell(item, feature)
+            state = (
+                "applies"
+                if value == 1
+                else (
+                    "inapplicable"
+                    if value == 0
+                    else (
+                        "out_of_scope"
+                        if value == -2
+                        else (
+                            "ambiguous"
+                            if primary.get((item, feature), {}).get("status")
+                            == "ambiguous"
+                            else "missing"
+                        )
+                    )
+                )
+            )
+            row[state] += 1
+        row["n_in_scope"] = sum(
+            row[s] for s in ["applies", "inapplicable", "ambiguous", "missing"]
+        )
+        row["n_resolved"] = row["applies"] + row["inapplicable"]
+        rows.append(row)
+    return rows
+
+
 def select_features(
     run,
     *,
@@ -166,7 +234,7 @@ def atlas(run, left, right, feature_ids=None):
 def matrix_data(
     run, item_ids=None, feature_ids=None, *, cluster=False, present_only=False
 ):
-    items = list(item_ids if item_ids is not None else ordered_task_ids(run))
+    items = list(item_ids if item_ids is not None else ordered_matrix_ids(run))
     features = list(feature_ids if feature_ids is not None else select_features(run))
     if present_only:
         features = [f for f in features if any(run.cell(i, f) == 1 for i in items)]

@@ -86,3 +86,6 @@ This is a standalone pilot project. Execution uses hosted APIs, and the offline 
 The pilot's offline tests cover schemas, source gates, prompts, independent jobs, budget controls, binary judgments, metrics, compositionality, checkpoint recovery, and full CLI runs. CI runs without credentials.
 
 Generated run directories are excluded from Git. Reproduce the sample report with the offline command above. Pilot fixtures and references are committed directly with their byte hashes preserved. Downloaded human norm files retain their source-specific terms recorded in the source registry; this project does not grant additional rights to those data.
+
+
+For the current human pilot, [the visualization guide](VISUALIZATION_EXPLORER.md#human-only-empirical-pilot-analysis) covers verified analysis snapshots, the human-target matrix, judgment coverage, full data exports and the local explorer. These analyses do not make paid model calls and retain every unresolved cell explicitly.

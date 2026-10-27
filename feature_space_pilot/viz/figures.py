@@ -249,6 +249,12 @@ def _ranked_atlas(data, limit):
 
 
 def static_atlas(run, left="poem_T", right="finance_T", *, max_features=24):
+    if left not in run.items or right not in run.items:
+        return (
+            None,
+            [],
+            "Task comparison unavailable: these task targets are not present in this human-only run.",
+        )
     data = atlas(run, left, right)
     selected = _ranked_atlas(data, max_features)
     fig = _frame(
@@ -390,11 +396,18 @@ def static_matrix(run, *, max_features=24, cluster=False):
         data = matrix_data(
             run, data["item_ids"], data["feature_ids"][:max_features], cluster=cluster
         )
+    if not data["item_ids"] or not data["feature_ids"]:
+        return None, [], "No resolved applicable features in the selected target scope."
+    human_only = not run.task_item_ids
     fig = _frame(
         run,
-        "Which properties are shared across the task hierarchy?",
+        (
+            "Which properties are shared across human-norm targets?"
+            if human_only
+            else "Which properties are shared across the task hierarchy?"
+        ),
         f"{data['n_items']} displayed targets · {data['n_features']} selected features / {data['n_bank']} bank · {data['n_resolved']}/{data['n_items']*data['n_features']} resolved cells · {data['ordering']}",
-        size=(20, 11.25),
+        size=(20, max(11.25, 4 + 0.32 * data["n_items"])),
     )
     ax = fig.add_axes([0.205, 0.26, 0.75, 0.53])
     ax.imshow(
@@ -408,8 +421,12 @@ def static_matrix(run, *, max_features=24, cluster=False):
     ax.set_yticks(range(len(data["item_ids"])), data["item_labels"], fontsize=9)
     ax.set_xticks(
         range(len(data["feature_ids"])),
-        [textwrap.fill(x, 18) for x in data["feature_labels"]],
+        [textwrap.fill(x, 40) for x in data["feature_labels"]],
         fontsize=7.6,
+        rotation=90,
+        ha="right",
+        va="center",
+        rotation_mode="anchor",
     )
     ax.tick_params(axis="both", length=0, pad=8)
     for i, row in enumerate(data["states"]):
@@ -441,6 +458,59 @@ def static_matrix(run, *, max_features=24, cluster=False):
         for j, f in enumerate(data["feature_ids"])
     ]
     return fig, rows, caption
+
+
+def _static_coverage(run, rows, *, title, subtitle, limit=None):
+    selected = rows[:limit] if limit else rows
+    fig = _frame(run, title, subtitle, size=(20, max(11.25, 5 + 0.32 * len(selected))))
+    ax = fig.add_axes([0.39, 0.19, 0.56, 0.61])
+    y = list(range(len(selected)))
+    left = [0] * len(selected)
+    for key, label, color in [
+        ("applies", "Applicable", "#167D7F"),
+        ("inapplicable", "Inapplicable", "#CBD9DB"),
+        ("ambiguous", "Ambiguous", "#E7AF53"),
+        ("missing", "Missing/failed", "#CA706A"),
+    ]:
+        values = [row[key] for row in selected]
+        ax.barh(y, values, left=left, label=label, color=color, height=0.78)
+        left = [a + b for a, b in zip(left, values)]
+    ax.set_yticks(y, [textwrap.fill(row["text"], 60) for row in selected], fontsize=8)
+    ax.invert_yaxis()
+    ax.set_xlabel("Targets" if "feature_id" in selected[0] else "Frozen bank features")
+    ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.06), ncol=4, frameon=False)
+    ax.grid(axis="x", alpha=0.15)
+    caption = "Independent judgments from the frozen bank. Applicable and inapplicable are resolved 1/0 cells; ambiguous and missing/failed remain unknown. Counts include the unresolved denominator and do not estimate human production frequency. Full counts, IDs and labels are exported."
+    fig.text(0.035, 0.065, textwrap.fill(caption, 190), fontsize=8, color="#52616A")
+    return fig, rows, caption
+
+
+def static_judgment_coverage(run):
+    from .derive import coverage_rows
+
+    rows = coverage_rows(run)
+    return _static_coverage(
+        run,
+        rows,
+        title="Which targets still need judgment review?",
+        subtitle=f"{len(rows)} human targets · {len(run.features)} frozen features · ambiguous and missing judgments remain separate",
+    )
+
+
+def static_feature_applicability(run, *, max_features=24):
+    from .derive import coverage_rows
+
+    rows = sorted(
+        coverage_rows(run, by="feature"),
+        key=lambda row: (-row["applies"], row["text"], row["feature_id"]),
+    )
+    return _static_coverage(
+        run,
+        rows,
+        title="Which selected properties apply across the most targets?",
+        subtitle=f"Top {min(max_features,len(rows))} / {len(rows)} frozen features, ranked for exploratory inspection by known applicable count; all unresolved target judgments remain visible",
+        limit=max_features,
+    )
 
 
 def static_discovery(run):
@@ -545,7 +615,7 @@ def static_human(run):
         ax.set_xticks([0, 1, 2], ["P0", "P1", "P2"])
         ax.set_ylim(0, 1.05)
         ax.set_title(source["source_dataset"])
-        ax.set_ylabel("Recall relative to listed human productions")
+        ax.set_ylabel("Lexical / frozen-mapping recall relative to human lists")
         if not source["recovery"]:
             ax.text(
                 0.5,
@@ -613,10 +683,20 @@ def static_human(run):
                 profiles=profiles,
             )
         )
+    fig.text(
+        0.035,
+        0.09,
+        textwrap.fill(
+            "Matching uses frozen reviewed equivalences where supplied, otherwise exact normalized phrase overlap. Zero lexical overlap does not rule out semantic correspondence. No new semantic mappings or category reviews are inferred.",
+            175,
+        ),
+        fontsize=8,
+        color="#52616A",
+    )
     return (
         fig,
         {"sources": data},
-        "Verified real sources and aligned language only. Recall is relative to listed productions, not ontological truth. Category profiles show the first item by stable ID per source, among independently coded memberships; coverage is displayed. Full per-item profiles remain in exported data. Unavailable panels are not zero results.",
+        "Verified real sources and aligned language only. Recall uses frozen reviewed equivalences where supplied, otherwise exact normalized phrase matching; zero lexical overlap does not rule out semantic correspondence. Category profiles require independently coded and reviewed features. Full per-item profiles remain in exported data. Unavailable panels are not zero results.",
     )
 
 

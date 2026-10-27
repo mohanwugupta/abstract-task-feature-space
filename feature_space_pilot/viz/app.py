@@ -26,6 +26,8 @@ from feature_space_pilot.viz.derive import (
     discovery_rows,
     contribution_rows,
     ordered_task_ids,
+    ordered_matrix_ids,
+    coverage_rows,
     item_label,
     human_sources,
     human_geometry,
@@ -46,6 +48,7 @@ PAGES = [
     "Task Atlas",
     "Composition",
     "Matrix",
+    "Coverage",
     "Feature Discovery",
     "Human Baseline",
     "Geometry",
@@ -311,23 +314,36 @@ def _composition_page(run, features):
 
 def _matrix_page(run, features):
     st.subheader("Which judged properties co-occur?")
+    human_only = not run.task_item_ids
     family = st.selectbox(
         "Displayed target family",
-        [
-            "All task + situation targets",
-            "Creative writing",
-            "Reconciliation",
-            "Standalone situations",
-        ],
+        (
+            ["All human targets", "Concepts", "Events", "Objects"]
+            if human_only
+            else [
+                "All task + situation targets",
+                "Creative writing",
+                "Reconciliation",
+                "Standalone situations",
+            ]
+        ),
         key="matrix_family",
     )
-    items = ordered_task_ids(run)
+    items = ordered_matrix_ids(run)
     task = {
         "Creative writing": "poem",
         "Reconciliation": "finance",
         "Standalone situations": None,
     }.get(family, "all")
-    if task != "all":
+    if human_only:
+        target_type = {
+            "Concepts": "concept",
+            "Events": "event",
+            "Objects": "object",
+        }.get(family)
+        if target_type:
+            items = [i for i in items if run.items[i]["target_type"] == target_type]
+    elif task != "all":
         items = [i for i in items if run.items[i].get("task_id") == task]
     present = st.checkbox(
         "Only features applicable to at least one displayed target",
@@ -361,6 +377,52 @@ def _matrix_page(run, features):
     ]
     _table(rows, "View underlying matrix cells", "matrix_data")
     _inspector(run, data["feature_ids"], "matrix")
+
+
+def _coverage_page(run):
+    st.subheader("Which judgments still need review?")
+    rows = coverage_rows(run)
+    totals = {
+        key: sum(row[key] for row in rows)
+        for key in ["applies", "inapplicable", "ambiguous", "missing"]
+    }
+    columns = st.columns(4)
+    for column, label, value in zip(
+        columns,
+        ["Applicable", "Inapplicable", "Ambiguous", "Missing/failed"],
+        totals.values(),
+    ):
+        column.metric(label, value)
+    fig = go.Figure()
+    for key, label, color in [
+        ("applies", "Applicable", "#167D7F"),
+        ("inapplicable", "Inapplicable", "#CBD9DB"),
+        ("ambiguous", "Ambiguous", "#E7AF53"),
+        ("missing", "Missing/failed", "#CA706A"),
+    ]:
+        fig.add_trace(
+            go.Bar(
+                name=label,
+                x=[row[key] for row in rows],
+                y=[row["text"] for row in rows],
+                orientation="h",
+                marker_color=color,
+                customdata=[row["item_id"] for row in rows],
+                hovertemplate="%{y}: %{x}<br>%{customdata}<extra>%{fullData.name}</extra>",
+            )
+        )
+    fig.update_layout(
+        barmode="stack",
+        height=max(500, 24 * len(rows)),
+        xaxis_title="Frozen bank features",
+        yaxis=dict(autorange="reversed"),
+        legend=dict(orientation="h"),
+    )
+    st.plotly_chart(fig, width="stretch", key="coverage_plot")
+    st.caption(
+        "Ambiguous and missing judgments remain unresolved; none are filled with zero. Coverage is across the full frozen bank, independent of discovery filters."
+    )
+    _table(rows, "Per-target coverage and unresolved counts", "coverage_rows")
 
 
 def _discovery_page(run, features):
@@ -434,7 +496,7 @@ def _discovery_page(run, features):
 def _human_page(run):
     st.subheader("What correspondence to human production is supported?")
     st.caption(
-        "Human production is a reference observation, not truth. Generated-only propositions are not errors. Sources, languages and coding vocabularies remain separate."
+        "Human production is a reference observation, not truth. Recovery uses frozen reviewed equivalences if supplied, otherwise exact normalized phrase overlap. Zero lexical overlap does not rule out semantic correspondence. Sources, languages and coding vocabularies remain separate."
     )
     for source in human_sources(run):
         st.markdown("**" + source["source_dataset"] + "**")
@@ -462,9 +524,9 @@ def _human_page(run):
                 )
             )
         fig.update_layout(
-            title="Recovery relative to listed human productions",
+            title="Lexical / mapped recovery relative to human lists",
             template="plotly_white",
-            yaxis_title="List-relative recall",
+            yaxis_title="List-relative lexical / mapped recall",
         )
         if any(r.get("recall_relative_to_lists") is not None for r in recovery):
             st.plotly_chart(
@@ -538,7 +600,7 @@ def _geometry_page(run, features):
     st.caption(
         "Generated binary features use Jaccard 0–1. Dense embeddings use cosine 0–2. Agreement is descriptive and does not demonstrate internal feature use."
     )
-    ids = ordered_task_ids(run)
+    ids = ordered_matrix_ids(run)
     if ids and features:
         data = geometry_data(run, ids, features)
         if data.get("available"):
@@ -685,13 +747,14 @@ def main():
     )
     parser = argparse.ArgumentParser(add_help=False)
     parser.add_argument("--run-dir")
+    parser.add_argument("--page", choices=PAGES, default="Task Atlas")
     args, _ = parser.parse_known_args()
     initial = args.run_dir or os.environ.get("FEATURE_SPACE_RUN_DIR", "")
     with st.sidebar:
         st.markdown("### FEATURE SPACE")
         st.caption("RESEARCH EXPLORER · V1")
         path = st.text_input("Frozen run directory", value=initial, key="run_path")
-        page = st.selectbox("Explore", PAGES, key="page")
+        page = st.selectbox("Explore", PAGES, index=PAGES.index(args.page), key="page")
     st.markdown(
         '<p style="font-size:12px;letter-spacing:2px;color:#66796e;font-weight:700">FEATURE SPACE / FROZEN RUN ATLAS</p>',
         unsafe_allow_html=True,
@@ -792,6 +855,8 @@ def main():
         _composition_page(run, features)
     elif page == "Matrix":
         _matrix_page(run, features)
+    elif page == "Coverage":
+        _coverage_page(run)
     elif page == "Feature Discovery":
         _discovery_page(run, features)
     elif page == "Human Baseline":

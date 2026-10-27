@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 from . import VIZ_VERSION
 from .load import load_run, SYNTHETIC_BANNER
 from . import figures
-from .derive import composition_rows, contribution_rows
+from .derive import composition_rows, contribution_rows, matrix_data
 from ..io import canonical, digest, file_hash, write_json, write_csv
 
 
@@ -102,6 +102,21 @@ def export_run(run_dir, output_dir=None, *, config=None):
             lambda: figures.static_geometry(run, seed=config.seed),
         ),
     ]
+    if not run.task_item_ids:
+        definitions += [
+            (
+                "07_judgment_coverage",
+                "Which human targets still need review?",
+                lambda: figures.static_judgment_coverage(run),
+            ),
+            (
+                "08_feature_applicability",
+                "Which selected features apply across human targets?",
+                lambda: figures.static_feature_applicability(
+                    run, max_features=config.max_features
+                ),
+            ),
+        ]
     records = []
     prefix = "synthetic_" if run.demo else ""
     for figure_id, title, builder in definitions:
@@ -195,6 +210,24 @@ def export_run(run_dir, output_dir=None, *, config=None):
     write_json(data_dir / "feature_inspector.json", provenance)
     contributions = contribution_rows(run)
     write_json(data_dir / "prompt_contributions.json", contributions)
+    matrix = matrix_data(run, run.scope["item_ids"], run.scope["feature_ids"])
+    full_cells = [
+        dict(
+            item_id=i,
+            target_text=run.items[i]["text"],
+            feature_id=f,
+            feature_text=run.features[f]["text"],
+            state=matrix["states"][n][j],
+        )
+        for n, i in enumerate(matrix["item_ids"])
+        for j, f in enumerate(matrix["feature_ids"])
+    ]
+    write_json(data_dir / "full_matrix_cells.json", full_cells)
+    write_csv(
+        data_dir / "full_matrix_cells.csv",
+        full_cells,
+        ["item_id", "target_text", "feature_id", "feature_text", "state"],
+    )
     (output / "feature_inspector.html").write_text(_inspector_html(run, provenance))
     manifest = dict(
         viz_version=VIZ_VERSION,
@@ -323,7 +356,13 @@ def _gallery(run, records, config):
             f'<section id="figure-{row["figure_id"]}"><p class="eyebrow">FIGURE {row["figure_id"].split("_")[0]} · {row["status"].upper()}</p><h2>{html.escape(row["title"])}</h2>{image}<p>{html.escape(row["caption"])}</p>{evidence}<p>{links} · <a href="{row["data_file"]}">Underlying rows (JSON)</a> · <a href="feature_inspector.html">Feature evidence</a></p></section>'
         )
     return (
-        '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Feature Space · Research Atlas</title><style>body{background:#f7f7f3;color:#20323d;font:16px/1.65 system-ui;margin:0}main{max-width:1320px;margin:auto;padding:44px 32px}h1{font-size:52px;letter-spacing:-2px;line-height:1.1;margin:18px 0}h2{font-size:29px;line-height:1.25}.eyebrow{font-size:12px;font-weight:750;letter-spacing:2px;color:#61716e}header{padding:20px 0 42px;border-bottom:1px solid #d6ded9}.banner{background:#fff0df;color:#8c3e1e;padding:14px 20px;border-left:4px solid #d76b31;font-weight:700}section{background:white;border:1px solid #e0e5df;border-radius:8px;padding:28px;margin:28px 0}img{width:100%;height:auto}a{color:#147f77}code{overflow-wrap:anywhere}.unavailable{padding:35px;background:#f3f4f0;border-left:3px solid #87958f}footer{font-size:12px;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}td,th{padding:10px;border-bottom:1px solid #e0e5df;text-align:left}</style></head><body><main><header><p class="eyebrow">FEATURE SPACE / FROZEN RUN ATLAS</p><h1>Inspect the representation.<br>Follow the evidence.</h1><p>Two realistic tasks, independent situations, and the exact propositions connecting them.</p><div class="banner">'
+        '<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Feature Space · Research Atlas</title><style>body{background:#f7f7f3;color:#20323d;font:16px/1.65 system-ui;margin:0}main{max-width:1320px;margin:auto;padding:44px 32px}h1{font-size:52px;letter-spacing:-2px;line-height:1.1;margin:18px 0}h2{font-size:29px;line-height:1.25}.eyebrow{font-size:12px;font-weight:750;letter-spacing:2px;color:#61716e}header{padding:20px 0 42px;border-bottom:1px solid #d6ded9}.banner{background:#fff0df;color:#8c3e1e;padding:14px 20px;border-left:4px solid #d76b31;font-weight:700}section{background:white;border:1px solid #e0e5df;border-radius:8px;padding:28px;margin:28px 0}img{width:100%;height:auto}a{color:#147f77}code{overflow-wrap:anywhere}.unavailable{padding:35px;background:#f3f4f0;border-left:3px solid #87958f}footer{font-size:12px;overflow-wrap:anywhere}table{border-collapse:collapse;width:100%;font-size:13px}td,th{padding:10px;border-bottom:1px solid #e0e5df;text-align:left}</style></head><body><main><header><p class="eyebrow">FEATURE SPACE / FROZEN RUN ATLAS</p><h1>Inspect the representation.<br>Follow the evidence.</h1><p>'
+        + (
+            "Human-norm targets, independent feature judgments, and supported human production comparisons."
+            if not run.task_item_ids
+            else "Two realistic tasks, independent situations, and the exact propositions connecting them."
+        )
+        + '</p><div class="banner">'
         + html.escape(
             SYNTHETIC_BANNER
             if run.demo
