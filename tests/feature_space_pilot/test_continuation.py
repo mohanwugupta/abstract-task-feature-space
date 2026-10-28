@@ -202,3 +202,29 @@ def test_collector_repair_cannot_authorize_scientific_code_changes(
     with pytest.raises(ValueError, match="Execution code"):
         module.collector_repair_plan(out)
     assert not (out / "execution_amendment_history.jsonl").exists()
+
+
+def test_pilot_monitor_waits_when_semantic_analysis_owns_shared_budget(monkeypatch):
+    import feature_space_pilot.continuation as module
+
+    calls = []
+    sleeps = []
+
+    def attempt(out, **kwargs):
+        calls.append(kwargs["preflight_hash"])
+        if len(calls) == 1:
+            raise ValueError("Another process owns the cumulative budget ledger")
+        return dict(status="needs_adjudication")
+
+    monkeypatch.setattr(module, "continue_batch", attempt)
+    monkeypatch.setattr(
+        module, "continuation_plan", lambda out: dict(preflight_hash="fresh")
+    )
+    monkeypatch.setattr(module.time, "sleep", sleeps.append)
+    assert (
+        module.watch_continuation(
+            "fixture", preflight_hash="first", watch=True, poll_seconds=5
+        )["status"]
+        == "needs_adjudication"
+    )
+    assert calls == ["first", "fresh"] and sleeps == [5]

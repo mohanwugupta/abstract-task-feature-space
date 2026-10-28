@@ -53,6 +53,7 @@ The audit is offline; the human stage plans **540 generation jobs**. Scientific 
 
 ## Documentation
 
+- [Automated semantic matching of existing generations to human labels](AUTOMATED_SEMANTIC_MATCHING.md)
 - [Setup, hosted API configuration, source gates, and live-run instructions](FEATURE_SPACE_PILOT.md)
 - [Artifact and data dictionary](DATA_DICTIONARY.md)
 - [Product requirements](PRD_Feature_Space_Human_Norm_Pilot.md)

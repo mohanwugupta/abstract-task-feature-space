@@ -1,6 +1,6 @@
 # Feature-space pilot artifact dictionary
 
-All run artifacts live under `artifacts/feature_space_pilot/<run_id>/`. Text uses UTF-8. Hashes are SHA-256. Structured objects are canonical JSON (sorted keys, compact separators, Unicode preserved, no NaN) when hashed; file hashes cover verbatim bytes. Human reference content is evaluation-only and never used as model context.
+Primary run artifacts live under `artifacts/feature_space_pilot/<run_id>/`. Text uses UTF-8. Hashes are SHA-256. Structured objects are canonical JSON (sorted keys, compact separators, Unicode preserved, no NaN) when hashed; file hashes cover verbatim bytes. Human reference content is evaluation-only and never used as generator context.
 
 | Artifact | Fields / meaning |
 |---|---|
@@ -40,7 +40,17 @@ All run artifacts live under `artifacts/feature_space_pilot/<run_id>/`. Text use
 
 `budget_live.jsonl` and `budget_demo.jsonl` sit above individual run folders. `reserve` entries bind a ticket/job/stage to a worst-case USD liability; `settle` entries replace the reservation with provider-token cost; `overage` records actual cost and stops execution. Unknown usage remains reserved. The adjacent lock file coordinates processes. Keep a single live ledger across the entire pilot.
 
-Source inventory and selection files live in `data/feature_space_pilot/`; retain raw norm files read-only and separately from model prompts.
+Source inventory and selection files live in `data/feature_space_pilot/`; retain raw norm files read-only and separately from generator prompts.
+
+## Separate automated semantic matching
+
+`artifacts/feature_space_semantic_matching/<analysis_id>/` contains exploratory model-scored alignments, described in [AUTOMATED_SEMANTIC_MATCHING.md](AUTOMATED_SEMANTIC_MATCHING.md). Human labels are supplied only to this separate evaluation grader, never to the original generator. Original primary metrics and journals are unchanged.
+
+`inventory.json` holds `items`, per-item `norm_features` (`human_id,label,categories`), deduplicated `propositions`, and local `origins` (`generation_job_id,prompt_family,replicate,raw_feature_index,comparison_cap`). `jobs.json` groups up to five propositions with every norm label for that target; origin metadata is absent from API payloads. `rubric.json`, `config.json`, `source_provenance.json`, `code_hashes.json` and `token_counts.json` pin the contract and provider-count evidence.
+
+The separate `judgments.jsonl` stores each attempt's semantic job, exact IDs, raw response/hash, disjoint `matches,related,uncertain` arrays, evidence, usage and ledger ticket. `semantic_pairs.csv` exports assigned pairs; remaining labels imply no match only after a complete valid response. `semantic_recovery.csv` contains per-item/family/repetition coverage, `recall` (null if incomplete), `observed_recall_lower_bound`, `recall_including_uncertain`, unique recovered IDs and `human_reviewed=false`. Final family summaries and figures use identical completely scored targets across all three families. No feature absent from the human inventory is automatically false.
+
+`analysis_manifest.json` records source/code/input hashes, planned/completed requests and propositions, control status, own accounted cost and shared ledger cost. Synthetic fixtures explicitly set `demo=true,billed_execution=false` and carry nonempirical labels; live execution is distinct. Figures require successful synthetic logical controls, which do not measure semantic-grader validity.
 
 
 ## Read-only visualization artifacts

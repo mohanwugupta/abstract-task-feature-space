@@ -1,0 +1,14 @@
+{
+  "model_config": "feature_space_pilot.json",
+  "analysis_root": "artifacts/feature_space_semantic_matching",
+  "comparison_cap": 10,
+  "propositions_per_request": 5,
+  "completion_budget_usd": 2,
+  "max_attempts": 2,
+  "max_input_tokens": 16000,
+  "max_output_tokens": 3000,
+  "count_workers": 6,
+  "batch_max_requests": 200,
+  "batch_max_in_flight": 8,
+  "batch_max_queued_input_tokens": 10000000
+}

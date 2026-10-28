@@ -416,6 +416,17 @@ def watch_continuation(
                 "collector_retry",
                 message="Temporary connection failure or uncertain acknowledgement; retaining reservations and retrying reconciliation after the next poll",
             )
+        except ValueError as problem:
+            if (
+                not watch
+                or str(problem) != "Another process owns the cumulative budget ledger"
+            ):
+                raise
+            emit(
+                progress,
+                "collector_retry",
+                message="Another authorized analysis owns the shared budget controller; will retry without submitting or dropping work",
+            )
         else:
             if not watch or result["status"] != "batch_pending":
                 return result
