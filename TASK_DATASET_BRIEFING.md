@@ -1,39 +1,36 @@
-# Task and situation dataset — corrected primary analysis
+# Task and situation study: current primary analysis
 
-Use the independent **Experiment 2** outputs. The previous task-only view of the pooled 5,825-feature vocabulary is retained as secondary exploration; it is no longer the primary task representation. [The experimental separation guide](EXPERIMENT_SEPARATION.md) explains the correction and the separate human benchmark.
+The primary judging scope is now **target-specific**. Each of the 15 descriptions is evaluated only against features independently generated for that same description by P0/P1/P2 across repetitions. The historical 15 × 592 cross-task matrix remains exploratory and is not the primary task representation.
 
-## What has been processed?
+## Start here
 
-- **131/135 generation jobs** were accepted across the 15 task/situation items, P0/P1/P2 and three repetitions.
-- The **875 task-origin phrases** were independently reconstructed and conservatively consolidated into **592 canonical task features**. The count coincides with the previously reported task-origin subset, but reconstruction uses original provenance and local equivalence evidence, not a text filter on the pooled bank.
-- Every one of the **15 × 592 = 8,880 cells** has compatible prior attempt evidence. **6,976 are definitively 0/1; 1,879 ambiguous and 25 invalid remain `?`.**
-- Shared/distinctive features, abstraction transitions, situation inheritance, discovery coverage and component/direct comparisons have been recomputed using only this bank.
-- Semantic families and specificity tags are provisional offline coding. They do not merge propositions or replace binary columns.
+- [Full side-by-side P0/P1/P2 feature table](artifacts/feature_space_collaborator/followup_23476f15019ef1c1/task/prompt_comparison.html): every accepted feature and repetition, target descriptions, summaries, native validity badges and original generation provenance. Opens offline without a server.
+- [Task scientific report](artifacts/feature_space_collaborator/followup_23476f15019ef1c1/task/scientific_report.md)
+- [Own-target validity counts](artifacts/feature_space_collaborator/followup_23476f15019ef1c1/task/figure_T1_target_local_validity.svg)
+- [Empirical prompt profiles](artifacts/feature_space_collaborator/followup_23476f15019ef1c1/task/figure_T2_prompt_profiles.svg)
+- [Discovery-only compositionality](artifacts/feature_space_collaborator/followup_23476f15019ef1c1/task/figure_T3_discovery_composition.svg)
+- [Collaborator findings and independent human validation](HUMAN_VALIDATION_AND_LOCAL_TASKS.md)
 
-## Figures to open
+PNG versions accompany the SVG figures. Full local inventories and judgments are under `task/target_inventories/<target>/`; `generation_features.csv` preserves all 875 raw task phrases, prompt families, three repetitions, model/prompt hashes and local verdicts. No examples-only feature cap is imposed.
 
-1. [Figure A — Task feature-space overview](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/task/figure_A_task_feature_space.svg): actual task-generated propositions organized by overlapping semantic families, with all 15 applicability profiles.
-2. [Figure B — Abstraction and generalization](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/task/figure_B_abstraction.svg): broad and specific properties across domain, type, instance and situated variants, separately for writing and reconciliation. Red outlines mark inherited-text disagreements requiring review.
-3. [Figure C — Compositionality](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/task/figure_C_compositionality.svg): shared discoveries, component-only discoveries, direct additions attributable to component omissions, provisional 0/0/1 candidates, inapplicable additions and unresolved evidence. Each deadline/review/both condition and prompt family is separate.
+## Current evidence
 
-PNG versions accompany every SVG. Display examples are exported explicitly; the full 592-feature bank and all matrix cells remain available. The figure selection is not a feature cap.
+Local reconsolidation yields **713 primary cells**. Existing evidence resolves **648: 635 yes and 13 no**. **65 remain unknown: 62 ambiguous and three invalid.** All previous responses are preserved; no native judgments were rerun. The 131/135 accepted generation jobs leave missing samples visible.
 
-Read [the full task scientific report](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/task/scientific_report.md) for actual propositions, per-item coverage, transition counts, sampling gaps, quality flags and candidate properties for later behavioral validation.
+The complete paired comparison uses thirteen fully sampled targets; incomplete finance targets remain in full tables. P0 tends to produce broad/familiar properties; P1 is more literal and can produce label metadata; P2 has more resource/evaluation/social cues but still restates many explicit instructions and specific details. The declared cue screen detected no explicit incentive, uncertainty or conflict/trade-off language in this complete cohort. Cue coding is provisional, not semantic gold or a claim of universal prompt superiority.
 
-## How to interpret the results
+## How to interpret comparisons
 
-The automated family comparison finds 119 shared, 164 writing-distinctive, 138 reconciliation-distinctive and 171 unresolved features. Family presence requires at least one yes; family absence requires every item in that family to be no. These unreviewed labels include questionable positives, which are flagged rather than automatically corrected.
+Shared property identities support comparing independently generated sets. They never add a candidate to another target's primary inventory. If a feature was not generated for the base task, its applicability there is unknown under the primary design; it is not assigned zero.
 
-Task abstraction and feature abstraction are different: domain → task type → instance is the existing item hierarchy; a feature may describe a broad functional demand or an exact instance constraint. Situations are another axis. Semantic families, specificity and identical applicability profiles are separate interpretation aids. None establishes semantic equivalence or an internal model mechanism.
+Compositionality therefore describes overlap among G(T), G(S), and G(T+S), with equal-planned-call and full-sample allocations plus explicit sampling gaps. New direct discoveries do not establish interaction-dependent applicability. A separate non-executing targeted validation design identifies where compatible historical evidence might be reused; new paid judgments require a fresh cost preflight and authorization.
 
-Direct generation often finds an existing component property omitted during independent generation. Six features exhibit the 0/0/1 candidate pattern; no genuine relational emergence is confirmed. Missing generation roles and ambiguous labels limit those comparisons. The diagnostic set includes unchanged requirements with inconsistent labels, cross-domain positives and candidate interactions with all three descriptions for inspection.
+Read `manual_review.csv` for a manageable 19-case provenance-preserving review set. Native judge negatives and unknowns, near duplicates, instruction restatements, specific details and possible evaluation features are candidates for inspection. No human approvals or automatic corrections are invented. A feature's presence does not establish preference direction or internal/causal feature use.
 
-The next scientific step is targeted grounding/consistency review and later behavioral tests of promising properties. A feature's presence does not assign it a preference value or demonstrate that the model uses it in decisions. No new paid judgments were launched by this correction.
-
-## Reproduce offline
+## Reproduce
 
 ```bash
-MPLCONFIGDIR=artifacts/feature_space_full/matplotlib_cache .venv/bin/python -m feature_space_pilot.experiments.run
+MPLCONFIGDIR=artifacts/feature_space_full/matplotlib_cache .venv/bin/python -m feature_space_pilot.collaborator.run
 ```
 
-`artifacts/feature_space_experiments/latest.json` points to the newest immutable export. Original experiments, provider jobs, frozen manifests and the cumulative $100 ledger remain unchanged. [The human benchmark report](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/human/scientific_report.md) is separate and supplies no vocabulary to the primary task study.
+`artifacts/feature_space_collaborator/latest.json` points to the latest immutable export. The workflow is offline, makes no model API calls and preserves original experiments and the cumulative $100 ledger.

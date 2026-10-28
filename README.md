@@ -6,19 +6,23 @@ The pipeline provides isolated feature discovery, conservative candidate consoli
 
 ## Two independent primary experiments
 
-**Experiment 1 validates feature generation against human norms. Experiment 2 constructs the task representations for subsequent preferences research.** Each has its own provenance-derived vocabulary, consolidation decisions, bank identity, applicability matrix and scientific report. Human-only discoveries cannot enter the primary task vocabulary. A proposition independently discovered in both experiments remains eligible in both.
+**Experiment 1 validates feature generation against human norms. Experiment 2 develops task representations for subsequent preferences research.** Their feature provenance, inventories and reports remain independent. A proposition independently discovered in both experiments remains eligible in both.
 
-The corrected empirical banks contain **5,233 human-generated features** and **592 task-generated features**. The task matrix is **15 × 592**, rather than 15 × the pooled 5,825-feature bank. Start with [the corrected results and workflow](EXPERIMENT_SEPARATION.md) and [the task figure guide](TASK_DATASET_BRIEFING.md).
+The current analysis compares weighted human and LLM **36-concept cosine similarity matrices**, with concept-label permutation RSA and a separate supervised feature-aligned comparison. The primary task scope contains **713 target-local feature judgments**: each description is judged only against its own discoveries. The historical **15 × 592 cross-task matrix is exploratory**, not the primary task scope.
+
+Start with [the collaborator results and methods](HUMAN_VALIDATION_AND_LOCAL_TASKS.md), [the complete P0/P1/P2 comparison guide](TASK_DATASET_BRIEFING.md), and the motivation linked there.
 
 Reconstruct from existing evidence, entirely offline:
 
 ```bash
-MPLCONFIGDIR=artifacts/feature_space_full/matplotlib_cache .venv/bin/python -m feature_space_pilot.experiments.run
+MPLCONFIGDIR=artifacts/feature_space_full/matplotlib_cache .venv/bin/python -m feature_space_pilot.collaborator.run
 ```
 
-`artifacts/feature_space_experiments/latest.json` links the two reports and their immutable export. The command preserves original frozen inputs, active inference, provider jobs and budget ledgers; reuses compatible judgments; retains `?`; and makes no API calls or credential reads. There is no live-execution option. It also exports task Figures A–C, original generation provenance, old/new ID mappings, a diagnostic review set and per-cell reuse audits.
+`artifacts/feature_space_collaborator/latest.json` links the independent human and task reports and a full offline HTML prompt table. Outputs include all human frequency coordinates, generation-frequency/binary representations, RSA effects/p-values/sparsity and sensitivities, audited alignment/unmatched features, published reliability review, per-target inventories, all generation repetitions, native judgment reuse, and discovery-only compositionality. The command makes no model calls or credential reads; originals, active jobs and ledgers stay unchanged.
 
-Semantic families and scope labels are provisional offline interpretation metadata. They never replace or merge the binary feature columns, assign preference values, or establish internal/causal feature use. Remaining paid work requires a new cost preflight and authorization under the unchanged cumulative $100 cap.
+The human similarities are sparse and some P1 overlap is grammatical. Semantic alignment is supervised, not independent RSA. Task cue coding is provisional; generation absence is never an applicability zero. No participant reliability ceiling, preference value or internal/causal feature-use claim is invented. Any new paid work requires a cost preflight and authorization under the unchanged cumulative **$100** cap.
+
+The preceding [experiment-separation reconstruction](EXPERIMENT_SEPARATION.md) preserves independent human/task banks and historical evidence. Its `feature_space_pilot.experiments.run` command remains available for reproducing that checkpoint; use the collaborator workflow above for the current primary analyses.
 
 ## Preserved pooled vocabulary — secondary exploration
 

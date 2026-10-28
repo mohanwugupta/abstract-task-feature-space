@@ -1,0 +1,60 @@
+{
+  "review_date": "2026-10-28",
+  "review_scope": "Both complete original papers; Methods pages visually verified against publisher PDFs. No participant-level reconstruction.",
+  "records": [
+    {
+      "paper": "Vinson & Vigliocco (2008), Behavior Research Methods 40:183-190",
+      "unit": "feature_generators",
+      "metric": "collection_sample_size",
+      "sample": "280 participants; 20 per word",
+      "procedure": "Feature listing; noun and verb forms presented separately",
+      "value": null,
+      "locator": "p186, Feature collection",
+      "participant_similarity_ceiling": false,
+      "comparable_to_cosine_rsa": false,
+      "interpretation": "Collection design, not a reported agreement coefficient",
+      "citation_url": "https://link.springer.com/content/pdf/10.3758/BRM.40.1.183.pdf",
+      "reviewed_pdf_sha256": "46eb69e6a0ad2e896a61f894e128fd4bc4001f73ab49477edbdab29360498180"
+    },
+    {
+      "paper": "Vinson & Vigliocco (2008)",
+      "unit": "researcher_consolidation",
+      "metric": "unanimity_requirement",
+      "sample": "Three native English speakers",
+      "procedure": "Split conjunctions or merge synonyms only by unanimous decision; subset independently entered by two, third mediated",
+      "value": null,
+      "locator": "p186, Feature analysis",
+      "participant_similarity_ceiling": false,
+      "comparable_to_cosine_rsa": false,
+      "interpretation": "Decision rule, not 100% observed participant agreement",
+      "citation_url": "https://doi.org/10.3758/BRM.40.1.183"
+    },
+    {
+      "paper": "Vinson & Vigliocco (2008)",
+      "unit": "researcher_coding",
+      "metric": "consensus_categorization",
+      "sample": "Two English-speaking coders",
+      "procedure": "Category disagreements discussed and resolved",
+      "value": null,
+      "locator": "p187, Classifying the speaker-generated features",
+      "participant_similarity_ceiling": false,
+      "comparable_to_cosine_rsa": false,
+      "interpretation": "No numerical pre-consensus coding agreement reported",
+      "citation_url": "https://doi.org/10.3758/BRM.40.1.183"
+    },
+    {
+      "paper": "Harpaintner, Trumpp & Kiefer (2018), Frontiers in Psychology 9:1748",
+      "unit": "researcher_coding",
+      "metric": "joint_probability_of_agreement",
+      "sample": "Two trained, independent coders; 296 concepts; productions from 60 participants, ten per concept",
+      "procedure": "Coders categorized properties with the target visible; overlapping category assignments allowed",
+      "value": 0.7679,
+      "locator": "p5, Data Coding Scheme, final paragraph",
+      "participant_similarity_ceiling": false,
+      "comparable_to_cosine_rsa": false,
+      "interpretation": "76.79% coder agreement; not participant feature-space reliability; raw agreement denominator not specified",
+      "citation_url": "https://www.frontiersin.org/journals/psychology/articles/10.3389/fpsyg.2018.01748/pdf",
+      "reviewed_pdf_sha256": "729e28e8dcc59f10c613b611ab16cc1a82b050c73b21ea8bd571d93c9b8fd3c1"
+    }
+  ]
+}

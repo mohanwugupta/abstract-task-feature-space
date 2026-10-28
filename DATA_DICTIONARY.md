@@ -1,8 +1,41 @@
 # Feature-space pilot artifact dictionary
 
-## Independent primary experiments
+## Current human validation and target-local task analyses
 
-Corrected primary artifacts live under `artifacts/feature_space_experiments/separated_<checkpoint>/human/` and `.../task/`. `latest.json` above those exports points to both scientific reports. Experiment 1 is the human-norm methodology benchmark; Experiment 2 is the task feature-discovery application. The old pooled bank is secondary exploration. Each bank is reconstructed from its own original generation provenance, not filtered by canonical text. Independently generated identical propositions remain eligible in both banks.
+`artifacts/feature_space_collaborator/followup_<identity>/` is the current primary export, linked by `latest.json`. All analyses are offline. The human and task experiments remain separate; previous experiment exports below are preserved.
+
+| Current artifact | Meaning |
+|---|---|
+| `human/human_frequency_vectors.csv`, `human_feature_coordinates.csv` | 36 selected word-plus-original-type concepts × all 1,029 original frequency coordinates. `vf_####` preserves original index, including two duplicated text labels; no weights or coordinates are discarded. |
+| `human/concept_order_and_raw_crosswalk.csv` | Exact shared concept order, raw index, source word/type and model-facing stimulus. Homonymous noun/verb/object rows are distinct. |
+| `human/llm_frequency_vectors_P*.csv`, `llm_binary_vectors_P*.csv` | Independent human-experiment vocabulary; feature count is the number of three repetitions containing a canonical feature, once per repetition. Primary first-ten-per-call normalization preserves comparable generation budgets; the bank itself is uncapped. |
+| `human/generation_occurrences.csv`, `generation_coverage.csv` | Every selected proposition, original index/job/hash and repetition; planned/accepted calls and actual input/output tokens. Incomplete sampling is not interpreted as generation absence. |
+| `human/human_similarity.csv`, `similarity_<variant>_P*.csv` | Identically ordered concept cosine matrices. Zero means a defined orthogonal pair; `?` means undefined zero-norm cosine. Diagonal is retained in data and hidden in the main figure. |
+| `human/rsa_primary.csv`, `upper_triangle_similarities.csv` | Primary Spearman effect across 630 pairs, 9,999 two-axis concept-label permutations, two-sided +1 p-values, Holm-adjusted primary p-values, zero-pair proportions and availability. Pairwise entries are not independent observations. |
+| `human/rsa_sensitivities.csv`, `permutation_nulls/*.npy` | Binary, content-only, raw-surface, within-original-type null and all-output sensitivities. Seed, library versions, tie policy, null design and code hashes are frozen. Sensitivities are exploratory. |
+| `human/shared_pair_feature_evidence.csv`, `metalinguistic_column_audit.csv` | Actual canonical and original propositions responsible for nonzero similarities; transparent linguistic screening explains content-only exclusions without consulting human labels. |
+| `human/semantic_inventory_audit.csv`, `semantic_mapping_audit.csv` | Existing matcher audited against typed raw norms and original generation provenance. Other-sense labels are excluded. Duplicate labels are mapped only to a unique active original coordinate, otherwise withheld. Per-proposition mass, evidence hashes, related/uncertain labels and disagreements are retained. |
+| `human/aligned_*_vectors_P*.csv`, `feature_aligned_cosine*.csv`, `alignment_summary.json` | Supervised, target-conditioned projection onto the 1,029 coordinates. At most one unit of mass per canonical proposition/repetition is split across clear labels; per-label mass is capped before averaging. Binary and single-label-only sensitivities are separate. Empty projection cosine is undefined, not zero. |
+| `human/unmatched_generated_features.csv` | Unmatched and unscored canonical generation units with actual propositions and provenance. Unmatched does not mean invalid. Family denominators count repetitions, not just distinct strings. |
+| `human/published_reliability.json`, `human_reliability.md` | Exact publication metrics, unit, sample, procedure, value, pages and citations. Coding agreement/consensus rules are not participant-similarity ceilings. No participant LOOCV is performed. |
+| `human/harpaintner_status.json`, `harpaintner_aggregate_reference.csv`, `human_stimulus_provenance.json` | SM/IS-E/SC/VA category summaries and original German/English provenance. Quantitative comparison is unavailable pending reviewed translations and generated category coding; no human feature strings are invented. |
+| `task/target_inventories/<target>/inventory.json`, `scope.json`, `judgments.csv` | Independently consolidated target-local candidates, source prompts/repetitions, own bank hash and native applicability only. `?` retains ambiguous/invalid/missing evidence. Shared canonical IDs never expand another target's scope. |
+| `task/primary_local_judgments.csv`, `target_inventory_summary.csv` | Irregular union of 713 native cells with explicit old feature/provider IDs, semantic reuse proofs and original receipt hashes. No new rectangular cross-task applicability matrix is produced. |
+| `task/generation_features.csv`, `generation_call_metrics.csv`, `target_prompt_metrics.csv` | Every raw accepted task proposition and original generation/model/prompt provenance, local verdict, cue coding, planned/accepted repetitions and per-target prompt summaries. Missing jobs have no fabricated feature counts or rates. |
+| `task/prompt_comparison.html`, `prompt_comparison_full.md` | Readable P0/P1/P2 columns for all targets and all three repetitions, full descriptions and literal prompts, local judgment badges and per-target summaries. No server, external scripts, API key or network is needed. |
+| `task/prompt_summary.csv`, `level_prompt_summary.csv`, `prompt_feature_patterns.csv` | Descriptive cue proportions and observed prompt membership. Main rates average calls within target, then the same 13 completely sampled targets. Level tables retain missing coverage. Cue labels are provisional, not semantic gold or preference signs. |
+| `task/near_duplicate_candidates.csv`, `manual_review.csv` | Reviewable lexical similarity with protected-meaning flags; representative cases include original job, repetition, model/hash and actual proposition. No automatic corrections or human approvals. |
+| `task/discovery_compositions*.csv` | G(T), G(S), G(T+S) discovery membership, equal-planned-call/full-sample coverage and native-only applicability. Non-generation is not inapplicability. Original task-only comparison IDs preserve shared phrase provenance independently of local reconsolidation; this registry never adds a judging cell. |
+| `task/targeted_validation_design.json` | Separate non-executing selective design. Existing compatible historical responses are marked for possible reuse; unresolved/new calls need explicit cost preflight and authorization. No 0/0/1 interaction is inferred from generation absence. |
+| `human/figure_H1_*`, `figure_H2_*`, `task/figure_T1_*`, `figure_T2_*`, `figure_T3_*` | PNG/SVG similarity matrices, supervised aligned cosines, own-target validity counts, empirical prompt profiles and discovery-only composition. |
+| `motivation.md`, `scientific_report.md`, `human/scientific_report.md`, `task/scientific_report.md` | Collaborator framing, scientific findings, limitations and next questions. No causal/internal feature-use or preference model is inferred. |
+| `manifest.json`, `source_checkpoint.json`, `source_preservation.json` | Recursive output hashes, source byte hashes, original journal prefixes, module/library identities and preservation verification. Original artifacts/manifests/jobs/ledgers are unchanged; zero model calls and zero additional paid cost. |
+
+Verify with `python -m feature_space_pilot.collaborator.run --verify <export>`. Existing versions are immutable. Outputs inside any original empirical source directory are rejected.
+
+## Preserved experiment-separation checkpoint
+
+Earlier separated artifacts live under `artifacts/feature_space_experiments/separated_<checkpoint>/human/` and `.../task/`. Their banks preserve the experiment distinction, but their rectangular cross-task matrix is historical exploration. Each bank was reconstructed from its own original generation provenance. Independently generated identical propositions remain eligible in both experiments. Current task judging is target-local, as above.
 
 | Corrected artifact | Meaning |
 |---|---|

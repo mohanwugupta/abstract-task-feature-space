@@ -1,5 +1,7 @@
 # Independent human benchmark and task feature discovery
 
+**Historical separated checkpoint.** The experiment distinction remains correct, but the 15 × 592 cross-task judging scope and its primary interpretation are superseded by [target-specific judging and the collaborator human analyses](HUMAN_VALIDATION_AND_LOCAL_TASKS.md). Existing exports stay unchanged. Historical human-list recovery also preceded the new word-type inventory audit; use the current audited comparisons for collaborator conclusions.
+
 The scientific correction follows [the separation specification](PRD_Experimental_Separation.md). Experiment 1 validates the feature-generation method against human semantic norms. Experiment 2 applies that method to construct the task representations for future preferences experiments. Human-only discoveries supply no vocabulary to Experiment 2.
 
 ## Current primary outputs
@@ -77,4 +79,4 @@ Use `--pooled-run PATH` to select another compatible source project or `--no-fig
 
 The source checkpoint records immutable byte hashes and fixed complete-line prefixes of append-only judgments and the budget ledger. Original frozen manifests, generation responses, provider jobs, active processes and ledgers are untouched. The pooled 5,825-feature experiment remains available as secondary exploration. No API credentials are read and no additional paid calls are made. Remaining paid judgments require a new cost preflight and authorization under the existing cumulative $100 cap.
 
-See [the artifact dictionary](DATA_DICTIONARY.md#independent-primary-experiments), [the task figure guide](TASK_DATASET_BRIEFING.md), and [the append-only TDD record](scratchpad_feature_space_pilot.md).
+See [the artifact dictionary](DATA_DICTIONARY.md#preserved-experiment-separation-checkpoint), [the task figure guide](TASK_DATASET_BRIEFING.md), and [the append-only TDD record](scratchpad_feature_space_pilot.md).
