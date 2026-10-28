@@ -4,6 +4,19 @@ A reproducible human-norm feature-space pilot and two-task compositionality stud
 
 The pipeline provides isolated feature discovery, conservative candidate consolidation, strict binary applicability judgments, resumable execution, cumulative API budget controls, and auditable reports. The case studies cover creative writing and synthetic financial reconciliation.
 
+## Complete shared vocabulary
+
+The expanded workflow uses every accepted human and task feature across all **75 items**, with conservative semantic consolidation, complete provenance, and a shared binary applicability matrix. The original 150-feature runs remain preserved baselines.
+
+```bash
+.venv/bin/python -m feature_space_pilot.full.run --dry-run
+.venv/bin/python -m feature_space_pilot.full.run --prepare
+```
+
+Preparation is offline and exports all available features, figures, actual task propositions, and every blocked cell with its cost. Paid stages require completed source generations, measured costs and fresh whole-stage preflight. The unchanged **$100 cumulative cap** covers previous spending and outstanding reservations. First fund every primary cell, then preflight all known invalid retries; no arbitrary feature subset is substituted.
+
+See [the full workflow and execution guide](FULL_FEATURE_SPACE_PILOT.md), [starting-state audit](FULL_PILOT_AUDIT.md), and [incremental TDD record](scratchpad_feature_space_pilot.md). The commands below describe the preserved original pilot.
+
 ## Run the offline demonstration
 
 Requires Python 3.11. No API credentials or GPU are needed.
@@ -69,7 +82,7 @@ OPENAI_API_KEY=your-openai-api-key-here
 
 The live runner loads it automatically. An existing exported `OPENAI_API_KEY` takes precedence. `.env` is ignored by Git; `.env.example` provides the blank template. Offline demos and dry runs do not read credentials.
 
-Future generator and judge runs default to user-selected **GPT-6 Luna (`gpt-6-luna`), low reasoning, using OpenAI Batch**. The current Mini run preserves completed results and continues unfinished judgments through Batch under its original model and frozen inputs. Model IDs remain configurable; unsupported seed/temperature parameters are omitted. Paid execution requires verified pricing/capabilities, a fresh dry-run hash and explicit `--execute-live`. Three repetitions, the 150-feature bank and the shared **$100** cumulative cap remain. The new Luna Batch human+task completion ceiling is **$21.56625**, plus existing liabilities, with 16,000-input/700-generation-output/400-judge-output envelopes and two attempts.
+Future generator and judge runs default to user-selected **GPT-6 Luna (`gpt-6-luna`), low reasoning, using OpenAI Batch**. The current Mini run preserves completed results and continues unfinished judgments through Batch under its original model and frozen inputs. Model IDs remain configurable; unsupported seed/temperature parameters are omitted. Paid execution requires verified pricing/capabilities, a fresh dry-run hash and explicit `--execute-live`. Three repetitions and the shared **$100** cumulative cap remain. The original runner retains its 150-feature baseline; the full workflow above has no feature cap. The new Luna Batch human+task completion ceiling is **$21.56625**, plus existing liabilities, with 16,000-input/700-generation-output/400-judge-output envelopes and two attempts.
 
 All 60 supplied human stimuli and 15 task targets are integrated. Source/workbook/P0 verification remains enforced; English abstract generation is exploratory and pending reviews suppress affected comparisons. Mini diagnostics passed previously; Luna and Batch have offline mocked validation, with no paid diagnostic performed during this change.
 

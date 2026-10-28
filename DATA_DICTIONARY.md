@@ -105,3 +105,31 @@ The `status` command produces read-only approximate live snapshots rather than s
 
 
 `execution_amendment_history.jsonl` is an append-only sequence of superseded execution amendments. A collector-only repair records changed file names, reason, UTC timestamp and prior amendment hash in the current amendment's `collector_repairs`. Scientific input/config/journal pins remain identical. `batch_state.json` may mark a chunk `reconciliation_pending`; its requests and tickets stay held while other chunks are collected. Network failures are recorded by safe exception class, without provider bodies or credentials. Watch mode retries temporary transport failures with a fresh preflight hash and never blindly repeats an uncertain create.
+
+## Complete shared global bank and matrix
+
+The separate `feature_space_pilot.full` workflow writes `artifacts/feature_space_full/projects/full_<design>/`. It never overwrites the original 150-feature experiments. See [FULL_FEATURE_SPACE_PILOT.md](FULL_FEATURE_SPACE_PILOT.md) for execution and interpretation.
+
+| Artifact | Meaning |
+|---|---|
+| `identity.json`, `frozen_config.json`, `source_frozen_inputs.json`, `stimuli.json`, `literal_binary_prompt.json` | Immutable source/job-plan, code, model, rubric and 75-item identity. |
+| `closed_generations.json`, `equivalence_jobs.json` | Frozen after all planned source generations succeed; original receipt hashes retain their source meaning. |
+| `banks/<snapshot>/bank.json`, `feature_bank.csv` | Every accepted canonical feature, with stable column inventory hash and no frequency/size cap. Snapshot hash also binds origins/review evidence. |
+| `feature_origins.csv`, `feature_exclusions.csv` | Every accepted raw phrase → canonical ID, source item/job/family/repetition/model/attempt/hash; parseable rejected-attempt phrases have explicit exclusions. |
+| `frozen_global_bank.json`, `global_matrix_scope.json` | Final bank and full item × column cross-product, frozen only after source completion and semantic-assistance closure. Uncertain equivalences remain separate. |
+| `equivalence/equivalences.jsonl` | Candidate-to-candidate bidirectional entailment, seven preservation checks, raw evidence and model receipts. Separate from generated-to-human-label matching; never human approval. |
+| `provider_input_profile.json`, `equivalence/provider_input_counts.json` | Provider counts bound to exact templates/payloads/settings. Atomic feature-byte additions and framing margins remain explicitly estimated. |
+| `applicability/judgments.jsonl`, `reuse_receipts.json` | Atomic binary attempts and strict compatible reuse with original source hashes; failed/ambiguous evidence never becomes zero. |
+| `*/batch_state.json`, `*/completed_batches.jsonl`, raw Batch files | Active acknowledgement/reconciliation state plus hashed durable archive. Unknown acknowledgement liabilities remain held. |
+| `*/unlocated_prior_requests.json` | Existing request reservations lacking located receipts; held for reconciliation instead of duplicated. |
+| `full_manifest.json`, `current_cost_report.json`, `latest_report.json` | Current operational/scientific status, refreshed whole-stage costs and immutable report pointer. Matrix completion is separate from scientific review completion. |
+| `reports/<checkpoint>/semantic_review_queue.csv`, `blocked_equivalence_chains.json` | All retrieval proposals including protected-incompatible pairs, pending decisions and unsupported transitive merges. Retrieval is not exhaustive. |
+| `binary_matrix.csv` / `applicability_matrix_partial.csv` | Complete 0/1 matrix only when resolved; otherwise full scope with `?`. Unknown never means false. |
+| `blocked_cells.csv` | Every unresolved item/feature/proposition, reason and next-attempt upper-bound cost. Source additions may expand the provisional inventory. |
+| `task_level_feature_audit.csv`, `task_applicability.csv`, `task_shared_distinct_features.csv` | Actual propositions/provenance across hierarchy/situations, all global task cells, and concrete-task shared/distinguishing labels requiring known values on both sides. |
+| `compositionality.json`, `interaction_review.csv` | Full/equal-call discovery comparisons, applicability, discovery gaps and candidate interactions. Named interpretation required for confirmation. |
+| `feature_space_structure.json`, `legacy_150_coverage.csv`, saturation exports | Complete vocabulary coverage, applicable lower bounds, gated global geometry, fair same-global-judge subset comparisons and uncapped/comparison-cap discovery curves. |
+| `observed_usage.json`, `cost_report.json` | Observed input/output usage by operation/model, missing usage, existing liabilities, full primary cost, diagnostic all-retry bound and current authorized retry-funding stage. |
+| `scientific_report.md`, `task_case_studies.md`, `completion_plan.md`, PNG/SVG/PDF | Human-readable evidence and costed next steps. Unsupported geometry is explicitly withheld. |
+
+The funding policy preflights all remaining primary cells before invalid retries. After outstanding requests finish, all known eligible invalid retries must fit as one stage or no new retries are submitted. Two attempts maximum, the original stage allocations, and the cumulative $100 cap remain fixed. No new budget ledger is introduced.

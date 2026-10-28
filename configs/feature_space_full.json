@@ -1,0 +1,23 @@
+{
+  "schema_version": "complete_global_v1",
+  "model_config": "feature_space_pilot.json",
+  "source_runs": [
+    "artifacts/feature_space_pilot/live_human_74608725aae4e0dc",
+    "artifacts/feature_space_pilot/live_tasks_96fb5b19b4c8b9ef"
+  ],
+  "expected_items": 75,
+  "artifact_root": "artifacts/feature_space_full/projects",
+  "feature_cap": null,
+  "max_attempts": 2,
+  "retry_policy": "staged_primary_then_costed_invalid_retries",
+  "batch_max_requests": 1000,
+  "batch_max_in_flight": 8,
+  "batch_max_queued_input_tokens": 8000000,
+  "equivalence_pairs_per_request": 5,
+  "equivalence_output_tokens": 2000,
+  "proposal_neighbors": 8,
+  "semantic_reviews_file": null,
+  "relational_reviews_file": null,
+  "provider_input_profile": "artifacts/feature_space_full/provider_input_profile.json",
+  "semantic_matching_dir": "artifacts/feature_space_semantic_matching/semantic_8f8897426b82de20"
+}
