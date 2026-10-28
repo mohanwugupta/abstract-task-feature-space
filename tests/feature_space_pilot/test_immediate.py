@@ -432,6 +432,14 @@ def test_immediate_driver_completes_frozen_scope_and_resumes_without_paid_replay
         max_waves=1,
     )
     assert len(calls) == 2
+    another = build_plan(
+        source, path, allow_synthetic=True, workers=256, wave_size=1024
+    )
+    assert (
+        len(another["reuse"]["reused"]) == 2
+        and another["check"]["new_primary_calls"] == 0
+    )
+    assert another["identity"]["wave_size"] == 1024
 
 
 def test_unlocated_immediate_reservation_is_held_before_any_new_transport(tmp_path):

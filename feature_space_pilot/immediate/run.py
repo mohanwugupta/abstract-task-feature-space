@@ -194,7 +194,13 @@ def check_cost(items, features, index, meter, c, ledger):
 
 
 def build_plan(
-    source, profile_path, *, allow_synthetic=False, workers=128, max_rps=50.0
+    source,
+    profile_path,
+    *,
+    allow_synthetic=False,
+    workers=256,
+    max_rps=50.0,
+    wave_size=1024,
 ):
     source = Path(source).resolve()
     m = json.loads((source / "full_manifest.json").read_text())
@@ -235,6 +241,7 @@ def build_plan(
         profile_hash=profile["profile_hash"],
         workers=workers,
         max_rps=max_rps,
+        wave_size=wave_size,
         code={p.name: file_hash(p) for p in Path(__file__).parent.glob("*.py")},
         demo=bool(c.get("demo")),
     )
@@ -533,7 +540,7 @@ def run(
                                     **plan["meter"].bound(item, feature),
                                 )
                             )
-                            if len(tasks) >= 256:
+                            if len(tasks) >= plan["identity"]["wave_size"]:
                                 break
                     if tasks:
                         rows = engine.wave(tasks)
@@ -670,7 +677,8 @@ def main():
         "--input-profile",
         default="artifacts/feature_space_immediate/feature_input_profile.json",
     )
-    p.add_argument("--workers", type=int, default=128)
+    p.add_argument("--workers", type=int, default=256)
+    p.add_argument("--wave-size", type=int, default=1024)
     p.add_argument("--max-rps", type=float, default=50.0)
     mode = p.add_mutually_exclusive_group(required=True)
     mode.add_argument("--dry-run", action="store_true")
@@ -679,11 +687,19 @@ def main():
     p.add_argument("--preflight-hash")
     p.add_argument("--max-waves", type=int)
     a = p.parse_args()
-    if not 1 <= a.workers <= 256 or not 0 < a.max_rps <= 100:
+    if (
+        not 1 <= a.workers <= 256
+        or not 0 < a.max_rps <= 100
+        or not 1 <= a.wave_size <= 4096
+    ):
         p.error("Workers 1–256 and max-rps >0 to100 are required")
     try:
         plan = build_plan(
-            a.source_full_run, a.input_profile, workers=a.workers, max_rps=a.max_rps
+            a.source_full_run,
+            a.input_profile,
+            workers=a.workers,
+            max_rps=a.max_rps,
+            wave_size=a.wave_size,
         )
         if a.dry_run:
             print(
