@@ -6,6 +6,8 @@ The pipeline provides isolated feature discovery, conservative candidate consoli
 
 ## Complete shared vocabulary
 
+For the current task/situation results, start with [the task briefing and figure guide](TASK_DATASET_BRIEFING.md). It covers processing, uncertainty, clustering and abstraction choices.
+
 The current applicability stage uses [concurrent immediate execution](IMMEDIATE_APPLICABILITY.md) at the user's request for faster completion, reusing Batch results under the same$100cap.
 
 The expanded workflow uses every accepted human and task feature across all **75 items**, with conservative semantic consolidation, complete provenance, and a shared binary applicability matrix. The original 150-feature runs remain preserved baselines.
