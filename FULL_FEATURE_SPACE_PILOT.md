@@ -90,3 +90,13 @@ Candidate descriptive representations do not demonstrate features internally or 
 ```
 
 Offline fixtures cover uncapped banks, protected meaning, provenance/stable IDs, strict model/prompt reuse, unknowns, global scope, equal-call composition, budget stages, interruption recovery and unchanged source bytes. Synthetic execution is explicitly labeled and cannot pass the empirical live gate. See `scratchpad_feature_space_pilot.md` for recorded RED → GREEN cycles and `FULL_PILOT_AUDIT.md` for the starting-state audit.
+
+## Overnight amendment — 27 October 2026
+
+The user authorized progress from the valid generations currently available, without waiting for perfect sampling, with **one shared cumulative $100 limit**. Current full configuration selects `generation_policy=frozen_available_checkpoint` and `stage_budget_policy=shared_total_only`.
+
+`overnight_generation_checkpoint.json` freezes all accepted discoveries and their source receipts, all75items, observed coverage and every missing generation job. The checkpoint closes vocabulary discovery for this execution; it does **not** label missing generations successful. Late original outputs remain preserved for a subsequent version. Composition/saturation analyses retain their actual sampling gaps, and named scientific reviews remain required. The original source jobs and 150-feature experiments remain unchanged.
+
+The shared ledger continues to count every previous cost and held liability. Separate stage partitions described earlier no longer restrict this amended full controller; each stage draws from the same$100 ceiling. The complete remaining primary pass and all known invalid retries are still preflighted as whole stages, and every request is durably reserved before submission. Maximum attempts remains2. No smaller arbitrary vocabulary or unknown-to-zero conversion is introduced.
+
+The overnight controller uses2,000-request chunks, up to8active batches, and the existing8Mqueued-input bound. A separate `caffeinate -i -w PID` process prevents idle system sleep while the controller lives; keep the laptop lid open. The controller automatically submits/collects stages when their measured-cost and integrity checks pass. Review requirements and the shared$100cap still stop unsafe or unsupported progress.

@@ -234,3 +234,30 @@ def test_staged_budget_collects_pending_first_pass_before_any_retry(tmp_path):
             plan["authorized_stage"] == "collect_pending"
             and plan["authorized_stage_upper_bound_usd"] == 0
         )
+
+
+def test_closed_available_checkpoint_can_fund_full_scope_without_fabricating_generation_completion(
+    tmp_path,
+):
+    from feature_space_pilot.full.budget import cost_plan, profile_inputs, IndexedLedger
+
+    c = config(tmp_path)
+    profile = profile_inputs(items(), c["judge"], lambda p: dict(input_tokens=250))
+    with IndexedLedger(
+        tmp_path / "ledger.jsonl", cap=100, stage_caps=c["stage_caps"]
+    ) as ledger:
+        result = cost_plan(
+            items(),
+            features(),
+            c,
+            ledger,
+            dict(reused=[], unresolved_prior=[], external_pending={}),
+            profile=profile,
+            generations_complete=False,
+            source_scope_closed=True,
+        )
+    assert result["live_ready"] and result["bank_provisional"] is False
+    assert (
+        result["source_generations_complete"] is False
+        and result["source_scope_closed"] is True
+    )

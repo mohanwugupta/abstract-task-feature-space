@@ -22,7 +22,7 @@ from ..io import (
     append_jsonl,
 )
 from ..progress import console_reporter, emit
-from .sources import collect_sources
+from .sources import collect_sources, apply_checkpoint
 from .bank import build_bank, propose_equivalences
 from .reuse import reuse_evidence, cell_job, previous_full_sources
 from .matrix import matrix_state
@@ -60,6 +60,11 @@ def load_settings(path):
         c[k] = options[k]
     if c["api_cap_usd"] != 100 or sum(c["stage_caps"].values()) > 100:
         raise ValueError("Full pilot must preserve the cumulative $100 cap")
+    budget_policy = options.get("stage_budget_policy", "original_allocations")
+    if budget_policy == "shared_total_only":
+        c["stage_caps"] = {stage: c["api_cap_usd"] for stage in c["stage_caps"]}
+    elif budget_policy != "original_allocations":
+        raise ValueError("Unknown stage budget policy")
     c["equivalence"] = dict(
         c["judge"], max_output_tokens=options["equivalence_output_tokens"]
     )
@@ -71,12 +76,19 @@ def resolve(c, path):
     return p if p.is_absolute() else Path(c["root"]) / p
 
 
+def source_ready(source):
+    return bool(source.get("generation_scope_closed", source["generations_complete"]))
+
+
 def ledger_for(c):
     return IndexedLedger(
         resolve(c, c.get("artifact_root", "artifacts/feature_space_pilot"))
         / ("budget_demo.jsonl" if c.get("demo") else "budget_live.jsonl"),
         cap=c["api_cap_usd"],
         stage_caps=c["stage_caps"],
+        budget_policy=c.get("full_options", {}).get(
+            "stage_budget_policy", "original_allocations"
+        ),
     )
 
 
@@ -204,6 +216,12 @@ def make_plan(c, *, profile=None):
         allow_synthetic=bool(c.get("demo")),
         expected_items=options["expected_items"],
     )
+    generation_policy = options.get("generation_policy", "all_planned_successful")
+    if generation_policy == "frozen_available_checkpoint":
+        checkpoint_path = resolve(c, options["generation_checkpoint_file"])
+        source = apply_checkpoint(source, json.loads(checkpoint_path.read_text()))
+    elif generation_policy != "all_planned_successful":
+        raise ValueError("Unknown source generation policy")
     manual, review_hash = _reviews(c)
     base = build_bank(source["generations"], reviews=manual)
     proposals = propose_equivalences(
@@ -278,6 +296,7 @@ def make_plan(c, *, profile=None):
         feature_cap=None,
         options=options,
         demo=bool(c.get("demo")),
+        generation_checkpoint_hash=source.get("generation_checkpoint_hash"),
     )
     design = digest(identity)
     out = resolve(c, options["artifact_root"]) / ("full_" + design[:16])
@@ -310,7 +329,7 @@ def make_plan(c, *, profile=None):
     ledger = read_ledger(c)
     eqstate = _state(eqout / "batch_state.json")
     eqcost = _phase_cost(
-        jobs, c, ledger, eqrecords, eqstate, counts, source["generations_complete"]
+        jobs, c, ledger, eqrecords, eqstate, counts, source_ready(source)
     )
     reuse_sources = source["snapshots"] + previous_full_sources(
         resolve(c, options["artifact_root"]), out
@@ -335,10 +354,13 @@ def make_plan(c, *, profile=None):
         reuse,
         profile=profile,
         generations_complete=source["generations_complete"],
+        source_scope_closed=source_ready(source),
         current_records=primary,
         active_tasks=list(ownstate["tasks"].values()),
     )
     if not eqcost["finished"]:
+        fullcost["bank_provisional"] = True
+        fullcost["final_consolidated_features"] = None
         fullcost["blockers"].append(
             "Semantic assistance is unfinished; final canonical bank is not frozen"
         )
@@ -384,6 +406,8 @@ def preflight(plan, *, stage="all"):
         requested_stage=stage,
         active_phase=phase,
         source_generations_complete=plan["source"]["generations_complete"],
+        generation_scope_closed=source_ready(plan["source"]),
+        missing_generation_jobs=len(plan["source"].get("missing_generation_jobs", [])),
         feature_cap=None,
         bank_inventory_hash=plan["bank"]["inventory_hash"],
         equivalence=plan["equivalence_cost"],
@@ -442,13 +466,20 @@ def freeze_inputs(plan):
         frozen["provider_input_profile.json"] = _freeze_json(
             out / "provider_input_profile.json", plan["profile"]
         )
-    if source["generations_complete"]:
+    if source_ready(source):
         frozen["closed_generations.json"] = _freeze_json(
             out / "closed_generations.json", source["generations"]
         )
         frozen["equivalence_jobs.json"] = _freeze_json(
             out / "equivalence_jobs.json", plan["equivalence_jobs"]
         )
+        if source.get("generation_checkpoint_hash"):
+            checkpoint = json.loads(
+                resolve(c, c["full_options"]["generation_checkpoint_file"]).read_text()
+            )
+            frozen["generation_checkpoint.json"] = _freeze_json(
+                out / "generation_checkpoint.json", checkpoint
+            )
     # Inventory identity describes columns; snapshot identity also includes origins
     # and review evidence that may grow without changing the vocabulary.
     bankdir = out / "banks" / digest(plan["bank"])[:16]
@@ -484,7 +515,7 @@ def freeze_inputs(plan):
         )
     elif json.loads((bankdir / "bank.json").read_text()) != plan["bank"]:
         raise ValueError("Frozen canonical bank artifact changed")
-    if source["generations_complete"] and plan["equivalence_cost"]["finished"]:
+    if source_ready(source) and plan["equivalence_cost"]["finished"]:
         frozen["frozen_global_bank.json"] = _freeze_json(
             out / "frozen_global_bank.json", plan["bank"]
         )
@@ -707,11 +738,11 @@ def advance(
             status = "batch_pending"
         elif (
             post["state"]["complete"]
-            and post["source"]["generations_complete"]
+            and source_ready(post["source"])
             and post["equivalence_cost"]["finished"]
         ):
             status = "complete"
-        elif not post["source"]["generations_complete"]:
+        elif not source_ready(post["source"]):
             status = "waiting_for_sources"
         elif nextcheck["blockers"]:
             status = "preflight_blocked"
@@ -736,10 +767,14 @@ def advance(
             demo=bool(c.get("demo")),
             human_reviewed=False,
             source_generations_complete=post["source"]["generations_complete"],
+            generation_scope_closed=source_ready(post["source"]),
+            missing_generation_jobs=len(
+                post["source"].get("missing_generation_jobs", [])
+            ),
             generation_fingerprint=post["source"]["generation_fingerprint"],
             bank_inventory_hash=post["bank"]["inventory_hash"],
             bank_dir=bankdir,
-            bank_frozen=post["source"]["generations_complete"]
+            bank_frozen=source_ready(post["source"])
             and post["equivalence_cost"]["finished"],
             canonical_features=len(post["bank"]["features"]),
             n_items=len(post["source"]["items"]),
@@ -818,7 +853,7 @@ def measure_inputs(c, *, stage="all", progress=None):
         path.parent.mkdir(parents=True, exist_ok=True)
         write_json(path, profile)
         plan = make_plan(c)
-    if stage != "applicability" and plan["source"]["generations_complete"]:
+    if stage != "applicability" and source_ready(plan["source"]):
         out = Path(plan["output_dir"])
         out.parent.mkdir(parents=True, exist_ok=True)
         with (out.parent / (plan["analysis_id"] + ".lock")).open("a") as guard:
@@ -944,7 +979,7 @@ def main():
                     )
                     if permanent_budget or not a.watch:
                         break
-                    if a.auto_count_inputs and plan["source"]["generations_complete"]:
+                    if a.auto_count_inputs and source_ready(plan["source"]):
                         counted = measure_inputs(c, stage=a.stage, progress=reporter)
                         if counted["analysis_id"] != expected:
                             raise ValueError(

@@ -215,3 +215,79 @@ def test_provisional_bank_snapshots_preserve_added_origins_without_overwriting(
     changed["bank"]["features"][0]["n_origins"] += 1
     _, second = freeze_inputs(changed)
     assert first != second and (Path(first) / "bank.json").read_bytes() == before
+
+
+def test_overnight_checkpoint_runs_all_cells_despite_explicit_missing_generation(
+    tmp_path,
+):
+    from test_full_sources import source_fixture
+    from feature_space_pilot.full.sources import collect_sources, available_checkpoint
+    from feature_space_pilot.full.run import make_plan, preflight, advance
+    from feature_space_pilot.io import write_json
+    from test_batch import FakeBatchAPI
+
+    c, profile = fixture_config(tmp_path)
+    incomplete = source_fixture(tmp_path, "incomplete", complete=False)
+    c["full_options"]["source_runs"][1] = str(incomplete)
+    source = collect_sources(
+        c["full_options"]["source_runs"], allow_synthetic=True, expected_items=2
+    )
+    from feature_space_pilot.full.budget import profile_inputs
+
+    profile = profile_inputs(
+        source["items"], c["judge"], lambda p: dict(input_tokens=250)
+    )
+    cp = tmp_path / "available.json"
+    write_json(cp, available_checkpoint(source))
+    c["full_options"].update(
+        generation_policy="frozen_available_checkpoint",
+        generation_checkpoint_file=str(cp),
+    )
+    plan = make_plan(c, profile=profile)
+    assert preflight(plan)["live_ready"] and not plan["source"]["generations_complete"]
+    api = FakeBatchAPI()
+    for _ in range(2):
+        plan = make_plan(c, profile=profile)
+        result = advance(
+            plan,
+            api=api,
+            preflight_hash=preflight(plan)["preflight_hash"],
+            render=False,
+        )
+    assert result["status"] == "complete" and result["matrix_complete"]
+    assert (
+        result["source_generations_complete"] is False
+        and result["generation_scope_closed"] is True
+    )
+    assert result["missing_generation_jobs"] == 1 and not result["scientific_complete"]
+    report = Path(result["report_dir"])
+    assert (report / "missing_generation_jobs.csv").exists()
+    summary = json.loads((report / "summary.json").read_text())
+    assert (
+        summary["generation_scope_closed"] and summary["missing_generation_jobs"] == 1
+    )
+
+
+def test_shared_total_budget_policy_removes_stage_partitions_but_keeps_100_hard_cap(
+    tmp_path,
+):
+    from feature_space_pilot.full.run import load_settings
+    from feature_space_pilot.full.budget import IndexedLedger
+
+    options = json.loads(Path("configs/feature_space_full.json").read_text())
+    options["model_config"] = str(Path("configs/feature_space_pilot.json").resolve())
+    options["stage_budget_policy"] = "shared_total_only"
+    path = tmp_path / "config.json"
+    path.write_text(json.dumps(options))
+    c = load_settings(path)
+    assert c["api_cap_usd"] == 100 and all(v == 100 for v in c["stage_caps"].values())
+    with IndexedLedger(
+        tmp_path / "ledger.jsonl",
+        cap=100,
+        stage_caps=c["stage_caps"],
+        budget_policy="shared_total_only",
+    ) as ledger:
+        ledger.reserve("full-primary", "judgment", 70)
+        with pytest.raises(ValueError, match="budget"):
+            ledger.reserve("over-cap", "adjudication", 31)
+        assert ledger.total == 70

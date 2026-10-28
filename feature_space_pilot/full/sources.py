@@ -1,6 +1,7 @@
 """Read only immutable inputs and sealed journal prefixes from baseline runs."""
 
 import csv
+import copy
 import hashlib
 import io
 import json
@@ -195,3 +196,85 @@ def collect_sources(paths, *, allow_synthetic=False, expected_items=75):
         ),
         generation_fingerprint=digest([r["record_hash"] for r in generations]),
     )
+
+
+def _frozen_inputs(source):
+    return {
+        s["manifest"]["run_id"]: {
+            k: v
+            for k, v in s["input_hashes"].items()
+            if k in {"frozen_config.json", "stimuli.jsonl", "generation_jobs.jsonl"}
+        }
+        for s in source["snapshots"]
+    }
+
+
+def available_checkpoint(source):
+    """Close the observed discovery scope without inventing successful samples."""
+    successful = {
+        r["job_id"] for r in source["generations"] if r["parse_status"] == "ok"
+    }
+    missing = [
+        dict(source_run_id=s["manifest"]["run_id"], **j)
+        for s in source["snapshots"]
+        for j in s["jobs"]
+        if j["job_id"] not in successful
+    ]
+    value = dict(
+        version="available_generation_checkpoint_v1",
+        items=source["items"],
+        generations=source["generations"],
+        coverage=source["coverage"],
+        generation_fingerprint=source["generation_fingerprint"],
+        generations_complete=source["generations_complete"],
+        source_completion={
+            s["manifest"]["run_id"]: s["generations_complete"]
+            for s in source["snapshots"]
+        },
+        frozen_source_inputs=_frozen_inputs(source),
+        missing_generation_jobs=missing,
+        policy="User-authorized available-generation checkpoint; retain all accepted features and all 75 items; late generations remain in original studies and require a new vocabulary version",
+    )
+    value["checkpoint_hash"] = digest(value)
+    return value
+
+
+def apply_checkpoint(source, checkpoint):
+    if checkpoint.get(
+        "version"
+    ) != "available_generation_checkpoint_v1" or checkpoint.get(
+        "checkpoint_hash"
+    ) != digest(
+        {k: v for k, v in checkpoint.items() if k != "checkpoint_hash"}
+    ):
+        raise ValueError("Generation checkpoint hash mismatch")
+    if checkpoint["items"] != source["items"] or checkpoint[
+        "frozen_source_inputs"
+    ] != _frozen_inputs(source):
+        raise ValueError("Generation checkpoint source identity mismatch")
+    live = {r["record_hash"]: r for r in source["generations"]}
+    if any(live.get(r["record_hash"]) != r for r in checkpoint["generations"]):
+        raise ValueError(
+            "Generation checkpoint receipt absent or changed in verified sources"
+        )
+    result = copy.deepcopy(source)
+    for k in [
+        "generations",
+        "coverage",
+        "generation_fingerprint",
+        "generations_complete",
+        "missing_generation_jobs",
+    ]:
+        result[k] = copy.deepcopy(checkpoint[k])
+    for s in result["snapshots"]:
+        rid = s["manifest"]["run_id"]
+        s["generations"] = [
+            r for r in result["generations"] if r["source_run_id"] == rid
+        ]
+        s["generations_complete"] = checkpoint["source_completion"][rid]
+    result.update(
+        generation_scope_closed=True,
+        generation_checkpoint_hash=checkpoint["checkpoint_hash"],
+        generation_policy=checkpoint["policy"],
+    )
+    return result

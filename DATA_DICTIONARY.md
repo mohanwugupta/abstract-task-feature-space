@@ -133,3 +133,5 @@ The separate `feature_space_pilot.full` workflow writes `artifacts/feature_space
 | `scientific_report.md`, `task_case_studies.md`, `completion_plan.md`, PNG/SVG/PDF | Human-readable evidence and costed next steps. Unsupported geometry is explicitly withheld. |
 
 The funding policy preflights all remaining primary cells before invalid retries. After outstanding requests finish, all known eligible invalid retries must fit as one stage or no new retries are submitted. Two attempts maximum, the original stage allocations, and the cumulative $100 cap remain fixed. No new budget ledger is introduced.
+
+Overnight amendment (27 October2026): `generation_checkpoint.json` freezes all available accepted generation receipts and source identities; `generation_scope_closed=true` permits execution without claiming `source_generations_complete=true`. `missing_generation_jobs.csv` lists each absent planned job. Late source successes do not mutate this bank. `stage_budget_policy=shared_total_only` explicitly removes partition allocations for the full controller while preserving the shared cumulative$100 lock/reservation/settlement guard and all old liabilities.

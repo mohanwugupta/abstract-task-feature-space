@@ -15,7 +15,22 @@ class IndexedLedger(Ledger):
     """Same durable events/guards, cached totals while this process owns the lock."""
 
     def __init__(self, *a, **k):
-        super().__init__(*a, **k)
+        policy = k.pop("budget_policy", "original_allocations")
+        if policy == "shared_total_only":
+            cap = k.get("cap", 100)
+            stages = k.get("stage_caps", {})
+            if cap != 100 or not stages or any(v != cap for v in stages.values()):
+                raise ValueError(
+                    "Shared-total policy requires the unchanged $100 cumulative cap"
+                )
+            # The base class assumes allocations form a partition. This explicit
+            # amendment uses one shared ceiling; reserve/settle still enforce it.
+            super().__init__(*a, **dict(k, stage_caps={"shared": cap}))
+            self.stage_caps = dict(stages)
+        elif policy == "original_allocations":
+            super().__init__(*a, **k)
+        else:
+            raise ValueError("Unknown ledger budget policy")
         self._index = None
         self._indexed_count = -1
 
@@ -169,6 +184,7 @@ def cost_plan(
     *,
     profile=None,
     generations_complete=False,
+    source_scope_closed=False,
     current_records=(),
     active_tasks=(),
 ):
@@ -266,7 +282,7 @@ def cost_plan(
             )
         )
     blockers = []
-    if not generations_complete:
+    if not (generations_complete or source_scope_closed):
         blockers.append(
             "All source generation jobs must be complete before freezing the global bank"
         )
@@ -314,8 +330,12 @@ def cost_plan(
         required_cells=len(items) * len(features),
         eligible_items=len(items),
         consolidated_features=len(features),
-        final_consolidated_features=len(features) if generations_complete else None,
-        bank_provisional=not generations_complete,
+        final_consolidated_features=(
+            len(features) if (generations_complete or source_scope_closed) else None
+        ),
+        bank_provisional=not (generations_complete or source_scope_closed),
+        source_generations_complete=generations_complete,
+        source_scope_closed=bool(generations_complete or source_scope_closed),
         reused_resolved_cells=len(resolved),
         prior_unresolved_cells=len(prior_unresolved),
         external_pending_cells=len(pending),

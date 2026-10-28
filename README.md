@@ -15,6 +15,8 @@ The expanded workflow uses every accepted human and task feature across all **75
 
 Preparation is offline and exports all available features, figures, actual task propositions, and every blocked cell with its cost. Paid stages require completed source generations, measured costs and fresh whole-stage preflight. The unchanged **$100 cumulative cap** covers previous spending and outstanding reservations. First fund every primary cell, then preflight all known invalid retries; no arbitrary feature subset is substituted.
 
+The current overnight amendment freezes all valid generations already available, records missing samples, and uses one shared $100 limit without separate stage partitions. Late original outputs remain preserved for a subsequent vocabulary version.
+
 See [the full workflow and execution guide](FULL_FEATURE_SPACE_PILOT.md), [starting-state audit](FULL_PILOT_AUDIT.md), and [incremental TDD record](scratchpad_feature_space_pilot.md). The commands below describe the preserved original pilot.
 
 ## Run the offline demonstration

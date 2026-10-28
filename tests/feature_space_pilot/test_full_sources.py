@@ -128,3 +128,48 @@ def test_global_order_preserves_frozen_source_order_for_sampling_allocations(tmp
     a = source_fixture(tmp_path, "a")
     result = collect_sources([z, a], allow_synthetic=True, expected_items=2)
     assert [i["item_id"] for i in result["items"]] == ["z", "a"]
+
+
+def test_available_checkpoint_freezes_every_accepted_feature_and_explicit_missing_jobs(
+    tmp_path,
+):
+    from feature_space_pilot.full.sources import (
+        collect_sources,
+        available_checkpoint,
+        apply_checkpoint,
+    )
+    from feature_space_pilot.io import append_jsonl, digest, file_hash, write_json
+
+    a = source_fixture(tmp_path, "human")
+    b = source_fixture(tmp_path, "task", complete=False)
+    source = collect_sources([a, b], allow_synthetic=True, expected_items=2)
+    checkpoint = available_checkpoint(source)
+    assert len(checkpoint["missing_generation_jobs"]) == 1
+    assert checkpoint["missing_generation_jobs"][0]["job_id"] == "g_task"
+    # A later successful source generation must not change the frozen vocabulary.
+    r = dict(source["generations"][0], job_id="g_task", item_id="task")
+    r.pop("source_run_id")
+    r.pop("generation_model")
+    r.pop("record_hash")
+    r["raw_response"] = json.dumps(dict(item_id="task", features=r["features"]))
+    r["response_hash"] = digest(r["raw_response"])
+    r["record_hash"] = digest(r)
+    append_jsonl(b / "generations.jsonl", r)
+    m = json.loads((b / "manifest.json").read_text())
+    m["artifacts"]["generations.jsonl"] = file_hash(b / "generations.jsonl")
+    m["journal_checkpoints"]["generations.jsonl"] = dict(
+        bytes=(b / "generations.jsonl").stat().st_size,
+        sha256=file_hash(b / "generations.jsonl"),
+    )
+    write_json(b / "manifest.json", m)
+    live = collect_sources([a, b], allow_synthetic=True, expected_items=2)
+    frozen = apply_checkpoint(live, checkpoint)
+    assert frozen["generation_scope_closed"] is True
+    assert frozen["generations_complete"] is False
+    assert (
+        len(frozen["generations"]) == 1 and frozen["coverage"]["task"]["completed"] == 0
+    )
+    assert frozen["missing_generation_jobs"] == checkpoint["missing_generation_jobs"]
+    checkpoint["generations"][0]["features"] = ["invented data"]
+    with pytest.raises(ValueError, match="checkpoint"):
+        apply_checkpoint(live, checkpoint)

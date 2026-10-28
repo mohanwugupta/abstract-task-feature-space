@@ -146,6 +146,7 @@ def write_full_report(
         out / "generation_coverage.csv",
         [dict(item_id=i, **v) for i, v in source["coverage"].items()],
     )
+    _csv(out / "missing_generation_jobs.csv", source.get("missing_generation_jobs", []))
     write_json(out / "cost_report.json", cost)
     write_json(out / "reuse_policy_and_audit.json", reuse)
     # Only a completely resolved scope receives a binary-matrix filename.
@@ -410,6 +411,11 @@ def write_full_report(
         synthetic=bool(c.get("demo")),
         matrix_complete=state["complete"],
         source_generations_complete=source["generations_complete"],
+        generation_scope_closed=bool(
+            source.get("generation_scope_closed", source["generations_complete"])
+        ),
+        missing_generation_jobs=len(source.get("missing_generation_jobs", [])),
+        generation_checkpoint_hash=source.get("generation_checkpoint_hash"),
         n_items=len(items),
         source_generated_features=bank["source_feature_count"],
         normalized_unique=bank["normalized_unique"],
@@ -506,6 +512,10 @@ def write_full_report(
     ) + "# Expanded feature-space pilot\n\n"
     text += f"{len(items)} items; {bank['source_feature_count']:,} accepted generated phrases; {bank['normalized_unique']:,} normalized strings; {len(features):,} canonical candidate features. No feature-frequency or bank-size cap. All raw origins and explicit failed-attempt exclusions are retained.\n\n"
     text += f"Binary applicability: **{state['resolved_cells']:,} / {state['planned_cells']:,} resolved**. Complete matrix: **{state['complete']}**. Source generations complete: **{source['generations_complete']}**. Global judge: `{c['judge']['model_id']}`; generation models: {summary['generation_models']}.\n\n"
+    if source.get("generation_checkpoint_hash"):
+        text += f"**Available-generation sampling amendment:** this vocabulary is frozen from all valid generations available at the user-authorized checkpoint. {summary['missing_generation_jobs']} planned generations were absent; they are listed in missing_generation_jobs.csv and remain absent in sampling-normalized analyses. Pending/late outputs remain in the original experiments and require a new vocabulary version. This closes the execution scope without asserting complete generation coverage, approved semantic equivalence, or scientific completion.\n\n"
+    if c.get("full_options", {}).get("stage_budget_policy") == "shared_total_only":
+        text += "**Budget amendment:** one shared $100 cumulative ceiling includes previous costs and all held reservations. Separate stage partitions are removed for this controller at the user's request. Whole-stage estimates and durable per-request reservations still enforce the cumulative cap.\n\n"
     text += f"Semantic consolidation uses narrow declared rules plus supported complete-link equivalence decisions. {summary['pending_equivalence_proposals']:,} proposed comparisons remain pending; other unproposed pairs are not proven distinct. Automated judgments and merges are not human approvals. Remaining semantic uncertainty can inflate discovery and distance counts. A complete candidate vocabulary does not establish complete semantic resolution.\n\n"
     text += f"Costed known scope: {cost['new_primary_calls']:,} new primary calls; {cost['remaining_attempts_upper_bound']:,} maximum remaining attempts. First-attempt bound ${cost['first_attempt_upper_bound_usd']:.4f}; full configured-attempt bound ${cost['remaining_completion_upper_bound_usd']:.4f}, plus ${cost['cumulative_accounted_usd']:.4f} existing accounted liability. Stage cap ${cost['stage_cap_usd']}; cumulative cap ${cost['budget_cap_usd']}. Cost blockers: {cost['blockers']}. Item/feature cell-level prices and reasons are in blocked_cells.csv. Final task-derived additions are not guessed while generation is incomplete.\n\n"
     text += f"Retry funding policy: `{cost['retry_policy']}`. Current authorized stage: `{cost['authorized_stage']}`, entire-stage bound ${cost['authorized_stage_upper_bound_usd']:.4f}. All unattempted cells are funded before invalid-response retries. Pending requests must finish before the full set of known invalid retries is costed; if that set does not fit, all new retries stop. Maximum two attempts per cell remains fixed. The all-configured-attempt bound above is diagnostic and is not a guarantee that every possible retry is funded. Observed usage is exported by model and operation in observed_usage.json; unrelated semantic-matcher output usage does not calibrate atomic judging.\n\n"
