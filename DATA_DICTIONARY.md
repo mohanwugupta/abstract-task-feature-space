@@ -53,6 +53,12 @@ The separate `judgments.jsonl` stores each attempt's semantic job, exact IDs, ra
 `analysis_manifest.json` records source/code/input hashes, planned/completed requests and propositions, control status, own accounted cost and shared ledger cost. Synthetic fixtures explicitly set `demo=true,billed_execution=false` and carry nonempirical labels; live execution is distinct. Figures require successful synthetic logical controls, which do not measure semantic-grader validity.
 
 
+## Independent matching baselines
+
+`artifacts/feature_space_baselines/baseline_<design>/` stores the separate [baseline comparison](MATCHING_BASELINES.md). `identity.json` binds the inventory, source-matching analysis/grader, settings and code hashes. Frozen embedding jobs contain exact contextualized text IDs, `/v1/embeddings` request bodies and explicitly labeled UTF-8 byte/token upper bounds. The shared live ledger records `embeddings` stage tickets. `embeddings.jsonl` stores hashed usage/response receipts, Batch IDs, ordered text IDs and hashed `.npy` vector-file references; raw vectors remain in provider output plus validated binary vector files rather than duplicated in the receipt journal.
+
+Each `reports/<checkpoint>/pair_scores.csv` contains the complete within-target Cartesian pair universe, lexical scores, optional embedding cosine and `judge_relation` (`matches,related,uncertain,no_match,unscored`). `judge_label` is 1 for clear matches, 0 for related/no-match and null for uncertain/unscored. Per-method `thresholds/*.json` freeze development evidence, threshold and selection metrics. `summary.json` lists complete/incomplete cohorts, uncertain exclusions, confusion counts and precision/recall/F1 relative to Luna. No entry is human gold or semantic approval. `report_manifest.json` seals source evidence and artifact hashes; `latest_report.json` is a pointer, and immutable checkpoints are not regenerated for provider-status-only changes.
+
 ## Read-only visualization artifacts
 
 `feature_space_pilot.viz` reads one verified run and writes separately under `artifacts/feature_space_visualizations/<run_id>/v1/`. `figure_manifest.json` records the exact source-manifest digest, evaluation fingerprint, visualization module hashes, renderer versions, analysis config/seed, selected counts, captions and underlying-data digests. Source runs and references are never resealed or altered.
