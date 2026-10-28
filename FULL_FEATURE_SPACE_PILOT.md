@@ -1,5 +1,7 @@
 # Complete shared feature-space pilot
 
+**Scientific status: preserved secondary exploratory analysis.** The primary human benchmark and task-discovery application are now reconstructed independently. Use [the corrected experimental separation](EXPERIMENT_SEPARATION.md) for primary banks, matrices, reports and task figures. Commands here document the original pooled experiment; its frozen inputs, jobs and ledgers are preserved.
+
 The full workflow replaces the hash-selected 150 columns with every accepted human and task discovery in one shared candidate bank. It reads the original experiments without changing their manifests, journals, model settings or collectors. The historical 150-feature studies remain baselines.
 
 Implementation: `feature_space_pilot/full/`. Configuration: `configs/feature_space_full.json`. Outputs: `artifacts/feature_space_full/projects/full_<design>/`. The existing `artifacts/feature_space_pilot/budget_live.jsonl` remains the single cumulative ledger.

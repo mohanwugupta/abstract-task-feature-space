@@ -1,6 +1,41 @@
 # Feature-space pilot artifact dictionary
 
-Primary run artifacts live under `artifacts/feature_space_pilot/<run_id>/`. Text uses UTF-8. Hashes are SHA-256. Structured objects are canonical JSON (sorted keys, compact separators, Unicode preserved, no NaN) when hashed; file hashes cover verbatim bytes. Human reference content is evaluation-only and never used as generator context.
+## Independent primary experiments
+
+Corrected primary artifacts live under `artifacts/feature_space_experiments/separated_<checkpoint>/human/` and `.../task/`. `latest.json` above those exports points to both scientific reports. Experiment 1 is the human-norm methodology benchmark; Experiment 2 is the task feature-discovery application. The old pooled bank is secondary exploration. Each bank is reconstructed from its own original generation provenance, not filtered by canonical text. Independently generated identical propositions remain eligible in both banks.
+
+| Corrected artifact | Meaning |
+|---|---|
+| `human/human_feature_bank.json`, `task/task_feature_bank.json` | Independent experiment-qualified `bank_id`, `inventory_hash`, full uncapped `features`, `origins`, local `review_decisions`, `blocked_chains`, explicit old/new mappings and transfer audit. `hf_` and `tf_` IDs have separate namespaces even for identical text. |
+| `feature_inventory.csv`, `feature_origins.csv` | Complete propositions and accepted raw phrases with source item/run/record/job, generator, family, repetition, attempt, raw index, original phrase ID, pooled canonical ID and new canonical ID. |
+| `generation_provenance.jsonl`, `generation_jobs.jsonl` | Original generation attempts and literal planned requests, preserving model/revision/prompt identity and rejected responses. No feature regeneration. |
+| `consolidation_decisions.json`, `consolidation_transfer_audit.csv` | Only locally supported direct equivalences can consolidate. `not_local_pair` excludes cross-experiment endpoints; `unsafe_review` flags protected-meaning/provenance failures. Complete-link evidence prevents hidden transitive bridges. |
+| `old_to_new_feature_ids.csv` | Pooled ID/proposition → experiment ID/proposition. `reusable_meaning` and `proof` identify exact propositions, declared safe rewrite proofs, direct reviewed equivalence, or review-required mappings. ID changes alone do not trigger calls. |
+| `matrix_scope.json` | Independent item and feature identities, bank hash, primary status, dimensions, judge configuration, and explicit unknown policy. Human scope is 60 × human vocabulary; task scope is 15 × task vocabulary. |
+| `applicability_matrix.csv`, `applicability_cells.csv` | Complete experiment cross-product. Observed integer 0/1 and `?` unknowns; internal -1 is serialized as `?`. Per-cell audit distinguishes reused binary, ambiguous, invalid, conflicting, usage-unknown, incompatible and missing evidence. |
+| `binary_matrix.csv` | Exists only for a fully resolved experiment; never fabricated by replacing unknowns with zeros. |
+| `reused_judgment_receipts.jsonl`, `rejected_judgment_receipts.csv`, `judgment_reuse_audit.json` | Original source/record/prompt/payload identities, proposition meaning proof, evidence and status. Reuse requires compatible item content/language, rubric, literal original prompt and model/decoding payload. Conflicting binaries remain unknown. |
+| `generation_coverage.csv`, `missing_generation_jobs.csv` | Accepted/planned samples and original failed/missing jobs, independently per experiment. |
+| `human/human_validation.json`, `semantic_recovery.csv`, `stratified_recovery.csv` | Provenance-checked reuse of the independent human-label matcher. Comparison caps normalize prompt families without capping the bank. Objects and events/actions are reported separately; no abstract feature-list recall or truth precision is invented. |
+| `human/aggregate_category_reference.csv` | Supplied aggregate Harpaintner category proportions, not individual human feature strings. Quantitative comparison remains unavailable without translation/coding review. |
+| `human/discovery_curves.csv`, `saturation_summary.csv` | All-generated and protocol-normalized discovery, with fixed complete cohorts across families/repetitions and separate stimulus groups. Three samples do not establish asymptotic saturation. |
+| `task/semantic_annotations.csv`, `semantic_family_counts.csv` | Provisional overlapping semantic families, specificity, functional/evaluation/relevance candidates, exact offline cue evidence and `human_reviewed=false`. Supplementary metadata only; no preference signs or new semantic equivalences. Counts can overlap. |
+| `task/family_shared_distinctive.csv`, `instance_shared_distinctive.csv` | Full proposition contrasts. Family presence is any observed yes; absence requires every family item no. Instance contrasts use the concrete tasks only. Unknowns prevent distinctiveness claims. |
+| `task/transitions.csv`, `transition_summary.json` | Domain/type/instance and parent/situated changes: retained, gained, lost/disagreement, absent or unresolved, with proposition text. |
+| `task/compositionality.json`, `composition_features.csv` | All six situations × P0/P1/P2 × equal-call/full-sample analyses. Actual propositions, T/S/TS values, discovery membership, component omissions, 0/0/1 candidates, missing samples and token counts. Discovery novelty is not confirmed relational emergence. |
+| `task/coapplicability_patterns.json` | Identical complete binary profiles with full membership and explicit complete-case coverage. Same profile is not semantic equivalence. |
+| `task/diagnostic_set.csv`, `diagnostic_flags.csv`, `quality_audit.json` | Modest balanced review sample plus every screening flag. Suspected issues, unresolved evidence and verified corrections are separate. Heuristics never change matrix values; no human approvals are inferred. |
+| `task/behavioral_validation_candidates.csv` | Functional/evaluation candidates for later testing; excludes features flagged for cross-domain, inheritance or linguistic problems. No positive/negative preference values or internal feature-use claims. |
+| `task/figure_A_task_feature_space`, `figure_B_abstraction`, `figure_C_compositionality` | Primary PNG/SVG task figures. Exact displayed examples are exported separately; display selection does not limit the full feature bank or analyses. |
+| `source_checkpoint.json`, `source_preservation.json`, `manifest.json` | Frozen original hashes, complete-line prefixes of growing journals and budget ledger, original source identities, code identity, final preservation verification and recursive output hashes. Original empirical files remain unchanged; append growth by active inference is allowed. No API calls, source writes or paid costs. |
+
+Run `python -m feature_space_pilot.experiments.run --verify <export>` to verify the sealed outputs, immutable originals and original journal prefixes. Output directories inside empirical source runs are rejected. Existing corrected exports are immutable; a new evidence/code checkpoint gets a new export ID.
+
+## Preserved original pilot format
+
+Original run artifacts live under `artifacts/feature_space_pilot/<run_id>/`. These and the `feature_space_full/` pooled studies are preserved historical/secondary representations. The original feature-cap rules below do not apply to corrected primary banks.
+
+Text uses UTF-8. Hashes are SHA-256. Structured objects are canonical JSON (sorted keys, compact separators, Unicode preserved, no NaN) when hashed; file hashes cover verbatim bytes. Human reference content is evaluation-only and never used as generator context.
 
 | Artifact | Fields / meaning |
 |---|---|

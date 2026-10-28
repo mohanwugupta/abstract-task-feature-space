@@ -1,16 +1,30 @@
 # Abstract task feature space
 
-A reproducible human-norm feature-space pilot and two-task compositionality study using configurable hosted frontier-model APIs.
+A human-norm methodology benchmark and an independent task feature-discovery study using configurable hosted frontier-model APIs.
 
 The pipeline provides isolated feature discovery, conservative candidate consolidation, strict binary applicability judgments, resumable execution, cumulative API budget controls, and auditable reports. The case studies cover creative writing and synthetic financial reconciliation.
 
-## Complete shared vocabulary
+## Two independent primary experiments
 
-For the current task/situation results, start with [the task briefing and figure guide](TASK_DATASET_BRIEFING.md). It covers processing, uncertainty, clustering and abstraction choices.
+**Experiment 1 validates feature generation against human norms. Experiment 2 constructs the task representations for subsequent preferences research.** Each has its own provenance-derived vocabulary, consolidation decisions, bank identity, applicability matrix and scientific report. Human-only discoveries cannot enter the primary task vocabulary. A proposition independently discovered in both experiments remains eligible in both.
+
+The corrected empirical banks contain **5,233 human-generated features** and **592 task-generated features**. The task matrix is **15 × 592**, rather than 15 × the pooled 5,825-feature bank. Start with [the corrected results and workflow](EXPERIMENT_SEPARATION.md) and [the task figure guide](TASK_DATASET_BRIEFING.md).
+
+Reconstruct from existing evidence, entirely offline:
+
+```bash
+MPLCONFIGDIR=artifacts/feature_space_full/matplotlib_cache .venv/bin/python -m feature_space_pilot.experiments.run
+```
+
+`artifacts/feature_space_experiments/latest.json` links the two reports and their immutable export. The command preserves original frozen inputs, active inference, provider jobs and budget ledgers; reuses compatible judgments; retains `?`; and makes no API calls or credential reads. There is no live-execution option. It also exports task Figures A–C, original generation provenance, old/new ID mappings, a diagnostic review set and per-cell reuse audits.
+
+Semantic families and scope labels are provisional offline interpretation metadata. They never replace or merge the binary feature columns, assign preference values, or establish internal/causal feature use. Remaining paid work requires a new cost preflight and authorization under the unchanged cumulative $100 cap.
+
+## Preserved pooled vocabulary — secondary exploration
 
 The current applicability stage uses [concurrent immediate execution](IMMEDIATE_APPLICABILITY.md) at the user's request for faster completion, reusing Batch results under the same$100cap.
 
-The expanded workflow uses every accepted human and task feature across all **75 items**, with conservative semantic consolidation, complete provenance, and a shared binary applicability matrix. The original 150-feature runs remain preserved baselines.
+The preserved pooled workflow uses accepted human and task features across all **75 items**. It is **secondary exploratory analysis**, not the primary representation for either experiment. Existing jobs continue under their frozen inputs; the offline correction does not alter them. The original 150-feature runs remain preserved baselines.
 
 ```bash
 .venv/bin/python -m feature_space_pilot.full.run --dry-run

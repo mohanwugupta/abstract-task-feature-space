@@ -1,37 +1,39 @@
-# Task and situation dataset briefing
+# Task and situation dataset — corrected primary analysis
 
-The task study has passed feature creation and semantic consolidation and now has substantial independent applicability data. We can inspect it while human-item inference continues.
+Use the independent **Experiment 2** outputs. The previous task-only view of the pooled 5,825-feature vocabulary is retained as secondary exploration; it is no longer the primary task representation. [The experimental separation guide](EXPERIMENT_SEPARATION.md) explains the correction and the separate human benchmark.
 
-| Stage | Current task checkpoint |
-|---|---|
-| Generation | 131 of 135 generation jobs accepted across the 15 items, three prompt families and three repetitions. Four missing samples remain explicit. |
-| Candidate inventory | 875 accepted task phrases map to 592 canonical feature IDs in the shared 5,825-feature bank. |
-| Applicability | 87,375 item–feature cells: 69,341 resolved (79.4%), comprising 11,453 yes and 57,888 no; 18,034 unresolved. |
-| Composition | Component/direct discovery comparisons, sampling allocations, applicability gains and provisional interaction candidates are computed. Missing samples and unresolved cells limit final claims. |
-| Interpretation | Labels remain automated and unreviewed. Semantic theme clusters and a feature ontology have not yet been assigned. |
+## What has been processed?
 
-Generate the task-only figures offline:
+- **131/135 generation jobs** were accepted across the 15 task/situation items, P0/P1/P2 and three repetitions.
+- The **875 task-origin phrases** were independently reconstructed and conservatively consolidated into **592 canonical task features**. The count coincides with the previously reported task-origin subset, but reconstruction uses original provenance and local equivalence evidence, not a text filter on the pooled bank.
+- Every one of the **15 × 592 = 8,880 cells** has compatible prior attempt evidence. **6,976 are definitively 0/1; 1,879 ambiguous and 25 invalid remain `?`.**
+- Shared/distinctive features, abstraction transitions, situation inheritance, discovery coverage and component/direct comparisons have been recomputed using only this bank.
+- Semantic families and specificity tags are provisional offline coding. They do not merge propositions or replace binary columns.
+
+## Figures to open
+
+1. [Figure A — Task feature-space overview](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/task/figure_A_task_feature_space.svg): actual task-generated propositions organized by overlapping semantic families, with all 15 applicability profiles.
+2. [Figure B — Abstraction and generalization](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/task/figure_B_abstraction.svg): broad and specific properties across domain, type, instance and situated variants, separately for writing and reconciliation. Red outlines mark inherited-text disagreements requiring review.
+3. [Figure C — Compositionality](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/task/figure_C_compositionality.svg): shared discoveries, component-only discoveries, direct additions attributable to component omissions, provisional 0/0/1 candidates, inapplicable additions and unresolved evidence. Each deadline/review/both condition and prompt family is separate.
+
+PNG versions accompany every SVG. Display examples are exported explicitly; the full 592-feature bank and all matrix cells remain available. The figure selection is not a feature cap.
+
+Read [the full task scientific report](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/task/scientific_report.md) for actual propositions, per-item coverage, transition counts, sampling gaps, quality flags and candidate properties for later behavioral validation.
+
+## How to interpret the results
+
+The automated family comparison finds 119 shared, 164 writing-distinctive, 138 reconciliation-distinctive and 171 unresolved features. Family presence requires at least one yes; family absence requires every item in that family to be no. These unreviewed labels include questionable positives, which are flagged rather than automatically corrected.
+
+Task abstraction and feature abstraction are different: domain → task type → instance is the existing item hierarchy; a feature may describe a broad functional demand or an exact instance constraint. Situations are another axis. Semantic families, specificity and identical applicability profiles are separate interpretation aids. None establishes semantic equivalence or an internal model mechanism.
+
+Direct generation often finds an existing component property omitted during independent generation. Six features exhibit the 0/0/1 candidate pattern; no genuine relational emergence is confirmed. Missing generation roles and ambiguous labels limit those comparisons. The diagnostic set includes unchanged requirements with inconsistent labels, cross-domain positives and candidate interactions with all three descriptions for inspection.
+
+The next scientific step is targeted grounding/consistency review and later behavioral tests of promising properties. A feature's presence does not assign it a preference value or demonstrate that the model uses it in decisions. No new paid judgments were launched by this correction.
+
+## Reproduce offline
 
 ```bash
-MPLCONFIGDIR=artifacts/feature_space_full/matplotlib_cache .venv/bin/python -m feature_space_pilot.task_focus.run
+MPLCONFIGDIR=artifacts/feature_space_full/matplotlib_cache .venv/bin/python -m feature_space_pilot.experiments.run
 ```
 
-`artifacts/feature_space_task_focus/latest.json` points to an immutable export with PNG/SVG figures, every underlying task applicability cell and original task feature provenance.
-
-Start with `figure_01_task_coverage`, then `figure_02_task_feature_map`. The map places actual propositions against both task hierarchies and the independent situation axis. Its 30 display examples do not cap the analysis vocabulary: all 87,375 cells remain in `task_applicability.csv`. `task_discovered_features.csv` lists all 592 task-discovered canonical features.
-
-`figure_03_coapplicability_patterns` groups identical binary profiles. Of the full vocabulary, 677 features are resolved across all 15 items: 254 have at least one positive value and 423 are zero everywhere. The other 5,148 features have unresolved cells. Consequently, this is a restricted complete-case preview. Identical profiles do not establish equivalent meanings or validate the underlying labels. Every group member is exported.
-
-The export also contains 86 parent-positive/situated-child-negative task-origin cells in `inheritance_review_flags.csv`. These are screening flags, not 86 confirmed errors: situations can legitimately change some properties. One review example is “lines 1 and 3 must rhyme,” marked 1 for `poem_T` and 0 for `poem_S_deadline`, although both retain the ABAB CDCD requirement. Inspect unchanged explicit requirements before interpreting such differences as situation effects. No label has been corrected automatically.
-
-A useful next layer is a multi-label feature taxonomy: goals/outputs, operations/information, format/quality constraints, time/resources, evaluation/social context, and relations/trade-offs. Theme and abstraction should be separate metadata. The existing item hierarchy is domain → task type → instance; situations are an independent axis. Feature granularity could range from output constraints to rhyme constraints to the concrete ABAB CDCD requirement. Multiple tags may apply while each original binary column remains available.
-
-Distinguish semantic grouping of proposition text from grouping by applicability pattern. Jaccard distance with average linkage can support descriptive clustering of binary profiles after missingness is handled transparently. Text embeddings and provisional model labels can propose semantic families, with representative features audited. Neither method automatically establishes equivalence or a parent–child ontology. Similarity matrices and multidimensional scaling can summarize item relationships once adequate judgments are available. Set-intersection plots can compare component and direct discoveries, preserving sampling gaps and uncertainty.
-
-Research precedents:
-
-- [Harpaintner, Trumpp & Kiefer (2018)](https://pmc.ncbi.nlm.nih.gov/articles/PMC6156367/) coded properties into categories and clustered concepts by category profiles, using dendrograms and cluster-profile plots. Their human categories should not be transferred to these tasks without a declared coding scheme.
-- [Kriegeskorte, Mur & Bandettini (2008)](https://www.frontiersin.org/journals/systems-neuroscience/articles/10.3389/neuro.06.004.2008/full) describe representational dissimilarity matrices and multidimensional scaling for comparing representations.
-- [Lex et al. (2014), UpSet](https://vdl.sci.utah.edu/publications/2014_infovis_upset/) use matrix-based set-intersection displays, useful for comparing task, situation and combined discovery sets.
-
-My priority recommendation is to inspect actual task feature maps, audit uncertain or contradictory labels, and tag the 592 task-discovered features by theme and scope. Composition plots and task geometry can then support more interpretable conclusions. The briefing and export make no API calls and leave active inference and original experiments intact.
+`artifacts/feature_space_experiments/latest.json` points to the newest immutable export. Original experiments, provider jobs, frozen manifests and the cumulative $100 ledger remain unchanged. [The human benchmark report](artifacts/feature_space_experiments/separated_9c9d7f47f2e8514d/human/scientific_report.md) is separate and supplies no vocabulary to the primary task study.
