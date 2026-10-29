@@ -12,13 +12,15 @@ The current analysis compares weighted human and LLM **36-concept cosine similar
 
 Start with [the collaborator results and methods](HUMAN_VALIDATION_AND_LOCAL_TASKS.md), [the complete P0/P1/P2 comparison guide](TASK_DATASET_BRIEFING.md), and the motivation linked there.
 
-Reconstruct from existing evidence, entirely offline:
+After the applicability queue finished, the [latest human comparison refresh](HUMAN_COMPARISON_REFRESH.md) reconstructed 230,271 definitive human-only judgments and reran full-output generation RSA plus supervised alignment. It also compares judged feature spaces while preserving unknowns: positive conditional pairwise correspondence is not reproduced in the small fixed complete-column subset. Full matrices, sensitivity tests and figures are available without new API calls.
+
+Rerun the latest human comparison, entirely offline (the linked refresh guide includes evidence reconstruction):
 
 ```bash
-MPLCONFIGDIR=artifacts/feature_space_full/matplotlib_cache .venv/bin/python -m feature_space_pilot.collaborator.run
+MPLCONFIGDIR=artifacts/feature_space_full/matplotlib_cache .venv/bin/python -m feature_space_pilot.human_refresh
 ```
 
-`artifacts/feature_space_collaborator/latest.json` links the independent human and task reports and a full offline HTML prompt table. Outputs include all human frequency coordinates, generation-frequency/binary representations, RSA effects/p-values/sparsity and sensitivities, audited alignment/unmatched features, published reliability review, per-target inventories, all generation repetitions, native judgment reuse, and discovery-only compositionality. The command makes no model calls or credential reads; originals, active jobs and ledgers stay unchanged.
+`artifacts/feature_space_human_refresh/results/latest.json` links the latest human report. The linked validation export also contains independent human/task reports, a full offline HTML prompt table, human frequency coordinates, generation-frequency/binary representations, RSA effects/p-values/sparsity and sensitivities, audited alignment coverage, published reliability review, per-target inventories, all generation repetitions, native judgment reuse, and discovery-only compositionality. The command makes no model calls or credential reads; source results and ledgers are read-only.
 
 The human similarities are sparse and some P1 overlap is grammatical. Semantic alignment is supervised, not independent RSA. Task cue coding is provisional; generation absence is never an applicability zero. No participant reliability ceiling, preference value or internal/causal feature-use claim is invented. Any new paid work requires a cost preflight and authorization under the unchanged cumulative **$100** cap.
 
@@ -26,9 +28,9 @@ The preceding [experiment-separation reconstruction](EXPERIMENT_SEPARATION.md) p
 
 ## Preserved pooled vocabulary — secondary exploration
 
-The current applicability stage uses [concurrent immediate execution](IMMEDIATE_APPLICABILITY.md) at the user's request for faster completion, reusing Batch results under the same$100cap.
+The [concurrent immediate applicability queue](IMMEDIATE_APPLICABILITY.md) finished its eligible primary requests and invalid retries on October 28, 2026. Its status is `needs_review`: ambiguous, held and retry-exhausted cases remain unresolved. Cumulative spending/reserved liability is $47.52 under the unchanged $100 cap.
 
-The preserved pooled workflow uses accepted human and task features across all **75 items**. It is **secondary exploratory analysis**, not the primary representation for either experiment. Existing jobs continue under their frozen inputs; the offline correction does not alter them. The original 150-feature runs remain preserved baselines.
+The preserved pooled workflow uses accepted human and task features across all **75 items**. It is **secondary exploratory analysis**, not the primary representation for either experiment. Its frozen inputs and original API responses remain preserved. The original 150-feature runs remain preserved baselines.
 
 ```bash
 .venv/bin/python -m feature_space_pilot.full.run --dry-run

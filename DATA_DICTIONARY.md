@@ -1,5 +1,23 @@
 # Feature-space pilot artifact dictionary
 
+## Latest human comparison refresh
+
+`artifacts/feature_space_human_refresh/results/human_comparison_<identity>/` contains the [post-judgment human comparisons](HUMAN_COMPARISON_REFRESH.md). All inputs are human-experiment discoveries; task-only columns are excluded. The normative comparison retains the same 36 Vinson concepts and all 1,029 published human coordinates. The full human-only applicability checkpoint is 60 × 5,233 with 230,271 definitive cells; the selected Vinson matrix has 135,414/188,388 definitive cells.
+
+| Artifact | Meaning |
+|---|---|
+| `rsa_generation_full_output.csv`, `figure_generation_full_output.*` | RSA using all accepted generated features, counting canonical presence once per repetition. Equal generation calls do not imply equal output yield; the earlier first-ten analysis remains separately available. |
+| `applicability_<scope>_<prompt>.csv` | Binary applicability with explicit `?` unknowns. `all_human` pools features discovered by that prompt anywhere in the human experiment; `vinson_only` restricts discovery origins to the 36 selected Vinson targets. Combined is the union, not a sum of overlapping prompt columns. |
+| `rsa_applicability.csv` | Complete-column common-space and jointly observed conditional-pair comparisons, full/content-only variants, all/within-type concept-label permutation tests, Holm groups, zero-norm diagnostics, coverage and pairwise coordinate counts. An unavailable coefficient is not zero. Conditional pairs use different coordinates and are explicitly exploratory. |
+| `similarity_*.csv`, `shared_known_*.csv`, `permutation_nulls/` | Similarity matrices in identical concept order, coordinate denominators per pair and preserved null distributions. Unknowns are never imputed as feature absence. |
+| `feature_pool_membership.csv`, `complete_column_audit.csv` | Prompt/discovery-origin pool membership, grammatical-screen flags and exact columns definitive across every concept. Complete-column selection can bias the retained vocabulary. |
+| `rsa_observation_mask.csv` | Separate observability diagnostic: 1 means a definitive judgment was recorded; 0 means unresolved. This mask is not an applicability representation or zero-filled feature matrix. |
+| `semantic_alignment_generation_coverage.csv` | Full canonical generation units versus original first-ten matching scope. P0 has 971 additional unscored units; these are not unmatched or invalid, and its old aligned cosine does not cover them. |
+| `summary.json`, `scientific_report.md`, `figure_*.svg/png` | Before/after coverage and cell transitions, full-output RSA, scoped semantic alignment, judged-space comparisons and scientific interpretation. No new human reliability ceiling or abstract feature strings. |
+| `source_checkpoint.json`, `source_preservation.json`, `manifest.json` | Input/output hashes, source preservation, code/library identities and zero-API-cost accounting. Historical sealed outputs are verified separately from runtime source views legitimately changed by the earlier authorized API continuation. |
+
+Use `python -m feature_space_pilot.human_refresh --verify <export>` to verify the results and preserved source data. See the linked guide for all offline reconstruction commands.
+
 ## Current human validation and target-local task analyses
 
 `artifacts/feature_space_collaborator/followup_<identity>/` is the current primary export, linked by `latest.json`. All analyses are offline. The human and task experiments remain separate; previous experiment exports below are preserved.

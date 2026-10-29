@@ -187,8 +187,12 @@ def test_category_adapter_preserves_rounded_proportions_without_inventing_featur
         load_reference(dict(spec, path=str(p), verified=False), live=True)
 
 
-def test_preflight_plans_all_csv_targets_and_discloses_remaining_scientific_gates():
-    plan = preflight(load_config(ROOT / "configs/feature_space_pilot.json"), "human")
+def test_preflight_plans_all_csv_targets_and_discloses_remaining_scientific_gates(
+    tmp_path,
+):
+    config = load_config(ROOT / "configs/feature_space_pilot.json")
+    config["artifact_root"] = str(tmp_path / "campaign")
+    plan = preflight(config, "human")
     assert (
         plan["selected_item_count"] == 60
         and plan["actual_plannable_generation_jobs"] == 540

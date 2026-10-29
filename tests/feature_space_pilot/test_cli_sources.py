@@ -36,12 +36,17 @@ def test_vinson_adapter_exact_axes_and_category_vocabulary(tmp_path):
 
 
 def test_cli_dry_runs_and_demo_entrypoints(tmp_path):
+    # Source validation must not depend on the user's accumulated paid spending.
+    config = json.loads((ROOT / "configs/feature_space_pilot.json").read_text())
+    config.update(root=str(ROOT), artifact_root=str(tmp_path / "campaign"))
+    config_path = tmp_path / "isolated_config.json"
+    config_path.write_text(json.dumps(config))
     common = [
         sys.executable,
         "-m",
         "feature_space_pilot.run",
         "--config",
-        "configs/feature_space_pilot.json",
+        str(config_path),
     ]
     for stage, count in [("human", 540), ("tasks", 135)]:
         p = subprocess.run(

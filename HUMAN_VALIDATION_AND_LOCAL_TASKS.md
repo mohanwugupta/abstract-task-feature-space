@@ -2,7 +2,11 @@
 
 The pilot asks whether a reproducible feature-generation procedure yields meaningful, interpretable properties before studying LLM task preferences. Experiment 1 evaluates correspondence with human semantic norms. Experiment 2 evaluates elicitation for realistic tasks. Their feature provenance and analyses remain separate. These findings reuse completed GPT-5 Mini generations and original automated Luna judgments; they are not a comparison across generator models. Neither experiment establishes internal feature use, a preference value, or a causal decision mechanism.
 
-## Current outputs
+## Updated human comparison after applicability completion
+
+See [the 2026-10-29 human comparison refresh](HUMAN_COMPARISON_REFRESH.md) for the latest human-only judgments, full-output generation RSA, conditional versus complete-column judged RSA, and explicit semantic-matcher scope. The uncapped P0 generation rho is .186; the balanced first-ten rho below remains .117. Applicability completion does not change generation-only RSA or previously matched alignment scores. The historical export below remains preserved.
+
+## Preserved initial outputs
 
 The immutable empirical export is `artifacts/feature_space_collaborator/followup_23476f15019ef1c1/`. `artifacts/feature_space_collaborator/latest.json` points to the latest version.
 
