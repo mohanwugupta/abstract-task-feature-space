@@ -41,7 +41,9 @@ This is a **new rubric pass** over selected cells, with new job IDs and at most 
 
 ## Cost preflight and execution status
 
-Current status: **prepared and preflighted; no paid judgments submitted**.
+Current status: **authorized and launched on October 30, 2026**. OpenAI acknowledged the first **8 batches / 8,000 requests**; the background controller submits and collects the remaining selected work as slots become available. This is a submission checkpoint, not a claim that those judgments have completed.
+
+The controller log is `artifacts/feature_space_binary_retry/controller_latest.log`; adjacent JSON records the PID, command, authorization and initial preflight. A PID-bound sleep-prevention helper runs while the controller is alive. Keep the Mac connected for local submission and collection; acknowledged Batch work executes at the provider.
 
 The new input profile measures 60 target templates using the input-token-counting endpoint, then applies the existing conservative feature/ID byte allowance and boundary reserve. Template counts are 485–494 tokens; request input bounds are 666–799. This is a measured-template bound, not a claim of exact per-request counts. The collector checks actual usage against each bound.
 
@@ -53,7 +55,7 @@ The prepared run uses **GPT-6 Luna, low reasoning, OpenAI Batch, 400 maximum out
 
 Review [the full cost preflight](artifacts/feature_space_binary_retry/retry_4ce8e706b4d1455d/cost_preflight_20261030.json) and [the exact selection summary](artifacts/feature_space_binary_retry/retry_4ce8e706b4d1455d/selection_summary.json). Execution computes a fresh ledger-dependent hash; a changed ledger or plan invalidates the old authorization hash.
 
-The user's existing requirement remains: “Do not make new paid API calls without an explicit cost preflight and authorization.” Preparing/measuring this run does not launch the paid stage. The launch command below is for an explicitly authorized submission.
+The user's existing requirement remains: “Do not make new paid API calls without an explicit cost preflight and authorization.” The user authorized this prepared stage after reviewing the cost (“send it brother”). The launch command below has already been started in the background; do not start a second controller while it is active.
 
 ## Commands
 
