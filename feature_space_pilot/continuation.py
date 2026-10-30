@@ -25,7 +25,7 @@ from .engine import (
 from .environment import load_api_credentials
 from .execution import execution_config
 from .io import append_jsonl, canonical, digest, file_hash, read_jsonl, write_json
-from .judge import judge_prompt, RUBRIC
+from .judge import judge_prompt, rubric_for
 from .planner import plan_generation
 from .progress import console_reporter, emit
 from .prompts import DIRECTORY
@@ -194,7 +194,7 @@ def _context(out, *, allow_collector_update=False):
     judge_jobs = []
     for item in items:
         for feature in bank:
-            p = judge_prompt(item, feature)
+            p = judge_prompt(item, feature, rubric_version=rubric_for(c["judge"]))
             judge_jobs.append(
                 dict(
                     job_id=digest(
@@ -515,7 +515,11 @@ def continue_batch(
                 continue
             session.enqueue(
                 prompt=job,
-                schema=judgment_schema(job["item_id"], job["feature_id"]),
+                schema=judgment_schema(
+                    job["item_id"],
+                    job["feature_id"],
+                    rubric_version=job["rubric_version"],
+                ),
                 settings=execution["judge"],
                 job_id=job["job_id"],
                 stage="judgment",
@@ -523,7 +527,7 @@ def continue_batch(
                 record_base=dict(
                     item_id=job["item_id"],
                     feature_id=job["feature_id"],
-                    rubric_version=RUBRIC,
+                    rubric_version=job["rubric_version"],
                     judge_model=c["judge"]["model_id"],
                     prompt_hash=job["prompt_hash"],
                 ),

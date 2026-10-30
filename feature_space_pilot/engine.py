@@ -23,7 +23,7 @@ from .planner import plan_generation, pending_jobs
 from .prompts import DIRECTORY, parse_generation
 from .clients import FakeClient, HostedClient, generation_schema, judgment_schema
 from .bank import consolidate
-from .judge import RUBRIC, judge_prompt, parse_judgment, build_matrix
+from .judge import RUBRIC, rubric_for, judge_prompt, parse_judgment, build_matrix
 from .budget import Ledger, estimate_cost, validate_prices
 from .environment import load_api_credentials
 from .progress import emit
@@ -64,7 +64,7 @@ def demo_config(root):
             generation=120, judgment=220, adjudication=80, embeddings=30, reserve=50
         ),
         generator=copy.deepcopy(model),
-        judge=copy.deepcopy(model),
+        judge=dict(copy.deepcopy(model), rubric_version=RUBRIC),
         sources=[],
         protocols={},
         human_target_count=60,
@@ -76,6 +76,9 @@ def demo_config(root):
 def load_config(path):
     path = Path(path).resolve()
     c = json.loads(path.read_text())
+    # New configuration loads default to strict binary. Historical reconstruction
+    # reads frozen dictionaries directly and rubric_for() preserves their v1.
+    c["judge"].setdefault("rubric_version", RUBRIC)
     c["root"] = str((path.parent / Path(c.get("root", ".."))).resolve())
     from .execution import execution_config
 
@@ -1041,7 +1044,9 @@ def run_pipeline(
             judge_jobs = []
             for item in items:
                 for feature in bank:
-                    p = judge_prompt(item, feature)
+                    p = judge_prompt(
+                        item, feature, rubric_version=rubric_for(c["judge"])
+                    )
                     job_id = digest(
                         [
                             item["content_hash"],
@@ -1068,12 +1073,19 @@ def run_pipeline(
                 if job["job_id"] in seen:
                     continue
                 parser = lambda raw, j=job: parse_judgment(
-                    raw, j["item_id"], j["feature_id"]
+                    raw,
+                    j["item_id"],
+                    j["feature_id"],
+                    rubric_version=j["rubric_version"],
                 )
                 result = _call(
                     judge_client,
                     job,
-                    judgment_schema(job["item_id"], job["feature_id"]),
+                    judgment_schema(
+                        job["item_id"],
+                        job["feature_id"],
+                        rubric_version=job["rubric_version"],
+                    ),
                     c["judge"],
                     ledger,
                     job["job_id"],
@@ -1082,7 +1094,7 @@ def run_pipeline(
                     dict(
                         item_id=job["item_id"],
                         feature_id=job["feature_id"],
-                        rubric_version=RUBRIC,
+                        rubric_version=job["rubric_version"],
                         judge_model=c["judge"]["model_id"],
                         prompt_hash=job["prompt_hash"],
                     ),
@@ -1158,6 +1170,7 @@ def _write_judgment_outputs(c, out, items, bank, judgments):
                 }
             ),
             *key,
+            rubric_version=rubric_for(c["judge"]),
         )
         prior = by_cell.get(key)
         if prior and prior["status"] == "ok" and prior["applies"] != a["applies"]:
@@ -1166,7 +1179,7 @@ def _write_judgment_outputs(c, out, items, bank, judgments):
             )
         by_cell[key] = dict(
             validated,
-            rubric_version=RUBRIC,
+            rubric_version=rubric_for(c["judge"]),
             judge_model="human:" + a["reviewer"],
             prompt_hash="manual_adjudication",
         )

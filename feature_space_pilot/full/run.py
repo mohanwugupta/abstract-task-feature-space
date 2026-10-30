@@ -12,6 +12,7 @@ from ..batch import OpenAIBatchAPI, BatchTransientError, BatchCreationUncertain
 from ..budget import estimate_cost
 from ..engine import load_config, _read
 from ..environment import load_api_credentials
+from ..judge import rubric_for
 from ..io import (
     canonical,
     digest,
@@ -271,7 +272,7 @@ def make_plan(c, *, profile=None):
     ]:
         code["support/" + name] = file_hash(Path(__file__).parents[1] / name)
     code["binary_prompt"] = file_hash(
-        Path(__file__).parents[1] / "prompts/binary_v1.txt"
+        Path(__file__).parents[1] / ("prompts/" + rubric_for(c["judge"]) + ".txt")
     )
     frozen_sources = [
         dict(
@@ -459,7 +460,7 @@ def freeze_inputs(plan):
             system=template_payload(source["items"][0], c["judge"])["input"][0][
                 "content"
             ],
-            rubric_version="binary_v1",
+            rubric_version=rubric_for(c["judge"]),
         ),
     )
     if plan["profile"] is not None:

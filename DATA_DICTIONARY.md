@@ -1,5 +1,22 @@
 # Feature-space pilot artifact dictionary
 
+## Strict binary judging and selected ambiguity recovery
+
+See [the binary-v2 protocol and execution guide](BINARY_JUDGING_V2.md). New applicability responses use `applies: integer enum [0,1]` and `status: enum [ok]`; null/ambiguous is supported only by explicit legacy v1 parsing. Operational failures remain errors/unknowns and never become zeros.
+
+`artifacts/feature_space_binary_retry/retry_<identity>/` contains a human-only, ambiguity-selected stage:
+
+| Artifact | Meaning |
+|---|---|
+| `prepared_manifest.json`, `identity.json`, `frozen_config.json` | Immutable source/config/prompt/schema/code hashes; new v2 job identity; Luna low reasoning, Batch, two attempts, shared $100 ledger. |
+| `jobs.jsonl`, `selection_summary.json` | Exactly source cells marked ambiguous, with item/feature/request hashes and original ambiguous receipt hashes. No definitive, technical-error, missing, unknown-usage or task-bank cells enter. |
+| `provider_input_profile.json`, `cost_preflight_20261030.json` | New-rubric provider template counts and conservative per-request bounds; complete two-attempt stage ceiling, current liabilities, cap and ledger-dependent authorization hash. Profiles do not create model-completion jobs. |
+| `applicability/` | Created only when execution/collection begins: durable new response journal, frozen Batch JSONL, custom IDs, acknowledged batches, provider output/error files, and reservations/usage receipts. |
+| `effective_cells.csv`, `effective_matrix_partial.csv` | Explicit overlay: preserve original v1 binary values and fill only selected ambiguous cells with validated v2 responses. Each cell records effective rubric and old/new provenance. This is a mixed-rubric representation; nonselected and failed cases remain unknown. |
+| `run_state.json` | Current selected-stage progress, cost checks, effective coverage and unresolved/held/exhausted states. No task candidate expansion. |
+
+The prepared empirical selection contains 81,161 human ambiguous cells; its measured two-attempt ceiling is $22.03766430 above $47.51803943 prior spending/reserved liability. Preparation does not authorize or submit paid inference.
+
 ## Latest human comparison refresh
 
 `artifacts/feature_space_human_refresh/results/human_comparison_<identity>/` contains the [post-judgment human comparisons](HUMAN_COMPARISON_REFRESH.md). All inputs are human-experiment discoveries; task-only columns are excluded. The normative comparison retains the same 36 Vinson concepts and all 1,029 published human coordinates. The full human-only applicability checkpoint is 60 × 5,233 with 230,271 definitive cells; the selected Vinson matrix has 135,414/188,388 definitive cells.

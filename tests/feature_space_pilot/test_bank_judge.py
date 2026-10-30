@@ -66,8 +66,12 @@ def test_binary_judge_isolated_strict_and_missing_never_zero():
         with pytest.raises(ValueError):
             parse_judgment(json.dumps(dict(good, applies=v)), item["item_id"], "f")
     ambiguous = dict(good, applies=None, status="ambiguous")
+    with pytest.raises(ValueError):
+        parse_judgment(json.dumps(ambiguous), item["item_id"], "f")
     assert (
-        parse_judgment(json.dumps(ambiguous), item["item_id"], "f")["status"]
+        parse_judgment(
+            json.dumps(ambiguous), item["item_id"], "f", rubric_version="binary_v1"
+        )["status"]
         == "ambiguous"
     )
     with pytest.raises(ValueError, match="incomplete"):

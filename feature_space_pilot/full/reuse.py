@@ -6,18 +6,21 @@ import hashlib
 from pathlib import Path
 from ..clients import build_payload, judgment_schema
 from ..io import digest, file_hash
-from ..judge import judge_prompt, parse_judgment, RUBRIC
+from ..judge import judge_prompt, parse_judgment, rubric_for
 
 POLICY = "same_item_content_feature_text_rubric_revision_and_literal_request_v1"
 
 
 def cell_job(item, feature, settings):
-    p = judge_prompt(item, feature)
+    version = rubric_for(settings)
+    p = judge_prompt(item, feature, rubric_version=version)
     body = build_payload(
         settings,
         system=p["system"],
         user=p["user"],
-        schema=judgment_schema(item["item_id"], feature["feature_id"]),
+        schema=judgment_schema(
+            item["item_id"], feature["feature_id"], rubric_version=version
+        ),
     )
     return dict(
         job_id=digest(
@@ -89,7 +92,7 @@ def reuse_evidence(sources, items, features, settings):
                 or oldjob["system"] != expected["system"]
                 or oldjob["user"] != expected["user"]
                 or record.get("prompt_hash") != expected["prompt_hash"]
-                or record.get("rubric_version") != RUBRIC
+                or record.get("rubric_version") != rubric_for(settings)
             ):
                 rejected["literal_prompt_or_rubric_mismatch"] += 1
                 continue
@@ -97,7 +100,9 @@ def reuse_evidence(sources, items, features, settings):
                 oldsettings,
                 system=oldjob["system"],
                 user=oldjob["user"],
-                schema=judgment_schema(iid, fid),
+                schema=judgment_schema(
+                    iid, fid, rubric_version=rubric_for(oldsettings)
+                ),
             )
             if body != expected["payload"]:
                 rejected["request_payload_mismatch"] += 1
@@ -114,7 +119,12 @@ def reuse_evidence(sources, items, features, settings):
             if record.get("parse_status") != "ok":
                 rejected["invalid_prior_response"] += 1
                 continue
-            parsed = parse_judgment(record["raw_response"], iid, fid)
+            parsed = parse_judgment(
+                record["raw_response"],
+                iid,
+                fid,
+                rubric_version=record["rubric_version"],
+            )
             if parsed["status"] != "ok":
                 unresolved.append(
                     dict(
@@ -237,7 +247,9 @@ def previous_full_sources(root, current):
                 c["judge"],
                 system=literal,
                 user=j["user"],
-                schema=judgment_schema(r["item_id"], r["feature_id"]),
+                schema=judgment_schema(
+                    r["item_id"], r["feature_id"], rubric_version=rubric_for(c["judge"])
+                ),
             )
             if r.get("payload_sha256") and digest(body) != r["payload_sha256"]:
                 raise ValueError("Prior full literal request reconstruction changed")

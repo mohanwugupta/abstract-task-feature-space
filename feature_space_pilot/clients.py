@@ -22,7 +22,11 @@ def generation_schema(item_id, cap):
     return schema
 
 
-def judgment_schema(item_id, feature_id):
+def judgment_schema(item_id, feature_id, *, rubric_version="binary_v2"):
+    from .judge import rubric_for, LEGACY_RUBRIC
+
+    rubric_for(dict(rubric_version=rubric_version))
+    legacy = rubric_version == LEGACY_RUBRIC
     return dict(
         type="object",
         additionalProperties=False,
@@ -30,8 +34,14 @@ def judgment_schema(item_id, feature_id):
         properties={
             "item_id": dict(type="string", enum=[item_id]),
             "feature_id": dict(type="string", enum=[feature_id]),
-            "applies": {"type": ["integer", "null"], "enum": [0, 1, None]},
-            "status": dict(type="string", enum=["ok", "ambiguous"]),
+            "applies": (
+                {"type": ["integer", "null"], "enum": [0, 1, None]}
+                if legacy
+                else dict(type="integer", enum=[0, 1])
+            ),
+            "status": dict(
+                type="string", enum=["ok", "ambiguous"] if legacy else ["ok"]
+            ),
             "evidence": dict(type="string"),
         },
     )

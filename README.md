@@ -4,6 +4,8 @@ A human-norm methodology benchmark and an independent task feature-discovery stu
 
 The pipeline provides isolated feature discovery, conservative candidate consolidation, strict binary applicability judgments, resumable execution, cumulative API budget controls, and auditable reports. The case studies cover creative writing and synthetic financial reconciliation.
 
+**Future applicability runs use binary_v2:** every valid response returns integer 0 or 1. See [the binary rule and prepared ambiguity-only retry](BINARY_JUDGING_V2.md). Historical v1 abstentions remain preserved; the new human-only Batch plan selects 81,161 ambiguous cells and repeats no definitive judgments. Its measured two-attempt cost ceiling is $22.04 ($69.56 cumulative), with paid submission awaiting explicit authorization.
+
 ## Two independent primary experiments
 
 **Experiment 1 validates feature generation against human norms. Experiment 2 develops task representations for subsequent preferences research.** Their feature provenance, inventories and reports remain independent. A proposition independently discovered in both experiments remains eligible in both.

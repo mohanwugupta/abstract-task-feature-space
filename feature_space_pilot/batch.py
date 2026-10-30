@@ -19,7 +19,7 @@ from .clients import build_payload
 from .budget import estimate_cost
 from .token_accounting import validate_payload
 from .prompts import parse_generation
-from .judge import parse_judgment
+from .judge import parse_judgment, LEGACY_RUBRIC
 from .progress import emit
 
 TERMINAL = {"completed", "failed", "expired", "cancelled"}
@@ -619,6 +619,9 @@ class BatchSession:
                         raw,
                         task["record_base"]["item_id"],
                         task["record_base"]["feature_id"],
+                        rubric_version=task["record_base"].get(
+                            "rubric_version", LEGACY_RUBRIC
+                        ),
                     )
             except (ValueError, KeyError, TypeError) as problem:
                 error = str(problem)

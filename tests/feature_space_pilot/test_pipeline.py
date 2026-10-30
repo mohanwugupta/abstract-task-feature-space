@@ -78,6 +78,9 @@ def test_interrupted_resume_and_charged_parse_retry(tmp_path):
 
 def test_design_changes_get_separate_run_and_ambiguous_cells_stay_partial(tmp_path):
     c = demo_config(tmp_path)
+    c["judge"][
+        "rubric_version"
+    ] = "binary_v1"  # Explicit historical abstention behavior.
     c["replicates"] = 2
     c["demo_human_count"] = 3
     result = run_pipeline(c, "human", client=FakeClient(ambiguous=True))

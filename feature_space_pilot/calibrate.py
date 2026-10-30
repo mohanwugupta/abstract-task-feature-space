@@ -7,7 +7,7 @@ from .engine import resolve, selected_items, preflight, _call, _read
 from .environment import load_api_credentials
 from .clients import HostedClient, generation_schema, judgment_schema
 from .prompts import generation_prompt, parse_generation
-from .judge import judge_prompt, parse_judgment
+from .judge import judge_prompt, parse_judgment, rubric_for
 from .budget import Ledger, estimate_cost
 from .io import write_json
 
@@ -44,9 +44,14 @@ def calibrate(config, *, role="judge", execute_live=False, client=None):
         feature = dict(
             feature_id="calibration_feature", text="requires eight lines of verse"
         )
-        prompt = judge_prompt(item, feature)
-        schema = judgment_schema(item["item_id"], feature["feature_id"])
-        parser = lambda raw: parse_judgment(raw, item["item_id"], feature["feature_id"])
+        version = rubric_for(settings)
+        prompt = judge_prompt(item, feature, rubric_version=version)
+        schema = judgment_schema(
+            item["item_id"], feature["feature_id"], rubric_version=version
+        )
+        parser = lambda raw: parse_judgment(
+            raw, item["item_id"], feature["feature_id"], rubric_version=version
+        )
     path = output / "attempt.jsonl"
     with Ledger(
         root / "budget_live.jsonl",

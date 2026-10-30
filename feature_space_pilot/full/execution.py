@@ -6,7 +6,6 @@ from ..budget import estimate_cost
 from ..clients import judgment_schema
 from ..engine import _read
 from ..io import append_jsonl, digest, file_hash, read_jsonl
-from ..judge import RUBRIC
 from .budget import input_bound
 from .reuse import cell_job
 from ..progress import emit
@@ -95,12 +94,16 @@ class FullSession(BatchSession):
             record_base=dict(
                 item_id=item["item_id"],
                 feature_id=feature["feature_id"],
-                rubric_version=RUBRIC,
+                rubric_version=j["rubric_version"],
                 judge_model=self.config["judge"]["model_id"],
                 prompt_hash=j["prompt_hash"],
                 payload_sha256=j["payload_sha256"],
             ),
-            schema=judgment_schema(item["item_id"], feature["feature_id"]),
+            schema=judgment_schema(
+                item["item_id"],
+                feature["feature_id"],
+                rubric_version=j["rubric_version"],
+            ),
             body=j["payload"],
             token_budget=counted,
             prices=self.config["judge"]["prices"],

@@ -5,7 +5,7 @@ from collections import Counter
 from ..budget import Ledger, estimate_cost
 from ..clients import build_payload, judgment_schema
 from ..io import canonical, digest
-from ..judge import judge_prompt
+from ..judge import judge_prompt, rubric_for
 from .reuse import model_identity
 
 PROFILE_VERSION = "atomic_provider_template_v1"
@@ -84,12 +84,15 @@ class IndexedLedger(Ledger):
 
 def template_payload(item, settings):
     feature = dict(feature_id="f_" + "0" * 20, text="")
-    p = judge_prompt(item, feature)
+    version = rubric_for(settings)
+    p = judge_prompt(item, feature, rubric_version=version)
     return build_payload(
         settings,
         system=p["system"],
         user=p["user"],
-        schema=judgment_schema(item["item_id"], feature["feature_id"]),
+        schema=judgment_schema(
+            item["item_id"], feature["feature_id"], rubric_version=version
+        ),
     )
 
 

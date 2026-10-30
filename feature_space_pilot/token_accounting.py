@@ -137,7 +137,7 @@ def validate_payload(payload, settings):
 def audit_prompts(config):
     from .engine import selected_items
     from .prompts import generation_prompt
-    from .judge import judge_prompt
+    from .judge import judge_prompt, rubric_for
     from .clients import build_payload, generation_schema, judgment_schema
 
     items = selected_items(config, "all")
@@ -161,14 +161,17 @@ def audit_prompts(config):
         feature = dict(
             feature_id="f_" + "0" * 20, text="requires a specific semantic property"
         )
-        p = judge_prompt(item, feature)
         s = config["judge"]
+        version = rubric_for(s)
+        p = judge_prompt(item, feature, rubric_version=version)
         data = validate_payload(
             build_payload(
                 s,
                 system=p["system"],
                 user=p["user"],
-                schema=judgment_schema(item["item_id"], feature["feature_id"]),
+                schema=judgment_schema(
+                    item["item_id"], feature["feature_id"], rubric_version=version
+                ),
             ),
             s,
         )

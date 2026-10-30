@@ -2,7 +2,7 @@
 
 from collections import Counter, defaultdict
 from ..io import digest
-from ..judge import parse_judgment, RUBRIC
+from ..judge import parse_judgment, rubric_for
 from ..full.reuse import cell_job, model_identity
 from ..full.matrix import matrix_state
 
@@ -50,10 +50,9 @@ def reconstruct_matrix(items, bank, sources, settings):
                 reason = "item_identity_mismatch"
             elif oldfeature is None:
                 reason = "missing_source_proposition"
-            elif (
-                r.get("judge_model") != settings["model_id"]
-                or r.get("rubric_version") != RUBRIC
-            ):
+            elif r.get("judge_model") != settings["model_id"] or r.get(
+                "rubric_version"
+            ) != rubric_for(settings):
                 reason = "model_or_rubric_mismatch"
             else:
                 key = iid, old_id
@@ -96,7 +95,12 @@ def reconstruct_matrix(items, bank, sources, settings):
                 if r.get("usage_unknown"):
                     status = "usage_unknown"
                 elif r.get("parse_status") == "ok":
-                    parsed = parse_judgment(r["raw_response"], iid, old_id)
+                    parsed = parse_judgment(
+                        r["raw_response"],
+                        iid,
+                        old_id,
+                        rubric_version=r["rubric_version"],
+                    )
                     if any(
                         parsed[k] != r.get(k) for k in ("applies", "status", "evidence")
                     ):

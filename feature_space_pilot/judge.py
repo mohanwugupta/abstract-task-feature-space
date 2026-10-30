@@ -5,11 +5,23 @@ import json
 from .io import canonical, digest
 from .prompts import DIRECTORY
 
-RUBRIC = "binary_v1"
+LEGACY_RUBRIC = "binary_v1"
+RUBRIC = "binary_v2"
 
 
-def judge_prompt(item, feature):
-    system = (DIRECTORY / "binary_v1.txt").read_text().strip()
+def rubric_for(settings=None):
+    """Missing flags in frozen historical settings mean v1, never retroactive v2."""
+    version = (
+        RUBRIC if settings is None else settings.get("rubric_version", LEGACY_RUBRIC)
+    )
+    if version not in {LEGACY_RUBRIC, RUBRIC}:
+        raise ValueError("Unknown applicability rubric version")
+    return version
+
+
+def judge_prompt(item, feature, *, rubric_version=RUBRIC):
+    rubric_for(dict(rubric_version=rubric_version))
+    system = (DIRECTORY / (rubric_version + ".txt")).read_text().strip()
     user = canonical(
         dict(
             item_id=item["item_id"],
@@ -23,11 +35,12 @@ def judge_prompt(item, feature):
         system=system,
         user=user,
         prompt_hash=digest([system, user]),
-        rubric_version=RUBRIC,
+        rubric_version=rubric_version,
     )
 
 
-def parse_judgment(raw, item_id, feature_id):
+def parse_judgment(raw, item_id, feature_id, *, rubric_version=RUBRIC):
+    rubric_for(dict(rubric_version=rubric_version))
     try:
         r = json.loads(raw)
     except (ValueError, TypeError) as e:
@@ -48,16 +61,18 @@ def parse_judgment(raw, item_id, feature_id):
         or len(r["evidence"]) > 1200
     ):
         raise ValueError("Brief evidence note required")
-    if r["status"] == "ambiguous" and r["applies"] is None:
+    if (
+        rubric_version == LEGACY_RUBRIC
+        and r["status"] == "ambiguous"
+        and r["applies"] is None
+    ):
         return r
     if (
         r["status"] != "ok"
         or type(r["applies"]) is not int
         or r["applies"] not in (0, 1)
     ):
-        raise ValueError(
-            "Judgment must be exactly integer 0 or 1; ambiguous requires null"
-        )
+        raise ValueError("Judgment must be exactly integer 0 or 1 with status=ok")
     return r
 
 

@@ -6,7 +6,10 @@ from feature_space_pilot.io import canonical, digest
 def settings():
     from feature_space_pilot.engine import load_config
 
-    return load_config("configs/feature_space_pilot.json")["judge"]
+    return dict(
+        load_config("configs/feature_space_pilot.json")["judge"],
+        rubric_version="binary_v1",
+    )
 
 
 def fixture():

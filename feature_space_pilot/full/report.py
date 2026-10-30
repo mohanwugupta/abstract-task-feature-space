@@ -8,6 +8,7 @@ import numpy as np
 from ..budget import estimate_cost
 from ..io import canonical, digest, file_hash, write_csv, write_json
 from ..prompts import normalize_phrase
+from ..judge import rubric_for
 from ..report import _human_analysis, _embedding_analysis, _references
 from .analysis import (
     structure_summary,
@@ -215,7 +216,7 @@ def write_full_report(
                     c["judge"]["max_output_tokens"],
                 ),
                 judge_model=c["judge"]["model_id"],
-                rubric_version="binary_v1",
+                rubric_version=rubric_for(c["judge"]),
                 missing_is_zero=False,
             )
 

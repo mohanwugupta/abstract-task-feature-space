@@ -12,7 +12,7 @@ from ..budget import estimate_cost
 from ..clients import parse_api_response
 from ..engine import _read
 from ..io import append_jsonl, canonical, digest, read_jsonl
-from ..judge import parse_judgment, RUBRIC
+from ..judge import parse_judgment
 
 
 class AdmissionRejected(Exception):
@@ -277,7 +277,12 @@ class ImmediateExecutor:
                     try:
                         if usage.get("finish_reason") != "stop":
                             raise ValueError("Immediate response failed or truncated")
-                        parsed = parse_judgment(raw, j["item_id"], j["feature_id"])
+                        parsed = parse_judgment(
+                            raw,
+                            j["item_id"],
+                            j["feature_id"],
+                            rubric_version=j["rubric_version"],
+                        )
                     except (ValueError, TypeError, KeyError) as problem:
                         message = str(problem)
                 row = dict(
@@ -285,7 +290,7 @@ class ImmediateExecutor:
                     feature_id=j["feature_id"],
                     job_id=j["job_id"],
                     attempt=task["attempt"],
-                    rubric_version=RUBRIC,
+                    rubric_version=j["rubric_version"],
                     judge_model=self.config["judge"]["model_id"],
                     prompt_hash=j["prompt_hash"],
                     payload_sha256=j["payload_sha256"],
